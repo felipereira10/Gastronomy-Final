@@ -1,28 +1,53 @@
 import { Mongo } from "../database/mongo.js"
-import { ObjectId } from "mongodb"
+import { ObjectId } from 'mongodb'
+import crypto from 'crypto'
 
 const collectionName = 'plates'
-
+plate
 export default class PlatesDataAccess {
-    async getPlates() {
+    async getUsers() {
         const result = await Mongo.db
         .collection(collectionName)
-        .find({})
+        .find({ })
         .toArray()
 
         return result
     }
 
-    async deleteUser(userId) {
+    async getAvailableUsers() {
         const result = await Mongo.db
         .collection(collectionName)
-        .findOneAndDelete({ _id: new ObjectId(userId) })
+        .find({ available: true })
         .toArray()
 
         return result
     }
 
-    async updateUser() {
+    async addPlate (plateData) {
+        const result = await Mongo.db
+        .collection(collectionName)
+        .insertOne(plateData)
 
+        return result
     }
+
+    async deletePlate (plateId) {
+        const result = await Mongo.db
+        .collection(collectionName)
+        .findOneAndDelete({ _id: new ObjectId(plateId) })
+
+        return result
+    }
+
+    async updatePlate (plateId, plateData) {
+        const result = await Mongo.db
+        .collection(collectionName)
+        .findOneAndUpdate(
+            { _id: new ObjectId(plateId) },
+            { $set: plateData }
+        )
+
+        return result
+    }
+    
 }

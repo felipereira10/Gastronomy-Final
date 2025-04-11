@@ -1,11 +1,10 @@
 import { Mongo } from "../database/mongo.js"
 import { ObjectId } from 'mongodb'
-import crypto from 'crypto'
 
 const collectionName = 'plates'
-plate
+
 export default class PlatesDataAccess {
-    async getUsers() {
+    async getPlates() {
         const result = await Mongo.db
         .collection(collectionName)
         .find({ })
@@ -14,7 +13,7 @@ export default class PlatesDataAccess {
         return result
     }
 
-    async getAvailableUsers() {
+    async getAvailablePlates() {
         const result = await Mongo.db
         .collection(collectionName)
         .find({ available: true })
@@ -23,7 +22,7 @@ export default class PlatesDataAccess {
         return result
     }
 
-    async addPlate (plateData) {
+    async addPlate(plateData) {
         const result = await Mongo.db
         .collection(collectionName)
         .insertOne(plateData)
@@ -39,7 +38,7 @@ export default class PlatesDataAccess {
         return result
     }
 
-    async updatePlate (plateId, plateData) {
+    async updatePlate(plateId, plateData) {
         const result = await Mongo.db
         .collection(collectionName)
         .findOneAndUpdate(

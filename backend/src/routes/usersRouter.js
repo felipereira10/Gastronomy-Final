@@ -1,21 +1,19 @@
 import express from 'express'
-import UsersControllers from '../controllers/users.js'
+import UsersControllers from '../controllers/usersController.js'
 
 const usersRouter = express.Router()
-
 const usersControllers = new UsersControllers()
 
 usersRouter.get('/', async (req, res) => {
-    const { sucess, statusCode, body } = await usersControllers.getUsers()
+    const { body, success, statusCode } = await usersControllers.getUsers()
 
-    res.status(statusCode).send({ sucess, statusCode, body })
+    res.status(statusCode).send({ body, success, statusCode })
 })
 
-// Os dois pontos, indica que vamos enviar um parâmetro
 usersRouter.delete('/:id', async (req, res) => {
-    const { sucess, statusCode, body } = await usersControllers.deleteUser(req.params.id)
+    const { body, success, statusCode } = await usersControllers.deleteUser(req.params.id)
 
-    res.status(statusCode).send({ sucess, statusCode, body })
+    res.status(statusCode).send({ body, success, statusCode })
 })
 
 usersRouter.put('/:id', async (req, res) => {
@@ -27,4 +25,4 @@ usersRouter.put('/:id', async (req, res) => {
 export default usersRouter 
 
 
-
+// Os dois pontos, indica que vamos enviar um parâmetro

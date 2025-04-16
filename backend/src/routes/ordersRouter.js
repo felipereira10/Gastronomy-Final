@@ -10,24 +10,28 @@ ordersRouter.get('/', async (req, res) => {
     res.status(statusCode).send({ body, success, statusCode })
 })
 
+ordersRouter.get('/:id', async (req, res) => {
+    const { body, success, statusCode } = await ordersControllers.getOrdersByUserId(req.params.id)
+
+    res.status(statusCode).send({ body, success, statusCode })
+})
+
 ordersRouter.post('/', async (req, res) => {
-    const { body, success, statusCode } = await ordersControllers.addOrders(req.body)
+    const { body, success, statusCode } = await ordersControllers.addOrder(req.body)
 
     res.status(statusCode).send({ body, success, statusCode })
 })
 
 ordersRouter.delete('/:id', async (req, res) => {
-    const { body, success, statusCode } = await ordersControllers.deleteOrders(req.params.id)
+    const { body, success, statusCode } = await ordersControllers.deleteOrder(req.params.id)
 
     res.status(statusCode).send({ body, success, statusCode })
 })
 
-// Os dois pontos, indica que vamos enviar um parâmetro
 ordersRouter.put('/:id', async (req, res) => {
-    const { body, success, statusCode } = await ordersControllers.updateOrders(req.params.id, req.body)
+    const { body, success, statusCode } = await ordersControllers.updateOrder(req.params.id, req.body)
 
     res.status(statusCode).send({ body, success, statusCode })
 })
 
-export default ordersRouter
-
+export default ordersRouter 

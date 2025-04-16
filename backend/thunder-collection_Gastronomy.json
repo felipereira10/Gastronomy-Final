@@ -1,0 +1,209 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "Gastronomy",
+    "collectionId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+    "dateExported": "2025-04-16T20:26:32.490Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "04a21496-de72-4f40-a6e5-51772cc4e5af",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "PedidoDoUsuário",
+            "url": "http://localhost:3000/orders/67e3183f132732a1fa5eec79",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2025-04-16T20:24:30.573Z",
+            "modified": "2025-04-16T20:24:30.573Z",
+            "headers": []
+        },
+        {
+            "_id": "ac6e22bc-dc6f-4f00-b0b0-f1a33e87fe32",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "DeleteOrdem",
+            "url": "http://localhost:3000/orders/680000c675b4338aeb370000",
+            "method": "DELETE",
+            "sortNum": 20000,
+            "created": "2025-04-16T20:24:38.073Z",
+            "modified": "2025-04-16T20:24:38.073Z",
+            "headers": []
+        },
+        {
+            "_id": "0fcbe74e-936e-43f7-8409-e8556107e18b",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "CadastroOrdem",
+            "url": "http://localhost:3000/orders",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2025-04-16T20:24:44.769Z",
+            "modified": "2025-04-16T20:24:44.769Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"userId\":\"67e3183f132732a1fa5eec79\",\n  \"pickupTime\":\"14:35-18/04/2025\",\n  \"items\": [\n    {\n      \"plateId\": \"67f95c1d94e057f9db01f397\",\n      \"quantity\": 4\n    }\n    ]\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "69531142-7184-4015-94b0-633ac7a91b70",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "Ordens",
+            "url": "http://localhost:3000/orders",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2025-04-16T20:24:49.337Z",
+            "modified": "2025-04-16T20:24:49.337Z",
+            "headers": []
+        },
+        {
+            "_id": "7627a5c7-8128-4836-b87b-efdcd6c123db",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "DeletePratos",
+            "url": "http://localhost:3000/plates/67f9610894e057f9db01f399",
+            "method": "DELETE",
+            "sortNum": 50000,
+            "created": "2025-04-16T20:24:53.873Z",
+            "modified": "2025-04-16T20:24:53.873Z",
+            "headers": []
+        },
+        {
+            "_id": "64acd5ba-cc98-49fc-9caf-240a38cb829c",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "CadastroPratos",
+            "url": "http://localhost:3000/plates",
+            "method": "POST",
+            "sortNum": 60000,
+            "created": "2025-04-16T20:25:02.314Z",
+            "modified": "2025-04-16T20:25:02.314Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\r\n  \"name\": \"Blackkk Widow Bites\",\r\n  \"price\": 6.75,\r\n  \"available\": false,\r\n  \"description\": \"Savory mini meatballs wrapped in a spicy mystery glaze.\",\r\n  \"ingredients\": [\"meatballs\", \"spicy soy glaze\", \"sesame seeds\"],\r\n  \"category\": \"Other\"\r\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "6791805b-ef83-4859-abba-ebb3292f71b0",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "PratosDisponíveis",
+            "url": "http://localhost:3000/plates/availables",
+            "method": "GET",
+            "sortNum": 70000,
+            "created": "2025-04-16T20:25:07.817Z",
+            "modified": "2025-04-16T20:25:07.817Z",
+            "headers": []
+        },
+        {
+            "_id": "b35a0e25-757a-42a2-b821-6539fe468e41",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "updatePratos",
+            "url": "http://localhost:3000/plates/67f95be294e057f9db01f396",
+            "method": "PUT",
+            "sortNum": 80000,
+            "created": "2025-04-16T20:25:13.505Z",
+            "modified": "2025-04-16T20:25:13.505Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"price\": 10.99\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "d4edca06-b3da-4493-b453-9ad0ef703cef",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "Pratos",
+            "url": "http://localhost:3000/plates",
+            "method": "GET",
+            "sortNum": 90000,
+            "created": "2025-04-16T20:25:19.161Z",
+            "modified": "2025-04-16T20:25:19.161Z",
+            "headers": []
+        },
+        {
+            "_id": "3254b6da-d5f0-4659-9288-7d7b3e9ebe49",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "Delete",
+            "url": "http://localhost:3000/users/67f9472d1547c25a99b6742f",
+            "method": "DELETE",
+            "sortNum": 100000,
+            "created": "2025-04-16T20:25:23.833Z",
+            "modified": "2025-04-16T20:25:23.833Z",
+            "headers": []
+        },
+        {
+            "_id": "c0ac6cfb-7d24-444e-8c40-8e3a56008dca",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "Update",
+            "url": "http://localhost:3000/users/67f9472d1547c25a99b6742f",
+            "method": "PUT",
+            "sortNum": 110000,
+            "created": "2025-04-16T20:25:28.649Z",
+            "modified": "2025-04-16T20:25:28.649Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"password\": \"pass12345\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "66c0458c-54af-48f2-a953-9ad3b2efdd93",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "Cadastro",
+            "url": "http://localhost:3000/auth/signup",
+            "method": "POST",
+            "sortNum": 120000,
+            "created": "2025-04-16T20:25:33.385Z",
+            "modified": "2025-04-16T20:25:33.385Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "  {\n    \"email\": \"teste03@gmail.com\",\n    \"password\": \"pass1234\"\n  }",
+                "form": []
+            }
+        },
+        {
+            "_id": "e096e27a-e873-45c6-9f50-348673bb3916",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "Login",
+            "url": "http://localhost:3000/auth/login",
+            "method": "POST",
+            "sortNum": 130000,
+            "created": "2025-04-16T20:25:37.641Z",
+            "modified": "2025-04-16T20:25:37.641Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"felipereira@gmail.com\",\n  \"password\": \"pass1234\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "e9b70659-7ebb-4ad3-b8d9-293e62e9cda5",
+            "colId": "02c75a7f-fb99-4ddc-85b2-790e706e74dc",
+            "containerId": "",
+            "name": "Usuários",
+            "url": "http://localhost:3000/users",
+            "method": "GET",
+            "sortNum": 140000,
+            "created": "2025-04-16T20:25:42.073Z",
+            "modified": "2025-04-16T20:25:42.073Z",
+            "headers": []
+        }
+    ],
+    "ref": "4RtYgLkVCT937f2zqaBQsOEgHGOyicSxN867Jvj0u-ELYW2-vDHj_J5Hzw_D0Y9MNK2Mxyh-nWf064hVf8dL3g"
+}

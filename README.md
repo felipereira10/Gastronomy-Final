@@ -26,7 +26,7 @@ npm install
 
 3. Configure as variáveis de ambiente no arquivo .env (exemplo abaixo):
 
-```bash
+```env
 MONGO_URI=your_mongodb_connection_string
 PORT=3000
 ```

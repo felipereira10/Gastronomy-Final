@@ -15,51 +15,51 @@ Projeto full stack de um sistema de pedidos gastronômicos, com backend em Node.
 Backend
 Acesse a pasta do backend:
 
-´´´bash
+```bash
 cd backend
 Instale as dependências:
-´´´
+```
 
-´´´bash
+```bash
 npm install
 Configure as variáveis de ambiente no arquivo .env (exemplo abaixo):
-´´´
+```
 
-´´´bash
+```bash
 MONGO_URI=your_mongodb_connection_string
 PORT=3000
 Inicie o servidor:
-´´´
+```
 
-´´´bash
+```bash
 npm run dev
 Frontend
 Acesse a pasta do frontend:
-´´´
+```
 
-´´´bash
+```bash
 cd frontend
 Instale as dependências:
 
-´´´bash
+```bash
 npm install
 Inicie o projeto Expo:
-´´´
+```
 
-´´´bash
+```bash
 npm run start
 Ou, para rodar em plataformas específicas:
-´´´
+```
 
-´´´bash
+```bash
 npm run android
 npm run ios
 npm run web
-´´´
+```
 ### Nota: Para rodar no iOS, é necessário estar em um macOS com Xcode instalado.
 
 ## 📁 Estrutura do Projeto
-´´´bash
+```bash
 Gastronomy-Final/
 ├── backend/
 │   ├── src/

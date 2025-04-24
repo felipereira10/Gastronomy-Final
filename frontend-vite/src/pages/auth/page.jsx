@@ -8,12 +8,13 @@ import {
   InputAdornment
 } from "@mui/material";
 import styles from './page.module.css';
-import authServices from "../../services/auth";
+
 import { useNavigate } from "react-router-dom";
+import useAuthServices from "../../services/auth";
 
 export default function Auth() {
     // useState é um hook do react que permite criar estados dentro de componentes funcionais
-    // authServices é um hook que contém as funções de autenticação
+    // useAuthServices é um hook que contém as funções de autenticação
     // authLoading é um estado que indica se a autenticação está carregando
     // login é uma função que faz o login do usuário
     // signup é uma função que faz o cadastro do usuário
@@ -21,7 +22,7 @@ export default function Auth() {
     const [formType, setFormType] = useState('login')
     const [formData, setFormData] = useState({})
     const [showPassword, setShowPassword] = useState(false)
-    const { login, signup, authLoading } = authServices()
+    const { login, signup, authLoading } = useAuthServices()
     const navigate = useNavigate()
     // useNavigate é um hook do react-router-dom que permite navegar entre páginas
     // Verifica se o usuário já está autenticado
@@ -49,27 +50,31 @@ export default function Auth() {
 
     const handleSubmitForm = async (e) => {
         e.preventDefault()
-
+    
         if (formType === 'login') {
-            await login(formData)
-            const auth = JSON.parse(localStorage.getItem('auth'))
-            if (auth?.token) {
+            const result = await login(formData)
+            if (result?.success && result?.body?.token) {
                 navigate('/profile')
+            } else {
+                console.log('Login inválido')
             }
         }
-
+    
         if (formType === 'signup') {
             if (formData.password !== formData.confirmPassword) {
                 console.log('Passwords do not match')
                 return
             }
-            await signup(formData)
-            const auth = JSON.parse(localStorage.getItem('auth'))
-            if (auth?.token) {
+    
+            const result = await signup(formData)
+            if (result?.success && result?.body?.token) {
                 navigate('/profile')
+            } else {
+                console.log('Signup falhou')
             }
         }
     }
+    
 
     if (authLoading) {
         return <h1>Loading...</h1>

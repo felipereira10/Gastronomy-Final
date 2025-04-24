@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function authServices() {
+export default function useAuthServices() {
     const [authLoading, setAuthLoading] = useState(false)
 
     const url = 'http://localhost:3000/auth'

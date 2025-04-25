@@ -48,30 +48,21 @@ export default function Auth() {
         })
     }
 
-    const handleSubmitForm = async (e) => {
+    const handleSubmitForm = (e) => {
         e.preventDefault()
-    
-        if (formType === 'login') {
-            const result = await login(formData)
-            if (result?.success && result?.body?.token) {
-                navigate('/profile')
-            } else {
-                console.log('Login inválido')
-            }
-        }
-    
-        if (formType === 'signup') {
-            if (formData.password !== formData.confirmPassword) {
-                console.log('Passwords do not match')
-                return
-            }
-    
-            const result = await signup(formData)
-            if (result?.success && result?.body?.token) {
-                navigate('/profile')
-            } else {
-                console.log('Signup falhou')
-            }
+        
+        switch (formType) {
+            case 'login':
+                login(formData, navigate)
+
+                break
+            case 'signup':
+                if(formData.password !== formData.confirmPassword) {
+                    console.log('Passwords do not match')
+                    return
+                }
+                signup(formData, navigate)
+            break
         }
     }
     

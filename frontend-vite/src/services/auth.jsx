@@ -5,43 +5,46 @@ export default function useAuthServices() {
 
     const url = 'http://localhost:3000/auth'
 
-    const login = (formData) => {
-        setAuthLoading(true)
-        
-        fetch(`${url}/login`, {
+    const login = async (formData) => {
+        setAuthLoading(true);
+        try {
+          const response = await fetch(`${url}/login`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+              'Content-Type': 'application/json',
             },
-            body: JSON.stringify(formData)
-        })
-        .then((response) => response.json())
-        .then((result) => {
-            console.log(result)
-            if(result.success && result.body.token) {
-                 // Verifique se o token e o usuário existem e estão corretos
-                console.log("Token:", token);
-                console.log("User:", user)
-
-                // Armazenando no localStorage
-                localStorage.setItem(
-                    'auth',
-                    JSON.stringify({ token: result.body.token, user: result.body.user })
-                )
-            }
-        })
-        .catch((error) => {
-            console.log(error)
-        })
-        .finally(() => {
-            setAuthLoading(false)
-        })
-    }
+            body: JSON.stringify(formData),
+          });
+      
+          const result = await response.json();
+          console.log("Resultado do login:", result);
+      
+          if (result.success && result.body.token) {
+            console.log("Token:", result.body.token);
+            console.log("User:", result.body.user);
+      
+            localStorage.setItem(
+              'auth',
+              JSON.stringify({ token: result.body.token, user: result.body.user })
+            );
+      
+            return result;
+          }
+      
+          return null;
+        } catch (error) {
+          console.error("Erro no login:", error);
+          return null;
+        } finally {
+          setAuthLoading(false);
+        }
+      };
+      
+    
 
     const logout = () => {
         localStorage.removeItem('auth')
-    }
+    };
 
     const signup = (formData) => {
         setAuthLoading(true)
@@ -61,16 +64,18 @@ export default function useAuthServices() {
                 localStorage.setItem(
                     'auth',
                     JSON.stringify({ token: result.body.token, user: result.body.user })
-                )
+                );
+                navigate('/auth');
             }
         })
+        
         .catch((error) => {
             console.log(error)
         })
         .finally(() => {
             setAuthLoading(false)
         })
-    }
+    };
 
-    return { signup, login, logout, authLoading }
-}
+    return { signup, login, logout, authLoading };
+} 

@@ -6,145 +6,120 @@ import { Mongo } from '../database/mongo.js';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 
-const collectionName = 'users'
+const collectionName = 'users';
 
+// Configuração do Passport
+passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, callback) => {
+    const user = await Mongo.db.collection(collectionName).findOne({ email });
 
-passport.use (new LocalStrategy({ usernameField: 'email' }, async (email, password, callback) => {
-    const user = await Mongo.db
-    .collection(collectionName)
-    // findOne ({}) = ache um com os parâmetros nas chaves
-    .findOne ({ email: email })
-
-    // com "!" é caso não tenha o usuário
     if (!user) {
-        return callback(null, false)
+        return callback(null, false); // Retorna sem o usuário
     }
 
-    // campo p/ salvar junto com os dados da password criptada + a chave p/ descriptar
-    const saltBuffer = user.salt.buffer
-
+    const saltBuffer = user.salt.buffer;
     crypto.pbkdf2(password, saltBuffer, 310000, 16, 'sha256', (err, hashedPassword) => {
         if (err) {
-            return callback(err, false)
+            return callback(err, false); // Erro durante a comparação da senha
         }
 
-        const userPasswordBuffer = Buffer.from(user.password.buffer)
+        const userPasswordBuffer = Buffer.from(user.password.buffer);
 
-        // Caso as senhas não se equivalerem
-        if(!crypto.timingSafeEqual(userPasswordBuffer, hashedPassword)) {
-            return callback(null, false)
+        if (!crypto.timingSafeEqual(userPasswordBuffer, hashedPassword)) {
+            return callback(null, false); // Senhas não batem
         }
 
-        const { password, salt, ...rest } = user
+        const { password, salt, ...rest } = user;
+        return callback(null, rest); // Retorna o usuário sem a senha
+    });
+}));
 
-        return callback(null, rest)
-    })
-} ))
-
-// Rota
-const authRouter = express.Router()
+// Rota de autenticação
+const authRouter = express.Router();
 
 authRouter.post('/signup', async (req, res) => {
-    const checkUser = await Mongo.db
-    .collection(collectionName)
-    .findOne({ email: req.body.email })
+    const { email, password, fullname } = req.body;
 
-    if(checkUser) {
-        return res.status(500).send({
-            sucess: false,
-            statusCode: 500,
-            body: {
-                text: 'User already exists!'
-            }
-        })
+    const checkUser = await Mongo.db.collection(collectionName).findOne({ email });
+
+    if (checkUser) {
+        return res.status(400).send({
+            success: false,
+            statusCode: 400,
+            body: { text: 'User already exists!' }
+        });
     }
-    // Caso contrário:
-    const salt = crypto.randomBytes(16)
-    crypto.pbkdf2(req.body.password, salt, 310000, 16, 'sha256', async (err, hashedPassword) => {
-        if(err) {
+
+    const salt = crypto.randomBytes(16);
+    crypto.pbkdf2(password, salt, 310000, 16, 'sha256', async (err, hashedPassword) => {
+        if (err) {
             return res.status(500).send({
-                sucess: false,
+                success: false,
                 statusCode: 500,
-                body: {
-                    text: 'Error on crypto password!',
-                    err: err
-                }
-            })
+                body: { text: 'Error encrypting password!', err }
+            });
         }
 
-        const result = await Mongo.db
-        .collection(collectionName)
-        .insertOne({
-            fullname: req.body.fullname,
-            email: req.body.email,
+        const result = await Mongo.db.collection(collectionName).insertOne({
+            fullname,
+            email,
             password: hashedPassword,
-            salt // chave para criptografia
-        })
+            salt
+        });
 
         if (result.insertedId) {
-            const user = await Mongo.db
-                .collection(collectionName)
-                .findOne({ _id: new ObjectId(result.insertedId) })
-        
-            // Payload simples, apenas com os dados essenciais do usuário
+            const user = await Mongo.db.collection(collectionName).findOne({ _id: new ObjectId(result.insertedId) });
+
             const payload = {
                 id: user._id,
                 email: user.email
-            }
+            };
 
-            // Gerando o token JWT
-            const token = jwt.sign(payload, 'secret', { expiresIn: '1h' })
+            const token = jwt.sign(payload, 'secret', { expiresIn: '1h' });
 
             return res.send({
-                sucess: true,
+                success: true,
                 statusCode: 200,
                 body: {
-                    text: 'User registered correctly!',
+                    text: 'User registered successfully!',
                     token,
-                    user: payload, // Só retornando o payload básico, não o objeto completo
+                    user: payload, // Retorna dados essenciais do usuário
                     logged: true
                 }
-            })
+            });
         }
-    })
-})
+    });
+});
 
 authRouter.post('/login', (req, res) => {
-    passport.authenticate('local',(error, user) => {
-        if(error) {
+    passport.authenticate('local', (error, user) => {
+        if (error) {
             return res.status(500).send({
-                sucess: false,
+                success: false,
                 statusCode: 500,
-                body: {
-                    text: "Error during authentication",
-                    error
-                }
-            })
+                body: { text: 'Error during authentication', error }
+            });
         }
 
-        if(!user) {
+        if (!user) {
             return res.status(400).send({
-                sucess: false,
+                success: false,
                 statusCode: 400,
-                body: {
-                    text: "User not found",
-                    error
-                }
-            })
+                body: { text: 'User not found' }
+            });
         }
 
-        const token = jwt.sign(user, 'secret')
-        console.log(user)
-            return res.status(200).send({
-                sucess: true,
-                statusCode: 200,
-                body: {
-                    text: "User logged in correctly",
-                    user,
-                    token
-                }
-            })
-    })(req, res);
-})
+        const token = jwt.sign(user, 'secret', { expiresIn: '1h' });
 
-export default authRouter
+        return res.status(200).send({
+            success: true,
+            statusCode: 200,
+            body: {
+                text: 'User logged in successfully',
+                user,
+                token
+            }
+        });
+    })(req, res); // Passa a requisição e a resposta para o passport
+});
+
+export default authRouter;

@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function useAuthServices() {
-    const [authLoading, setAuthLoading] = useState(false)
+    const [authLoading, setAuthLoading] = useState(false);
+    const navigate = useNavigate();  // Adicionando useNavigate
 
-    const url = 'http://localhost:3000/auth'
+    const url = 'http://localhost:3000/auth';
 
     const login = async (formData) => {
         setAuthLoading(true);
@@ -15,6 +17,10 @@ export default function useAuthServices() {
             },
             body: JSON.stringify(formData),
           });
+          
+          if (!response.ok) {
+            throw new Error(`Erro ao fazer login: ${response.statusText}`);
+          }
       
           const result = await response.json();
           console.log("Resultado do login:", result);
@@ -38,44 +44,41 @@ export default function useAuthServices() {
         } finally {
           setAuthLoading(false);
         }
-      };
-      
-    
+    };
 
     const logout = () => {
-        localStorage.removeItem('auth')
+        localStorage.removeItem('auth');
     };
 
     const signup = (formData) => {
-        setAuthLoading(true)
+        setAuthLoading(true);
         
         fetch(`${url}/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*',
             },
-            body: JSON.stringify(formData)
+            body: JSON.stringify(formData),
         })
         .then((response) => response.json())
         .then((result) => {
-            console.log(result)
+            console.log(result);
             if(result.success && result.body.token) {
                 localStorage.setItem(
                     'auth',
                     JSON.stringify({ token: result.body.token, user: result.body.user })
                 );
-                navigate('/auth');
+                navigate('/auth');  // Redireciona após o sucesso do cadastro
             }
         })
-        
         .catch((error) => {
-            console.log(error)
+            console.log(error);
         })
         .finally(() => {
-            setAuthLoading(false)
-        })
+            setAuthLoading(false);
+        });
     };
 
     return { signup, login, logout, authLoading };
-} 
+}

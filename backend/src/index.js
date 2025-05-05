@@ -24,7 +24,14 @@ async function main () {
     // Inicia o servidor só depois da conexão
     const app = express();
     app.use(express.json());
-    app.use(cors());
+
+    // Antes das suas rotas, adicione a configuração CORS
+    app.use(cors({
+        origin: 'http://localhost:5173', // Substitua pelo seu frontend, se for diferente
+        methods: ['GET', 'POST'],
+        allowedHeaders: ['Content-Type'],
+    }));
+
 
     app.get('/', (req, res) => {
       res.send({

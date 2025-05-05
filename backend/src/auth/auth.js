@@ -10,26 +10,27 @@ const collectionName = 'users';
 
 // Configuração do Passport
 passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, callback) => {
-    const user = await Mongo.db.collection(collectionName).findOne({ email });
+    const db = Mongo.getDb(); // <- CORRIGIDO AQUI
+    const user = await db.collection(collectionName).findOne({ email });
 
     if (!user) {
-        return callback(null, false); // Retorna sem o usuário
+        return callback(null, false);
     }
 
     const saltBuffer = user.salt.buffer;
     crypto.pbkdf2(password, saltBuffer, 310000, 16, 'sha256', (err, hashedPassword) => {
         if (err) {
-            return callback(err, false); // Erro durante a comparação da senha
+            return callback(err, false);
         }
 
         const userPasswordBuffer = Buffer.from(user.password.buffer);
 
         if (!crypto.timingSafeEqual(userPasswordBuffer, hashedPassword)) {
-            return callback(null, false); // Senhas não batem
+            return callback(null, false);
         }
 
         const { password, salt, ...rest } = user;
-        return callback(null, rest); // Retorna o usuário sem a senha
+        return callback(null, rest);
     });
 }));
 
@@ -38,8 +39,9 @@ const authRouter = express.Router();
 
 authRouter.post('/signup', async (req, res) => {
     const { email, password, fullname } = req.body;
+    const db = Mongo.getDb(); // <- CORRIGIDO AQUI
 
-    const checkUser = await Mongo.db.collection(collectionName).findOne({ email });
+    const checkUser = await db.collection(collectionName).findOne({ email });
 
     if (checkUser) {
         return res.status(400).send({
@@ -59,7 +61,7 @@ authRouter.post('/signup', async (req, res) => {
             });
         }
 
-        const result = await Mongo.db.collection(collectionName).insertOne({
+        const result = await db.collection(collectionName).insertOne({
             fullname,
             email,
             password: hashedPassword,
@@ -67,7 +69,7 @@ authRouter.post('/signup', async (req, res) => {
         });
 
         if (result.insertedId) {
-            const user = await Mongo.db.collection(collectionName).findOne({ _id: new ObjectId(result.insertedId) });
+            const user = await db.collection(collectionName).findOne({ _id: new ObjectId(result.insertedId) });
 
             const payload = {
                 id: user._id,
@@ -82,7 +84,7 @@ authRouter.post('/signup', async (req, res) => {
                 body: {
                     text: 'User registered successfully!',
                     token,
-                    user: payload, // Retorna dados essenciais do usuário
+                    user: payload,
                     logged: true
                 }
             });
@@ -119,7 +121,7 @@ authRouter.post('/login', (req, res) => {
                 token
             }
         });
-    })(req, res); // Passa a requisição e a resposta para o passport
+    })(req, res);
 });
 
 export default authRouter;

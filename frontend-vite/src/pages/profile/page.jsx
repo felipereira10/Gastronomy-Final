@@ -8,16 +8,22 @@ export default function Profile() {
   const navigate = useNavigate()
   const authData = JSON.parse(localStorage.getItem('auth')) || {};
 
-  useEffect(() => {
-    if (authData) {
-        navigate('/profile');
-    }
-  }, [authData]);
+ useEffect(() => {
+        if(!authData) {
+            return navigate('/auth')
+        } else if(refetchOrders) {
+            getUserOrders(authData?.user?._id)
+        }
+    }, [authData, refetchOrders])
 
+    if(orderLoading) {
+        return( <Loading /> )
+    }
 
   const handleLogout = () => {
     logout()
-  };
+    return navigate('/')
+  }
 
   return (
     <>

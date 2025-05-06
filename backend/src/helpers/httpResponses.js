@@ -1,23 +1,23 @@
 export const ok = (body) => {
     return {
-        sucess: true,
+        success: true,
         statusCode: 200,
         body: body
-    }
-}
+    };
+};
 
 export const notFound = () => {
     return {
-        sucess: false,
+        success: false,
         statusCode: 400,
         body: 'Not Found'
-    }
-}
+    };
+};
 
 export const serverError = (error) => {
     return {
-        sucess: false,
+        success: false,
         statusCode: 500,
         body: error
-    }
-}
+    };
+};

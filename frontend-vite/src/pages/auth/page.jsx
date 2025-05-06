@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {
@@ -19,22 +19,22 @@ export default function Auth() {
     // login é uma função que faz o login do usuário
     // signup é uma função que faz o cadastro do usuário
     // authData é um objeto que contém os dados de autenticação do usuário
-    const [formType, setFormType] = useState('login')
-    const [formData, setFormData] = useState({})
-    const [showPassword, setShowPassword] = useState(false)
-    const { login, signup, authLoading } = useAuthServices()
-    const navigate = useNavigate()
+    const [formType, setFormType] = useState('login');
+    const [formData, setFormData] = useState({});
+    const [showPassword, setShowPassword] = useState(false);
+    const { login, signup, authLoading } = useAuthServices();
+    const navigate = useNavigate();
     // useNavigate é um hook do react-router-dom que permite navegar entre páginas
     // Verifica se o usuário já está autenticado
     // Se sim, redireciona para a página de perfil
     // Se não, redireciona para a página de autenticação
-    const authData = JSON.parse(localStorage.getItem('auth'))
+    const authData = JSON.parse(localStorage.getItem('auth'));
     
     useEffect(() => {
-        if(authData) {
-            return navigate('/profile')
+        if (authData) {
+            return navigate('/profile'); // Redireciona se já estiver logado
         }
-    }, [])
+    }, [authData, navigate]);
 
     const handleChangeFormType = () => {
         setFormType((prev) => (prev === 'login' ? 'signup' : 'login'))

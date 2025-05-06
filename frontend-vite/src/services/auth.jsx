@@ -50,35 +50,35 @@ export default function useAuthServices() {
         localStorage.removeItem('auth');
     };
 
-    const signup = (formData) => {
-        setAuthLoading(true);
-        
-        fetch(`${url}/signup`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-            },
-            body: JSON.stringify(formData),
-        })
-        .then((response) => response.json())
-        .then((result) => {
-            console.log(result);
-            if(result.success && result.body.token) {
-                localStorage.setItem(
-                    'auth',
-                    JSON.stringify({ token: result.body.token, user: result.body.user })
-                );
-                navigate('/auth');  // Redireciona após o sucesso do cadastro
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-        })
-        .finally(() => {
-            setAuthLoading(false);
-        });
-    };
+    const signup = async (formData) => {
+      setAuthLoading(true);
+      try {
+          const response = await fetch(`${url}/signup`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+              },
+              body: JSON.stringify(formData),
+          });
+  
+          const result = await response.json();
+          console.log(result);
+  
+          if (result.success && result.body.token) {
+              localStorage.setItem(
+                  'auth',
+                  JSON.stringify({ token: result.body.token, user: result.body.user })
+              );
+              navigate('/profile');  // Redireciona para a página de perfil após o sucesso
+          }
+      } catch (error) {
+          console.log(error);
+      } finally {
+          setAuthLoading(false);
+      }
+  };
+  
 
     return { signup, login, logout, authLoading };
 }

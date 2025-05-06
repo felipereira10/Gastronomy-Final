@@ -9,7 +9,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const authData = JSON.parse(localStorage.getItem("auth")) || {};
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true); // substitui orderLoading
+  const [loading, setLoading] = useState(true);
 
   const getUserOrders = async (userId) => {
     try {
@@ -46,9 +46,6 @@ export default function Profile() {
     <>
       <h1>{authData.user.fullname}</h1>
       <h3>{authData.user.email}</h3>
-      <Button variant="contained" onClick={handleLogout}>
-        Logout
-      </Button>
 
       <h2>Pedidos:</h2>
       {orders.length > 0 ? (
@@ -60,6 +57,10 @@ export default function Profile() {
       ) : (
         <p>Você ainda não tem pedidos.</p>
       )}
+
+      <Button variant="contained" onClick={handleLogout}>
+        Logout
+      </Button>
     </>
   );
 }

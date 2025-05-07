@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '../context/AuthContext';
 
 export default function useAuthServices() {
     const [authLoading, setAuthLoading] = useState(false);
-    const navigate = useNavigate();  // Adicionando useNavigate
+    const navigate = useNavigate();
+    const { setAuthData } = useAuth();
 
     const url = 'http://localhost:3000/auth';
 
@@ -26,16 +28,16 @@ export default function useAuthServices() {
           console.log("Resultado do login:", result);
       
           if (result.success && result.body.token) {
-            console.log("Token:", result.body.token);
-            console.log("User:", result.body.user);
-      
-            localStorage.setItem(
-              'auth',
-              JSON.stringify({ token: result.body.token, user: result.body.user })
-            );
-      
+            const authPayload = {
+              token: result.body.token,
+              user: result.body.user
+            };
+          
+            localStorage.setItem('auth', JSON.stringify(authPayload));
+            setAuthData(authPayload); // atualiza o contexto
+            
             return result;
-          }
+          }          
       
           return null;
         } catch (error) {
@@ -66,11 +68,14 @@ export default function useAuthServices() {
           console.log(result);
   
           if (result.success && result.body.token) {
-              localStorage.setItem(
-                  'auth',
-                  JSON.stringify({ token: result.body.token, user: result.body.user })
-              );
-              navigate('/profile');  // Redireciona para a página de perfil após o sucesso
+            const authPayload = {
+              token: result.body.token,
+              user: result.body.user
+            };
+          
+            localStorage.setItem('auth', JSON.stringify(authPayload));
+            setAuthData(authPayload); // atualiza o contexto
+            navigate('/profile');
           }
       } catch (error) {
           console.log(error);

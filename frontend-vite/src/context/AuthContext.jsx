@@ -1,34 +1,32 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react';
 
-const AuthContext = createContext()
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [authData, setAuthData] = useState(null)
+  const [authData, setAuthData] = useState(null);
+  const [isAuthLoaded, setIsAuthLoaded] = useState(false);
 
   useEffect(() => {
-    const savedData = localStorage.getItem('authData')
-    if (savedData) {
-      setAuthData(JSON.parse(savedData))
+    const storedAuth = localStorage.getItem('auth');
+    if (storedAuth) {
+      setAuthData(JSON.parse(storedAuth));
     }
-  }, [])
+    setIsAuthLoaded(true);
+  }, []);
 
   useEffect(() => {
     if (authData) {
-      localStorage.setItem('authData', JSON.stringify(authData))
+      localStorage.setItem('auth', JSON.stringify(authData));
     } else {
-      localStorage.removeItem('authData')
+      localStorage.removeItem('auth');
     }
-  }, [authData])
+  }, [authData]);
 
-  const logout = () => {
-    setAuthData(null)
-  }
+  const value = { authData, setAuthData };
 
-  return (
-    <AuthContext.Provider value={{ authData, setAuthData, logout }}>
-      {children}
-    </AuthContext.Provider>
-  )
-}
+  if (!isAuthLoaded) return null; // impede crash antes de carregar
 
-export const useAuth = () => useContext(AuthContext)
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = () => useContext(AuthContext);

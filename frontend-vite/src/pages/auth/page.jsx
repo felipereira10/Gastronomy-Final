@@ -8,9 +8,9 @@ import {
   InputAdornment
 } from "@mui/material";
 import styles from './page.module.css';
-
 import { useNavigate } from "react-router-dom";
 import useAuthServices from "../../services/auth";
+import { useAuth } from '../../context/AuthContext';
 
 export default function Auth() {
     // useState é um hook do react que permite criar estados dentro de componentes funcionais
@@ -28,13 +28,14 @@ export default function Auth() {
     // Verifica se o usuário já está autenticado
     // Se sim, redireciona para a página de perfil
     // Se não, redireciona para a página de autenticação
-    const authData = JSON.parse(localStorage.getItem('auth'));
+    const { authData } = useAuth();
     
     useEffect(() => {
-        if (authData) {
-            return navigate('/profile'); // Redireciona se já estiver logado
+        if (authData?.token) {
+          navigate('/profile');
         }
-    }, [authData, navigate]);
+      }, [authData?.token]);
+           
 
     const handleChangeFormType = () => {
         setFormType((prev) => (prev === 'login' ? 'signup' : 'login'))

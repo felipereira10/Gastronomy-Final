@@ -5,7 +5,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import useAuthServices from "../../services/auth";
 import Loading from "../../components/loading/Loading.jsx";
 import styles from "./page.module.css";
-import { LuLogOut, LuTimer, LuCheckCircle, LuXCircle } from "react-icons/lu";
+import { FiLogOut, FiClock, FiCheckCircle, FiXCircle } from "react-icons/fi";
 
 
 export default function Profile() {
@@ -66,19 +66,24 @@ export default function Profile() {
         {orders.length > 0 ? (
           orders.map((order) => (
             <div key={order._id} className={styles.orderContainer}>
-              {order.pickupStatus === "Pending" && (
+              {order.pickupStatus === 'Pending' && (
                 <p className={`${styles.pickupStatus} ${styles.pending}`}>
-                  <LuTimer /> {order.pickupStatus}
+                  <FiClock />
+                  {order.pickupStatus}
                 </p>
               )}
-              {order.pickupStatus === "Completed" && (
+
+              {order.pickupStatus === 'Completed' && (
                 <p className={`${styles.pickupStatus} ${styles.completed}`}>
-                  <LuCheckCircle /> {order.pickupStatus}
+                  <FiCheckCircle />
+                  {order.pickupStatus}
                 </p>
               )}
-              {order.pickupStatus === "Canceled" && (
+
+              {order.pickupStatus === 'Canceled' && (
                 <p className={`${styles.pickupStatus} ${styles.canceled}`}>
-                  <LuXCircle /> {order.pickupStatus}
+                  <FiXCircle />
+                  {order.pickupStatus}
                 </p>
               )}
               <h3>{order.pickupTime}</h3>

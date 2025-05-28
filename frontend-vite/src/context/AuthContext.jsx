@@ -3,8 +3,8 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [authData, setAuthData] = useState(null);
-  const [isAuthLoaded, setIsAuthLoaded] = useState(false);
+  const [authData, setAuthData] = useState(null);       // contém token e user
+  const [isAuthLoaded, setIsAuthLoaded] = useState(false); // para evitar renderização antes do carregamento
 
   useEffect(() => {
     const storedAuth = localStorage.getItem('auth');
@@ -15,16 +15,27 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (authData) {
+    if (authData?.token) {
       localStorage.setItem('auth', JSON.stringify(authData));
     } else {
       localStorage.removeItem('auth');
     }
   }, [authData]);
 
-  const value = { authData, setAuthData };
+  // Permite logout direto do contexto
+  const logout = () => {
+    setAuthData(null);
+    localStorage.removeItem('auth');
+  };
 
-  if (!isAuthLoaded) return null; // impede crash antes de carregar
+  const value = {
+    authData,
+    setAuthData,
+    logout,
+    isAuthenticated: !!authData?.token,
+  };
+
+  if (!isAuthLoaded) return null;
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

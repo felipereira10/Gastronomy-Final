@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext";
 import useAuthServices from "../../services/auth";
 import Loading from "../../components/loading/Loading.jsx";
+import styles from "./page.module.css";
+import { LuLogOut, LuTimer, LuCheckCircle, LuXCircle } from "react-icons/lu";
+
 
 export default function Profile() {
-  const { logout } = useAuthServices();
-  const navigate = useNavigate();
   const { authData, setAuthData } = useAuth();
+  const { logout } = useAuthServices(authData, setAuthData);
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,34 +39,66 @@ export default function Profile() {
 
   const handleLogout = () => {
     logout();
-    setAuthData(null); // Limpa os dados de autenticação no contexto
-    localStorage.removeItem("auth"); // Remove os dados de autenticação do localStorage
+    setAuthData(null);
+    localStorage.removeItem("auth");
     navigate("/auth");
   };
 
-  if (loading) {
-    return <Loading />;
-  }
+  if (loading) return <Loading />;
 
   return (
-    <>
-      <h1>{authData.user.fullname}</h1>
-      <h3>{authData.user.email}</h3>
+    <div className={styles.pageContainer}>
+      <div>
+        <h1>{authData.user.fullname}</h1>
+        <h3>{authData.user.email}</h3>
+      </div>
 
-      <h2>Pedidos:</h2>
-      {orders.length > 0 ? (
-        orders.map((order) => (
-          <div key={order._id}>
-            <p>Pedido #{order._id}</p>
-          </div>
-        ))
-      ) : (
-        <p>Você ainda não tem pedidos.</p>
-      )}
-
-      <Button variant="contained" onClick={handleLogout}>
+      <Button
+        variant="contained"
+        onClick={handleLogout}
+        className={styles.logoutButton}
+        startIcon={<LuLogOut />}
+      >
         Logout
       </Button>
-    </>
+
+      <div className={styles.ordersContainer}>
+        {orders.length > 0 ? (
+          orders.map((order) => (
+            <div key={order._id} className={styles.orderContainer}>
+              {order.pickupStatus === "Pending" && (
+                <p className={`${styles.pickupStatus} ${styles.pending}`}>
+                  <LuTimer /> {order.pickupStatus}
+                </p>
+              )}
+              {order.pickupStatus === "Completed" && (
+                <p className={`${styles.pickupStatus} ${styles.completed}`}>
+                  <LuCheckCircle /> {order.pickupStatus}
+                </p>
+              )}
+              {order.pickupStatus === "Canceled" && (
+                <p className={`${styles.pickupStatus} ${styles.canceled}`}>
+                  <LuXCircle /> {order.pickupStatus}
+                </p>
+              )}
+              <h3>{order.pickupTime}</h3>
+              {order.orderItems.map((item) => (
+                <div key={item._id}>
+                  <h4>{item.itemDetails[0]?.name}</h4>
+                  <p>Quantidade: {item.quantity}</p>
+                </div>
+              ))}
+            </div>
+          ))
+        ) : (
+          <div>
+            <p>Você ainda não tem pedidos.</p>
+            <Link to="/plates" className={styles.platesLink}>
+              Clique aqui e veja nossas especialidades!
+            </Link>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

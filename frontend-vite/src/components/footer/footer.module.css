@@ -1,0 +1,53 @@
+/* Garante que o body ocupe 100% da altura da tela */
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* O conteúdo do app cresce e empurra o footer para o fim */
+#root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Coloque isso no componente pai que envolve tudo (ex: App.jsx) */
+.mainContent {
+  flex: 1;
+}
+
+.footerContainer {
+  background-color: #004643;
+  color: #faf0ca;
+  padding: 2em 1em;
+  text-align: center;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.footerContainer img {
+  width: 6em;
+  filter: brightness(0) invert(1);
+}
+
+.linksContainer {
+  display: flex;
+  gap: 2em;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.link {
+  color: #faf0ca;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.link:hover {
+  color: #f9bc60;
+}

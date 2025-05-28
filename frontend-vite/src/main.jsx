@@ -10,7 +10,7 @@ import Cart from './pages/cart/page.jsx'
 import Profile from './pages/profile/page.jsx'
 import Plates from './pages/plates/page.jsx'
 import Auth from './pages/auth/page.jsx'
-import { AuthProvider } from './context/AuthContext' // IMPORTANTE
+import { AuthProvider } from './contexts/AuthContext'
 
 const pages = createBrowserRouter([
   {

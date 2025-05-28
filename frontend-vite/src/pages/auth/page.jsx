@@ -10,7 +10,7 @@ import {
 import styles from './page.module.css';
 import { useNavigate } from "react-router-dom";
 import useAuthServices from "../../services/auth";
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Auth() {
     // useState é um hook do react que permite criar estados dentro de componentes funcionais

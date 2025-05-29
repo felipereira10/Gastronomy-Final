@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@mui/material";
-import { useAuth } from "../../contexts/AuthContext";
-import useAuthServices from "../../services/auth";
+import { useAuth } from "../../contexts/AuthContext.jsx";
+import useAuthServices from "../../services/auth.jsx";
 import Loading from "../../components/loading/Loading.jsx";
 import styles from "./page.module.css";
 import { FiLogOut, FiClock, FiCheckCircle, FiXCircle } from "react-icons/fi";
@@ -57,7 +57,7 @@ export default function Profile() {
         variant="contained"
         onClick={handleLogout}
         className={styles.logoutButton}
-        startIcon={<LuLogOut />}
+        startIcon={<FiLogOut />}
       >
         Logout
       </Button>

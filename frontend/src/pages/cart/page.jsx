@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useCartContext } from "../../contexts/useCartContext"
 import styles from './page.module.css'
 import { LuMinus } from 'react-icons/lu'
+import { FiMinus } from "react-icons/fi";
 import ConfirmOrderPopup from "../../components/confirmOrderPopup/confirmOrderPopup"
 import orderServices from "../../services/order"
 
@@ -41,7 +42,7 @@ export default function Cart() {
         clearCart()
     }
 
-    // console.log(cartItems)
+    console.log(cartItems)
 
     if(!cartItems.length) {
         return(
@@ -73,7 +74,7 @@ export default function Cart() {
                                             <button onClick={() => {handleChangeItemQty('more', item._id)}}>+</button>
                                         </div>
                                     </div>
-                                    <button onClick={() => { removeFromCart(item._id) }}><LuMinus /> Remove item</button>
+                                    <button onClick={() => { removeFromCart(item._id) }}><FiMinus /> Remove item</button>
                                 </div>
                             </div>
                         ))}

@@ -45,6 +45,13 @@
     text-decoration: underline;
 }
 
+.logoutButton {
+    width: 100px; 
+    height: 50px;
+    position: absolute;
+    left: 30%;
+}
+
 @media screen and (max-width: 800px) {
     .ordersContainer {
         grid-template-columns: repeat(1, 1fr);

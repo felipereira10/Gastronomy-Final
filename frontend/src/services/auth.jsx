@@ -54,36 +54,43 @@ export default function useAuthServices() {
     };
 
     const signup = async (formData) => {
-      setAuthLoading(true);
-      try {
-          const response = await fetch(`${url}/signup`, {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Access-Control-Allow-Origin': '*',
-              },
-              body: JSON.stringify(formData),
-          });
-  
-          const result = await response.json();
-          console.log(result);
-  
-          if (result.success && result.body.token) {
+    setAuthLoading(true);
+
+    try {
+        const response = await fetch(`${url}/signup`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        });
+
+        const result = await response.json();
+
+        if (result.success && result.body.token) {
             const authPayload = {
-              token: result.body.token,
-              user: result.body.user
+                token: result.body.token,
+                user: result.body.user
             };
-          
+
             localStorage.setItem('auth', JSON.stringify(authPayload));
-            setAuthData(authPayload); // atualiza o contexto
+            setAuthData(authPayload);
+
+            // ✅ Redireciona após o cadastro
             navigate('/profile');
-          }
-      } catch (error) {
-          console.log(error);
-      } finally {
-          setAuthLoading(false);
-      }
-  };
+        } else {
+            console.error("Erro no signup:", result.body?.text || result);
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Erro no signup:", error);
+        return null;
+    } finally {
+        setAuthLoading(false);
+    }
+};
+
   
 
     return { signup, login, logout, authLoading };

@@ -19,7 +19,6 @@ async function main () {
       mongoConnectionString: process.env.MONGO_CS, 
       mongoDbName: process.env.MONGO_DB_NAME
     });
-    console.log('✅ Successfully connected to MongoDB');
 
     // Inicia o servidor só depois da conexão
     const app = express();

@@ -7,7 +7,6 @@ import Loading from "../../components/loading/Loading.jsx";
 import styles from "./page.module.css";
 import { FiLogOut, FiClock, FiCheckCircle, FiXCircle } from "react-icons/fi";
 
-
 export default function Profile() {
   const { authData, setAuthData } = useAuth();
   const { logout } = useAuthServices(authData, setAuthData);
@@ -23,7 +22,7 @@ export default function Profile() {
         setOrders(data.orders);
       }
     } catch (err) {
-      console.error("Erro ao buscar pedidos:", err);
+      console.error("Error fetching orders:", err);
     } finally {
       setLoading(false);
     }
@@ -86,20 +85,21 @@ export default function Profile() {
                   {order.pickupStatus}
                 </p>
               )}
+
               <h3>{order.pickupTime}</h3>
               {order.orderItems.map((item) => (
                 <div key={item._id}>
                   <h4>{item.itemDetails[0]?.name}</h4>
-                  <p>Quantidade: {item.quantity}</p>
+                  <p>Quantity: {item.quantity}</p>
                 </div>
               ))}
             </div>
           ))
         ) : (
           <div>
-            <p>Você ainda não tem pedidos.</p>
+            <p>You don't have any orders yet.</p>
             <Link to="/plates" className={styles.platesLink}>
-              Clique aqui e veja nossas especialidades!
+              Click here and check out our specialties!
             </Link>
           </div>
         )}

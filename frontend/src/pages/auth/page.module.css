@@ -1,7 +1,38 @@
-.authPageContainer, form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5em;
+.authBackground {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  padding: 1rem;
+}
+
+.authCard {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  background-color: #004643;
+  color: #faf0ca;
+  padding: 2rem;
+}
+
+.authForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.switchFormBtn {
+  background: none;
+  border: none;
+  color: #d4e09b;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  text-decoration: underline;
+}
+
+.switchFormBtn:hover {
+  color: #ffffff;
 }

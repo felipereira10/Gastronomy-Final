@@ -1,60 +1,174 @@
 .pageContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-    padding: .5em;
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+  padding: 3em 2em;
+  font-family: "Segoe UI", sans-serif;
+  
+  min-height: 50vh;
+}
+
+.profileContainer {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em;
+  background: #ffffff;
+  border-radius: 1em;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.userInfo h1 {
+  font-size: 2rem;
+  color: #004643;
+}
+
+.userInfo h3 {
+  font-size: 1rem;
+  color: #666;
+  font-weight: normal;
 }
 
 .orderContainer {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    flex-direction: column;
-    gap: 0.5em;
-    background-color: #004643;
-    color: #faf0ca;
-    padding: 1em;
-    border-radius: .5em;
+  background-color: #f2fbfa;
+  border: 1px solid #c9e8e6;
+  padding: 1em;
+  border-radius: 1em;
+  transition: transform 0.3s ease;
+}
+
+.orderContainer:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .ordersContainer {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5em;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5em;
+  margin-top: 1.5em;
 }
 
 .pickupStatus {
-    border-radius: 0.5em;
-    width: fit-content;
-    padding: 0.2em;
-    font-size: large;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.4em 0.8em;
+  border-radius: 6px;
+  width: fit-content;
 }
 
 .pending {
-    background-color: #d6c918;
+  background-color: #fce96a;
+  color: #5b4b00;
 }
 
 .completed {
-    background-color: #9ad618;
+  background-color: #c8f796;
+  color: #275f00;
 }
 
-.canceled{
-    background-color: #ce651a;
-}
-
-.platesLink {
-    color: #004643;
-    text-decoration: underline;
+.canceled {
+  background-color: #ffb38a;
+  color: #802f00;
 }
 
 .logoutButton {
-    width: 100px; 
-    height: 50px;
-    position: absolute;
-    left: 30%;
+  margin-top: 1em;
+  align-self: flex-end;
+  background-color: #004643 !important;
+  color: white !important;
+  font-weight: bold;
 }
 
-@media screen and (max-width: 800px) {
-    .ordersContainer {
-        grid-template-columns: repeat(1, 1fr);
-    }
+.platesLink {
+  display: inline-block;
+  margin-top: 1em;
+  color: #007c6d;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.platesLink:hover {
+  color: #005e54;
+}
+
+/* MODAL GERAL */
+.cookieOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+
+.cookieModalContent {
+  background-color: #ffffff;
+  padding: 2em;
+  border-radius: 1em;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  text-align: center;
+  animation: scaleUp 0.3s ease;
+}
+
+.cookieModalContent h2 {
+  margin-bottom: 0.5em;
+  color: #004643;
+}
+
+.cookieModalContent p {
+  color: #444;
+  font-size: 0.95rem;
+  margin: 0.5em 0;
+}
+
+.cookieActions {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  margin-top: 1.5em;
+}
+
+.privacyLink {
+  color: #0077cc;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* RESPONSIVO */
+@media screen and (max-width: 600px) {
+  .ordersContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .logoutButton {
+    width: 100%;
+  }
+
+  .cookieModalContent {
+    padding: 1.5em;
+  }
 }

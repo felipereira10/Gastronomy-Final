@@ -77,12 +77,18 @@ export default function Auth() {
                 fullWidth
                 margin="normal"
                 variant="outlined"
-                InputLabelProps={{ style: { color: "#faf0ca" } }}
-                InputProps={{
+                InputLabelProps={{
+                  style: { 
+                    color: "#faf0ca",
+                    top: "-10px" // sobe ou desce o label quando está flutuando
+                  }
+                }}
+                 InputProps={{
                   style: {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
-                    borderRadius: "6px"
+                    borderRadius: "6px",
+                    paddingTop: "3px", // aumenta espaço interno no topo
                   }
                 }}
               />
@@ -96,12 +102,18 @@ export default function Auth() {
                 fullWidth
                 margin="normal"
                 variant="outlined"
-                InputLabelProps={{ style: { color: "#faf0ca" } }}
-                InputProps={{
+                InputLabelProps={{
+                  style: { 
+                    color: "#faf0ca",
+                    top: "-10px" // sobe ou desce o label quando está flutuando
+                  }
+                }}
+                 InputProps={{
                   style: {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
-                    borderRadius: "6px"
+                    borderRadius: "6px",
+                    paddingTop: "3px", // aumenta espaço interno no topo
                   },
                   endAdornment: (
                     <InputAdornment position="end">
@@ -116,7 +128,12 @@ export default function Auth() {
                   )
                 }}
               />
-              <Button type="submit" variant="contained" color="primary">
+              <Button type="submit" variant="contained" color="primary"
+                style={{ 
+                  width: '150px',
+                  alignSelf: 'center'
+                }}
+              >
                 Login
               </Button>
             </form>
@@ -137,12 +154,18 @@ export default function Auth() {
                 fullWidth
                 margin="normal"
                 variant="outlined"
-                InputLabelProps={{ style: { color: "#faf0ca" } }}
-                InputProps={{
+                InputLabelProps={{
+                  style: { 
+                    color: "#faf0ca",
+                    top: "-10px" // sobe ou desce o label quando está flutuando
+                  }
+                }}
+                 InputProps={{
                   style: {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
-                    borderRadius: "6px"
+                    borderRadius: "6px",
+                    paddingTop: "3px", // aumenta espaço interno no topo
                   }
                 }}
               />
@@ -156,12 +179,18 @@ export default function Auth() {
                 fullWidth
                 margin="normal"
                 variant="outlined"
-                InputLabelProps={{ style: { color: "#faf0ca" } }}
-                InputProps={{
+                InputLabelProps={{
+                  style: { 
+                    color: "#faf0ca",
+                    top: "-10px" // sobe ou desce o label quando está flutuando
+                  }
+                }}
+                 InputProps={{
                   style: {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
-                    borderRadius: "6px"
+                    borderRadius: "6px",
+                    paddingTop: "3px", // aumenta espaço interno no topo
                   }
                 }}
               />
@@ -175,12 +204,18 @@ export default function Auth() {
                 fullWidth
                 margin="normal"
                 variant="outlined"
-                InputLabelProps={{ style: { color: "#faf0ca" } }}
-                InputProps={{
+                InputLabelProps={{
+                  style: { 
+                    color: "#faf0ca",
+                    top: "-10px" // sobe ou desce o label quando está flutuando
+                  }
+                }}
+                 InputProps={{
                   style: {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
-                    borderRadius: "6px"
+                    borderRadius: "6px",
+                    paddingTop: "3px", // aumenta espaço interno no topo
                   }
                 }}
               />
@@ -194,16 +229,30 @@ export default function Auth() {
                 fullWidth
                 margin="normal"
                 variant="outlined"
-                InputLabelProps={{ style: { color: "#faf0ca" } }}
-                InputProps={{
+                InputLabelProps={{
+                  style: { 
+                    color: "#faf0ca",
+                    top: "-10px" // sobe ou desce o label quando está flutuando
+                  }
+                }}
+                 InputProps={{
                   style: {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
-                    borderRadius: "6px"
+                    borderRadius: "6px",
+                    paddingTop: "3px", // aumenta espaço interno no topo
                   }
                 }}
               />
-              <Button type="submit" variant="contained" color="secondary">
+              <Button 
+                type="submit" 
+                variant="contained" 
+                color="secondary"
+                style={{
+                  width: '150px',
+                  alignSelf: 'center'
+                }}
+              >
                 Signup
               </Button>
             </form>

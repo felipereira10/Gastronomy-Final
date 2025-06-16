@@ -29,10 +29,15 @@
   color: #d4e09b;
   cursor: pointer;
   font-size: 0.9rem;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   text-decoration: underline;
 }
 
 .switchFormBtn:hover {
   color: #ffffff;
 }
+
+.MuiFormLabel-root {
+  margin-bottom: 8px;
+}
+

@@ -54,7 +54,6 @@ export default class OrdersDataAccess {
                     pickupTime: { $first: '$pickupTime' }
                 }
             }
-
         ])
         .toArray()
 
@@ -67,7 +66,7 @@ export default class OrdersDataAccess {
         .aggregate([
             {
                 $match: { userId: new ObjectId(userId) }
-            },
+            }, 
             {
                 $lookup: {
                     from: 'orderItems',
@@ -102,7 +101,6 @@ export default class OrdersDataAccess {
                     as: 'orderItems.itemDetails'
                 }
             },
-            // Juntar itens com mesmo ID
             {
                 $group: {
                     _id: '$_id',
@@ -112,7 +110,6 @@ export default class OrdersDataAccess {
                     pickupTime: { $first: '$pickupTime' }
                 }
             }
-
         ])
         .toArray()
 
@@ -123,17 +120,17 @@ export default class OrdersDataAccess {
         const { items, ...orderDataRest } = orderData
 
         orderDataRest.createdAt = new Date()
-        orderDataRest.pickupStatus = 'Peding'
+        orderDataRest.pickupStatus = 'Pending'
         orderDataRest.userId = new ObjectId(orderDataRest.userId)
 
         const newOrder = await Mongo.db
         .collection(collectionName)
         .insertOne(orderDataRest)
 
-        if (!newOrder.insertedId) {
+        if(!newOrder.insertedId) {
             throw new Error('Order cannot be inserted')
         }
-        // P/ cada item da lista de item, te permite trabalhar com 1 só
+
         items.map((item) => {
             item.plateId = new ObjectId(item.plateId)
             item.orderId = new ObjectId(newOrder.insertedId)
@@ -150,7 +147,7 @@ export default class OrdersDataAccess {
 
         const itemsToDelete = await Mongo.db
         .collection('orderItems')
-        .deleteMany( { orderId: new ObjectId(orderId) } )
+        .deleteMany({ orderId: new ObjectId(orderId) })
 
         const orderToDelete = await Mongo.db
         .collection(collectionName)
@@ -160,6 +157,7 @@ export default class OrdersDataAccess {
             itemsToDelete,
             orderToDelete
         }
+
         return result
     }
 

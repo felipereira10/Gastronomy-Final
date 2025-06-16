@@ -1,4 +1,4 @@
-import OrdersDataAccess from "../dataAccess/ordersDataAccess.js"
+import OrdersDataAccess from "../dataAccess/OrdersDataAccess.js"
 import { ok, serverError } from "../helpers/httpResponses.js"
 
 export default class OrdersControllers {
@@ -26,9 +26,9 @@ export default class OrdersControllers {
         }
     }
 
-    async addOrder(plateData) {
+    async addOrder(orderData) {
         try {
-            const result = await this.dataAccess.addOrder(plateData)
+            const result = await this.dataAccess.addOrder(orderData)
 
             return ok(result)
         } catch (error) {
@@ -36,9 +36,9 @@ export default class OrdersControllers {
         }
     }
 
-    async deleteOrder(plateId) {
+    async deleteOrder(orderId) {
         try {
-            const result = await this.dataAccess.deleteOrder(plateId)
+            const result = await this.dataAccess.deleteOrder(orderId)
 
             return ok(result)
         } catch (error) {
@@ -46,9 +46,9 @@ export default class OrdersControllers {
         }
     }
 
-    async updateOrder(plateId, plateData) {
+    async updateOrder(orderId, orderData) {
         try {
-            const result = await this.dataAccess.updateOrder(plateId, plateData)
+            const result = await this.dataAccess.updateOrder(orderId, orderData)
 
             return ok(result)
         } catch (error) {

@@ -41,3 +41,22 @@
   margin-bottom: 8px;
 }
 
+.errorMessage {
+  color: #ff6b6b;
+  background-color: #3a1a1a;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.successMessage {
+  color: #a6ffaf;
+  background-color: #1a3a1a;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+

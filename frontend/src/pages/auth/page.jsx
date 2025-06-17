@@ -12,6 +12,8 @@ import styles from './page.module.css';
 import { useNavigate } from "react-router-dom";
 import useAuthServices from "../../services/auth";
 import { useAuth } from '../../contexts/AuthContext';
+import Loading from "../../components/Loading/Loading.jsx";
+
 
 export default function Auth() {
   const [formType, setFormType] = useState('login');
@@ -21,11 +23,18 @@ export default function Auth() {
   const navigate = useNavigate();
   const { authData } = useAuth();
 
+
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isLoadingAfterLogin, setIsLoadingAfterLogin] = useState(false);
+  const [delayedRedirect, setDelayedRedirect] = useState(false);
+
+
   useEffect(() => {
-    if (authData?.token) {
+    if (authData?.token && delayedRedirect) {
       navigate('/profile');
     }
-  }, [authData?.token]);
+  }, [authData?.token, delayedRedirect]);
 
   const handleChangeFormType = () => {
     setFormType((prev) => (prev === 'login' ? 'signup' : 'login'));
@@ -39,27 +48,57 @@ export default function Auth() {
     });
   }
 
-  const handleSubmitForm = (e) => {
+  const handleSubmitForm = async (e) => {
     e.preventDefault();
+    setErrorMessage(''); // limpa mensagens anteriores
 
-    if (formType === 'login') {
-      login(formData, navigate);
-    } else if (formType === 'signup') {
-      if (formData.password !== formData.confirmPassword) {
-        alert('Passwords do not match');
-        return;
+    try {
+      if (formType === 'login') {
+        await login(formData);
+
+        setIsLoadingAfterLogin(true);
+        setTimeout(() => {
+          navigate('/profile');
+        }, 3000);
+
+      } else if (formType === 'signup') {
+        if (formData.password !== formData.confirmPassword) {
+          setErrorMessage('Credentials are not correct');
+          return;
+        }
+        await signup(formData);
+
+        setIsLoadingAfterLogin(true);
+        setTimeout(() => {
+          navigate('/profile');
+        }, 3000);
+
       }
-      signup(formData, navigate);
+    } catch (err) {
+      setErrorMessage(err.message);
     }
-  }
+  };
 
-  if (authLoading) {
-    return <Typography variant="h4">Loading...</Typography>;
+
+  if (authLoading || isLoadingAfterLogin) {
+    return <Loading />;
   }
 
   return (
     <div className={styles.authBackground}>
       <div className={styles.authCard}>
+
+        {/* Mensagens de erro e sucesso, sempre visíveis se existirem */}
+        {errorMessage && (
+        <Typography className={styles.errorMessage} role="alert" gutterBottom>
+          {errorMessage}
+        </Typography>
+        )}
+        {successMessage && (
+          <Typography className={styles.successMessage} role="alert" gutterBottom>
+            {successMessage}
+          </Typography>
+        )}
         {formType === 'login' ? (
           <>
             <h2>Login</h2>
@@ -105,7 +144,7 @@ export default function Auth() {
                 InputLabelProps={{
                   style: { 
                     color: "#faf0ca",
-                    top: "-10px" // sobe ou desce o label quando está flutuando
+                    top: "-10px"
                   }
                 }}
                  InputProps={{
@@ -113,7 +152,7 @@ export default function Auth() {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
                     borderRadius: "6px",
-                    paddingTop: "3px", // aumenta espaço interno no topo
+                    paddingTop: "3px",
                   },
                   endAdornment: (
                     <InputAdornment position="end">
@@ -182,7 +221,7 @@ export default function Auth() {
                 InputLabelProps={{
                   style: { 
                     color: "#faf0ca",
-                    top: "-10px" // sobe ou desce o label quando está flutuando
+                    top: "-10px"
                   }
                 }}
                  InputProps={{
@@ -190,7 +229,7 @@ export default function Auth() {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
                     borderRadius: "6px",
-                    paddingTop: "3px", // aumenta espaço interno no topo
+                    paddingTop: "3px",
                   }
                 }}
               />
@@ -207,7 +246,7 @@ export default function Auth() {
                 InputLabelProps={{
                   style: { 
                     color: "#faf0ca",
-                    top: "-10px" // sobe ou desce o label quando está flutuando
+                    top: "-10px"
                   }
                 }}
                  InputProps={{
@@ -215,7 +254,7 @@ export default function Auth() {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
                     borderRadius: "6px",
-                    paddingTop: "3px", // aumenta espaço interno no topo
+                    paddingTop: "3px",
                   }
                 }}
               />
@@ -232,7 +271,7 @@ export default function Auth() {
                 InputLabelProps={{
                   style: { 
                     color: "#faf0ca",
-                    top: "-10px" // sobe ou desce o label quando está flutuando
+                    top: "-10px"
                   }
                 }}
                  InputProps={{
@@ -240,7 +279,7 @@ export default function Auth() {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
                     borderRadius: "6px",
-                    paddingTop: "3px", // aumenta espaço interno no topo
+                    paddingTop: "3px",
                   }
                 }}
               />

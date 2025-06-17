@@ -2,41 +2,98 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: end;
-    width: 320px;
+    width: 280px;
     height: 420px;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid #ddd; /* leve borda */
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease;
+}
+
+.cardContainer:hover {
+    transform: translateY(-4px);
+}
+
+
+.cardContainer:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
 }
 
 .cardContainer img {
     height: 100%;
     width: 100%;
     object-fit: cover;
-    border-radius: 0.5em;
+    transition: transform 0.5s ease;
+}
+
+.cardContainer:hover img {
+    transform: scale(1.05);
 }
 
 .cardContent {
+    position: absolute;
+    bottom: 0;
+    width: 90%;
+    margin-bottom: 1em;
+    z-index: 2;
     display: flex;
     flex-direction: column;
-    gap: 1em;
-    position: absolute;
+    gap: 0.75em;
     color: #fff;
-    width: 90%;
-    padding-bottom: 0.5em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1rem;
+    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 1em;
+    border-radius: 0.75rem;
 }
 
-.cardContainer:before {
+.cardContainer::before {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 200px;
-    background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0, 0, 0, 0.8));
-    border-bottom-left-radius: 0.5em;
-    border-bottom-right-radius: 0.5em;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    z-index: 1;
+    transition: background 0.3s ease;
 }
 
 .price {
     text-align: right;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Botão estilo glass */
+.cardButton {
+    padding: 0.6em 1.2em;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.75em;
+    color: #fff;
+    font-weight: 500;
+    backdrop-filter: blur(12px);
+    transition: background 0.3s ease, transform 0.2s ease;
+    width: fit-content;
+    align-self: flex-start;
+    cursor: pointer;
+}
+
+.cardButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.cardList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem; /* espaço entre os cards */
+    justify-content: center; /* ou flex-start se quiser alinhado à esquerda */
+    padding: 1rem;
 }

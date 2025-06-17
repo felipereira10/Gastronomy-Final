@@ -1,21 +1,71 @@
 .popupContainer {
     background-color: #faf0ca;
-	color: #004643;
+    color: #004643;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    max-width: 500px;
+    margin: auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.25s ease;
 }
 
 .popupContainer img {
-    height: 300px;
     width: 100%;
-    object-fit: cover;
+    height: auto;
+    max-height: 300px; /* limita pra não estourar o popup */
+    object-fit: contain;
+    background-color: #e0e0e0; /* cor de fundo opcional pra áreas vazias */
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    display: block;
 }
+
+
+
 
 .popupContent {
     display: flex;
     flex-direction: column;
-    gap: 1em;
-    padding: 1em;
+    gap: 0.8em;
+    padding: 1.5em;
+    font-size: 1rem;
 }
 
 .ingredients {
-    color: #777777;
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.95rem;
+}
+
+/* Botão estilizado */
+.popupContent button {
+    background-color: #004643;
+    color: #faf0ca;
+    border: none;
+    padding: 0.75em 1.5em;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    width: fit-content;
+    align-self: flex-end;
+}
+
+.popupContent button:hover {
+    background-color: #002f2f;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

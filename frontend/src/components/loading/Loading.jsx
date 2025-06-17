@@ -1,7 +1,8 @@
 import React from 'react';
 import styles from './loading.module.css';
 import { CircularProgress, Typography, Box } from "@mui/material";
-import RestaurantIcon from '@mui/icons-material/Restaurant';
+// import RestaurantIcon from '@mui/icons-material/Restaurant';
+import SoupKitchenIcon from '@mui/icons-material/SoupKitchen';
 
 export default function Loading() {
   return (
@@ -17,7 +18,9 @@ export default function Loading() {
       role="status"
       aria-label="Loading"
     >
-      <RestaurantIcon style={{ fontSize: 80, marginBottom: 16 }} />
+
+      {/* <RestaurantIcon style={{ fontSize: 80, marginBottom: 16 }} /> */}
+      <SoupKitchenIcon style={{ fontSize: 80, marginBottom: 16 }} />
       <Typography variant="h5" gutterBottom>
         Preparando seu prato...
       </Typography>

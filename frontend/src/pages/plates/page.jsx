@@ -1,6 +1,6 @@
 import platesServices from "../../services/plates";
 import { useEffect, useState } from "react";
-import Loading from '../../components/loading/Loading.jsx';
+import Loading from "../../components/Loading/Loading.jsx";
 import PlateCard from "../../components/plateCard/plateCard";
 import styles from './page.module.css';
 import PlatePopup from "../../components/platePopup/platePopup.jsx";

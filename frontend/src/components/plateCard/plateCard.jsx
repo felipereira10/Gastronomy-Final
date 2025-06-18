@@ -8,7 +8,6 @@ export default function PlateCard({ plateData }) {
       <div className={styles.cardContent}>
         <h4>{plateData.name}</h4>
         <h3 className={styles.price}>$ {plateData.price}</h3>
-        <button className={styles.cardButton}>Buy</button>
       </div>
     </div>
   );

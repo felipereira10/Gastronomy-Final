@@ -1,0 +1,135 @@
+[
+    {
+        "_id": {
+            "$oid": "67e3183f132732a1fa5eec79"
+        },
+        "email": "felipereira@gmail.com",
+        "password": {
+            "$binary": {
+                "base64": "NTYaxKwBu1dsw7QBterF9A==",
+                "subType": "00"
+            }
+        },
+        "salt": {
+            "$binary": {
+                "base64": "/v9O1dhnDJFDhClst2DFRw==",
+                "subType": "00"
+            }
+        },
+        "fullname": "Felipe Pereira"
+    },
+    {
+        "_id": {
+            "$oid": "680008d37e51021ba87b6a11"
+        },
+        "email": "teste03@gmail.com",
+        "password": {
+            "$binary": {
+                "base64": "Q/XNoWZt65zRyUf3hOI8lQ==",
+                "subType": "00"
+            }
+        },
+        "salt": {
+            "$binary": {
+                "base64": "TDhlJx7uK0v1mULltVFivw==",
+                "subType": "00"
+            }
+        },
+        "fullname": "Teste 03"
+    },
+    {
+        "_id": {
+            "$oid": "68093f046861af6a4961b7eb"
+        },
+        "email": "felipe@gmail.com",
+        "password": {
+            "$binary": {
+                "base64": "ESSRI9tv/QZVJSTnPnK0TQ==",
+                "subType": "00"
+            }
+        },
+        "salt": {
+            "$binary": {
+                "base64": "Csi1FnBMpJ+KPJkbpL6Nxg==",
+                "subType": "00"
+            }
+        },
+        "fullname": "Felipe Silva"
+    },
+    {
+        "_id": {
+            "$oid": "680940d66861af6a4961b7ec"
+        },
+        "email": "teste@gmail.com",
+        "password": {
+            "$binary": {
+                "base64": "oa6XVGrwronQRpqndgRjLA==",
+                "subType": "00"
+            }
+        },
+        "salt": {
+            "$binary": {
+                "base64": "ZnP/Ywt4ujwcndecoqnBtQ==",
+                "subType": "00"
+            }
+        },
+        "fullname": "Teste 01"
+    },
+    {
+        "_id": {
+            "$oid": "68405295034ccddd9ac3f3a4"
+        },
+        "fullname": "Marcos Pacheco",
+        "email": "pacheco@gmail.com",
+        "password": {
+            "$binary": {
+                "base64": "a0o0Aaqk9rncd1XAmrmACA==",
+                "subType": "00"
+            }
+        },
+        "salt": {
+            "$binary": {
+                "base64": "01y5ZBaou18bx9MgEX0jww==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "_id": {
+            "$oid": "68496c52ab2f86c21b19dd97"
+        },
+        "email": "enzaogamer213@gmail.com",
+        "password": {
+            "$binary": {
+                "base64": "NTYaxKwBu1dsw7QBterF9A==",
+                "subType": "00"
+            }
+        },
+        "salt": {
+            "$binary": {
+                "base64": "/v9O1dhnDJFDhClst2DFRw==",
+                "subType": "00"
+            }
+        },
+        "fullname": "Enzo Pereira"
+    },
+    {
+        "_id": {
+            "$oid": "68497c4c681d5e3da8708e34"
+        },
+        "fullname": "Luiz Henrique",
+        "email": "luizhenrique@gmail.com",
+        "password": {
+            "$binary": {
+                "base64": "hHiFtJbXITSAuMqEgNa88A==",
+                "subType": "00"
+            }
+        },
+        "salt": {
+            "$binary": {
+                "base64": "V6e1cW0yg23bYMsRdENzZg==",
+                "subType": "00"
+            }
+        }
+    }
+]

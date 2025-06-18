@@ -1,0 +1,100 @@
+# Email Notification System
+
+This is a simple alert system built with **FastAPI**, **Tkinter**, and **MongoDB**, designed to notify users via email in case of a potential system breach.
+
+## 📁 Project Structure
+
+```
+project_notification/
+│
+├── backend/
+│   ├── main.py               # FastAPI backend to send email
+│   ├── requirements.txt      # Backend dependencies
+│   └── .env                  # SMTP credentials
+│
+├── frontend/
+│   ├── app_tkinter.py        # Tkinter GUI for email sending
+│   └── backups/              # Folder for user data backups
+│
+└── .env                      # Shared environment variables
+```
+
+## ⚙️ Technologies
+
+- **Frontend:** Python with Tkinter
+- **Backend:** FastAPI
+- **Database:** MongoDB (Cloud or Local)
+- **Email Sending:** SMTP (e.g., Gmail)
+- **Backup Format:** JSON (with BSON handling)
+
+## 🚀 How to Run
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/yourusername/project_notification.git
+cd project_notification
+```
+
+### 2. Setup environment variables
+
+Create a `.env` file in the root and backend folders:
+
+#### `.env` (root)
+
+```
+MONGO_CS=mongodb+srv://your_user:your_pass@cluster.mongodb.net/
+MONGO_DB_NAME=your_db_name
+REMETENTE_PADRAO=your@email.com
+```
+
+#### `backend/.env`
+
+```
+SMTP_EMAIL=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+```
+
+> ⚠️ Use an **App Password** if you're using Gmail with 2FA enabled.
+
+### 3. Install dependencies
+
+#### Backend
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
+#### Frontend
+Make sure you have `pymongo`, `requests`, `python-dotenv`, and `tkinter` installed:
+
+```bash
+pip install pymongo requests python-dotenv
+```
+
+### 4. Run the project
+
+#### Start backend server:
+```bash
+uvicorn main:app --reload
+```
+
+#### Start frontend app:
+```bash
+cd ../frontend
+python app_tkinter.py
+```
+
+## 💾 Backups
+
+Every time emails are sent, a backup of all user data (from MongoDB) is stored as a JSON file in the `backups/` directory.
+
+## 📌 Notes
+
+- The application uses a visual sender (`From:`) defined by environment variables.
+- The user emails must already exist in the MongoDB `users` collection.
+- Cross-Origin Resource Sharing (CORS) is enabled for development.
+
+## 📜 License
+
+MIT License. See `LICENSE` file (if applicable).

@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+
+# dotenv files
+.env
+backend/.env
+
+# Backup files
+*.bak
+*.swp
+*.swo
+
+# Editor config files
+.vscode/
+.idea/
+
+# Backup folder
+frontend/backups/
+
+# OS-specific
+.DS_Store
+Thumbs.db

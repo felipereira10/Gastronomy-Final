@@ -70,18 +70,18 @@ export default function Cart() {
                                         <p>Portions:</p>
                                         <p>{item.quantity}</p>
                                         <div className={styles.portionBtns}>
-                                            <button onClick={() => {handleChangeItemQty('less', item._id)}}>-</button>
-                                            <button onClick={() => {handleChangeItemQty('more', item._id)}}>+</button>
+                                            <button className={styles.rmvBtn} onClick={() => {handleChangeItemQty('less', item._id)}}>-</button>
+                                            <button className={styles.rmvBtn} onClick={() => {handleChangeItemQty('more', item._id)}}>+</button>
                                         </div>
                                     </div>
-                                    <button onClick={() => { removeFromCart(item._id) }}><FiMinus /> Remove item</button>
+                                    <button className={styles.rmvBtn} onClick={() => { removeFromCart(item._id) }}><FiMinus /> Remove item</button>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </section>
 
-                <button className={styles.confirmBtn} onClick={handleOpenPopup}>Confirm your order!</button>
+                <button className={styles.confirmBtn} onClick={handleOpenPopup}>Click to Confirm your order!</button>
             </div>
 
             <ConfirmOrderPopup open={confirmPopupOpen} onClose={handleOpenPopup} onConfirm={handleConfirmOrder}/>

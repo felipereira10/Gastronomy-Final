@@ -22,7 +22,7 @@ export default function Loading() {
       {/* <RestaurantIcon style={{ fontSize: 80, marginBottom: 16 }} /> */}
       <SoupKitchenIcon style={{ fontSize: 80, marginBottom: 16 }} />
       <Typography variant="h5" gutterBottom>
-        Preparando seu prato...
+        Preparing your plate...
       </Typography>
       <CircularProgress style={{ color: "#faf0ca" }} />
     </Box>

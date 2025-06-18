@@ -43,7 +43,24 @@
 }
 
 .confirmBtn {
-    position: fixed;
-    font-size: x-large;
-    bottom: 2em;
+    margin-top: 1em;
+    align-self: flex-center;
+    background-color: #004643 !important;
+    color: white !important;
+    font-weight: bold;
+    font-size: 15px;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+.rmvBtn {
+    margin-top: 1em;
+    align-self: flex-center;
+    background-color: #004643 !important;
+    color: white !important;
+    font-weight: bold;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 10px;
 }

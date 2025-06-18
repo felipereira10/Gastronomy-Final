@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 export default function Footer() {
     return (
         <footer className={styles.footerContainer}>
-            <img src="/imgs/logo.png" alt="" />
+            <img src="/public/imgs/logo.png" alt="" />
             <div>
                 <h2>Important Links</h2>
                 <div className={styles.linksContainer}>

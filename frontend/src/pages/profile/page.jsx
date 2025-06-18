@@ -1,7 +1,7 @@
 // ... imports
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Button } from "@mui/material";
+import { Button, Checkbox, FormControlLabel } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext.jsx";
 import useAuthServices from "../../services/auth.jsx";
 import Loading from "../../components/loading/Loading.jsx";
@@ -16,6 +16,14 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [cookiesAccepted, setCookiesAccepted] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showCookieModal, setShowCookieModal] = useState(false);
+
+  const [cookiePreferences, setCookiePreferences] = useState({
+    essential: false,
+    functional: false,
+    analytics: false,
+    personalData: false,
+  });
 
   const getUserOrders = async (userId) => {
     try {
@@ -38,12 +46,14 @@ export default function Profile() {
       getUserOrders(authData.user._id);
     }
 
-    const hasAcceptedCookies = localStorage.getItem("cookiesAccepted");
-    if (hasAcceptedCookies === "true") {
+    const accepted = localStorage.getItem("cookiesAccepted");
+    const prefs = localStorage.getItem("cookiePreferences");
+
+    if (accepted === "true" && prefs) {
       setCookiesAccepted(true);
-    } else if (hasAcceptedCookies === "false") {
-      localStorage.clear();
-      navigate("/auth");
+      setCookiePreferences(JSON.parse(prefs));
+    } else {
+      setShowCookieModal(true);
     }
   }, [authData, navigate]);
 
@@ -54,9 +64,36 @@ export default function Profile() {
     navigate("/auth");
   };
 
+  const handlePreferenceChange = (type) => {
+    setCookiePreferences((prev) => ({
+      ...prev,
+      [type]: !prev[type],
+    }));
+  };
+
   const handleAcceptCookies = () => {
+    const anyAccepted = Object.values(cookiePreferences).some((val) => val === true);
+    if (!anyAccepted) {
+      alert("You must accept at least one data usage option.");
+      return;
+    }
+
     localStorage.setItem("cookiesAccepted", "true");
+    localStorage.setItem("cookiePreferences", JSON.stringify(cookiePreferences));
     setCookiesAccepted(true);
+    setShowCookieModal(false);
+  };
+
+  const handleReopenModal = () => {
+    setShowCookieModal(true);
+  };
+
+  const handleRejectAll = () => {
+    localStorage.setItem("cookiesAccepted", "false");
+    localStorage.removeItem("cookiePreferences");
+    setCookiesAccepted(false);
+    localStorage.clear();
+    navigate("/auth");
   };
 
   if (loading) return <Loading />;
@@ -69,22 +106,68 @@ export default function Profile() {
 
   return (
     <div className={styles.pageContainer}>
-      {/* Modal de Cookies */}
-      {!cookiesAccepted && (
+      {/* Modal de Cookies com checklist */}
+      {showCookieModal && (
         <div className={styles.cookieOverlay}>
           <div className={styles.cookieModalContent}>
-            <h2>🍪 Cookie Policy</h2>
-            <p>
-              We use cookies to improve your experience and efficiently process your orders.
-              Learn more in our{" "}
-              <span className={styles.privacyLink} onClick={() => setShowPrivacyModal(true)}>
-                Privacy Portal
-              </span>.
-            </p>
+            <h2>🍪 Cookie & Data Preferences</h2>
+            <p>Select the types of data we can use:</p>
+            <div className={styles.cookieChecklist}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={cookiePreferences.essential}
+                    onChange={() => handlePreferenceChange("essential")}
+                    color="primary"
+                  />
+                }
+                label="Essential – Required for site functionality"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={cookiePreferences.functional}
+                    onChange={() => handlePreferenceChange("functional")}
+                    color="primary"
+                  />
+                }
+                label="Functional – Save preferences and UI settings"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={cookiePreferences.analytics}
+                    onChange={() => handlePreferenceChange("analytics")}
+                    color="primary"
+                  />
+                }
+                label="Analytics – Collect usage statistics"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={cookiePreferences.personalData}
+                    onChange={() => handlePreferenceChange("personalData")}
+                    color="primary"
+                  />
+                }
+                label="Personal Data – Store name, email and order history"
+              />
+            </div>
+
             <div className={styles.cookieActions}>
               <Button variant="contained" onClick={handleAcceptCookies} color="primary">
                 Accept and close
               </Button>
+              <Button variant="outlined" onClick={handleRejectAll} color="secondary">
+                Reject all and logout
+              </Button>
+              <p
+                className={styles.privacyLink}
+                onClick={() => setShowPrivacyModal(true)}
+              >
+                See full privacy policy
+              </p>
             </div>
           </div>
         </div>
@@ -95,17 +178,13 @@ export default function Profile() {
         <div className={styles.cookieOverlay}>
           <div className={styles.cookieModalContent}>
             <h2>Privacy Policy</h2>
-            <p>
-              We use cookies to improve your experience and efficiently process your orders.
-            </p>
-            <p>
-              We use cookies to collect information about how you interact with our website and allow us to remember you.
-              This information is used to improve and customize your browsing experience and for analytics.
-            </p>
-            <p>
-              By accepting, you agree to our use of cookies as described in this policy. For full details,
-              visit our official terms or contact our support.
-            </p>
+            <p>We use the following data types depending on your preferences:</p>
+            <ul>
+              <li><strong>Essential:</strong> Login, navigation and basic functionality.</li>
+              <li><strong>Functional:</strong> Interface preferences and behavior memory.</li>
+              <li><strong>Analytics:</strong> Website usage statistics and performance data.</li>
+              <li><strong>Personal Data:</strong> Full name, email, and order history for personalization.</li>
+            </ul>
             <Button variant="contained" onClick={() => setShowPrivacyModal(false)}>
               Close
             </Button>
@@ -120,14 +199,27 @@ export default function Profile() {
           <h3>{authData.user.email}</h3>
         </div>
 
-        <Button
-          variant="contained"
-          onClick={handleLogout}
-          className={styles.logoutButton}
-          startIcon={<FiLogOut />}
-        >
-          Logout
-        </Button>
+        <div className={styles.actionsRow}>
+          <Button
+            variant="contained"
+            onClick={handleLogout}
+            className={styles.logoutButton}
+            startIcon={<FiLogOut />}
+          >
+            Logout
+          </Button>
+
+          {cookiesAccepted && (
+            <Button
+              variant="outlined"
+              onClick={handleReopenModal}
+              color="secondary"
+              className={styles.preferenceButton}
+            >
+              Change Cookie Preferences
+            </Button>
+          )}
+        </div>
 
         <div className={styles.ordersContainer}>
           {orders.length > 0 ? (

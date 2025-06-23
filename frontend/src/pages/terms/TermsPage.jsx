@@ -1,74 +1,80 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import Loading from "../../components/loading/Loading";
-import styles from "./terms.module.css";
+import { useNavigate } from "react-router-dom";
+import { Button, Paper, Typography, CircularProgress } from "@mui/material";
 
 export default function TermsPage() {
-  const { authData, setAuthData } = useAuth();
-  const [term, setTerm] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { authData } = useAuth();
   const navigate = useNavigate();
+  const [terms, setTerms] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [accepting, setAccepting] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchTerms = async () => {
+    async function fetchTerms() {
       try {
         const res = await fetch("http://localhost:3000/auth/terms/active");
         const data = await res.json();
-        if (data.success) {
-          setTerm(data.term);
-        }
+        if (data.success) setTerms(data.term);
+        else setError("Failed to load terms.");
       } catch (err) {
-        console.error("Failed to fetch terms", err);
+        setError("Error fetching terms.");
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     fetchTerms();
   }, []);
 
-  const handleAcceptTerms = async () => {
+  const handleAccept = async () => {
+    setAccepting(true);
     try {
       const res = await fetch("http://localhost:3000/auth/accept-terms", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authData.token}`,
-        },
+          Authorization: `Bearer ${authData?.token}`
+        }
       });
 
-      const data = await res.json();
+      const result = await res.json();
 
-      if (data.success) {
-        const updatedUser = {
-          ...authData.user,
-          acceptedTerms: {
-            version: term.version,
-            acceptedAt: new Date(),
-          },
-        };
-        setAuthData({ user: updatedUser, token: authData.token });
+      if (result.success) {
         navigate("/profile");
       } else {
-        alert("Failed to accept terms.");
+        setError("Erro ao aceitar os termos.");
       }
     } catch (err) {
-      console.error("Error accepting terms", err);
+      setError("Erro ao conectar com o servidor.");
+    } finally {
+      setAccepting(false);
     }
   };
 
-  if (loading) return <Loading />;
+  if (loading) return <CircularProgress />;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (!terms) return <p>Nenhum termo de uso disponível.</p>;
 
   return (
-    <div className={styles.termsContainer}>
-      <h1>Terms of Use - Version {term.version}</h1>
-      <div className={styles.termsContent}>
-        <p>{term.content}</p>
-      </div>
-      <button className={styles.acceptButton} onClick={handleAcceptTerms}>
-        ✅ Accept Terms and Continue
-      </button>
+    <div style={{ padding: "2rem", maxWidth: 800, margin: "0 auto" }}>
+      <Typography variant="h4" gutterBottom>
+        Termos de Uso - v{terms.version}
+      </Typography>
+
+      <Paper elevation={2} style={{ padding: "1.5rem", marginBottom: "2rem", whiteSpace: "pre-line" }}>
+        {terms.content}
+      </Paper>
+
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleAccept}
+        disabled={accepting}
+      >
+        {accepting ? "Aceitando..." : "Aceitar Termos e Prosseguir"}
+      </Button>
     </div>
   );
 }

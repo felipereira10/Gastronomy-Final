@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-
+import UsersTerms from "./pages/admin/UsersTerms";
 import Home from './pages/home/page.jsx';
 import Cart from './pages/cart/page.jsx';
 import Profile from './pages/profile/page.jsx';
@@ -33,6 +33,7 @@ const pages = createBrowserRouter([
       // Rotas dos termos:
       { path: '/terms', element: <TermsPage /> },
       { path: '/admin/terms', element: <EditTerms /> },
+      { path: '/admin/users-terms', element: <UsersTerms /> },
     ],
   },
 ]);

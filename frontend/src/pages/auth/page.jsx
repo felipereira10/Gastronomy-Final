@@ -55,37 +55,44 @@ export default function Auth() {
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
-    setErrorMessage(''); // limpa mensagens anteriores
+    setErrorMessage('');
 
     try {
       if (formType === 'login') {
-        await login(formData);
+        const res = await login(formData);
 
-        setIsLoadingAfterLogin(true);
-        setTimeout(() => {
-          navigate('/profile');
-        }, 3000);
+        if (res?.user?.acceptedTerms === false) {
+          navigate('/terms');
+        } else {
+          setIsLoadingAfterLogin(true);
+          setTimeout(() => {
+            navigate('/profile');
+          }, 2000);
+        }
 
       } else if (formType === 'signup') {
         if (formData.password !== formData.confirmPassword) {
-          setErrorMessage('Credentials are not correct');
+          setErrorMessage('Passwords do not match');
           return;
-        } else if (!formData.acceptTerms) {
+        }
+
+        if (!formData.acceptTerms) {
           setErrorMessage('You must accept the Terms of Service to sign up');
           return;
         }
+
         await signup(formData);
 
         setIsLoadingAfterLogin(true);
         setTimeout(() => {
           navigate('/profile');
-        }, 3000);
-
+        }, 2000);
       }
     } catch (err) {
       setErrorMessage(err.message);
     }
   };
+
 
 
   if (authLoading || isLoadingAfterLogin) {
@@ -299,7 +306,11 @@ export default function Auth() {
                     color="primary"
                   />
                 }
-                label="I accept the Terms of Service"
+                label={
+                  <span>
+                    I accept the <Link to="/terms">Terms of Service</Link>
+                  </span>
+                }
               />
               <Button 
                 type="submit" 

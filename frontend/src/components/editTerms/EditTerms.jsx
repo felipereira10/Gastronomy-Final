@@ -7,7 +7,7 @@ import {
   Paper,
   Box,
   List,
-  ListItem,
+  ListItem
 } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext";
 import Loading from "../Loading/Loading";
@@ -20,29 +20,42 @@ export default function EditTerms() {
   const [loading, setLoading] = useState(true);
 
   const fetchTerms = async () => {
-    const res = await axios.get("/api/terms");
-    setTermsList(res.data.terms);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchTerms();
-  }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await axios.post(
-      "/api/auth/terms",
-      { version, content },
-      {
+    try {
+      const res = await axios.get("http://localhost:3000/auth/terms", {
         headers: {
           Authorization: `Bearer ${authData.token}`,
         },
-      }
-    );
-    setVersion("");
-    setContent("");
-    fetchTerms();
+      });
+      setTermsList(res.data.terms);
+    } catch (err) {
+      console.error("Erro ao buscar termos:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (authData?.token) fetchTerms();
+  }, [authData]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(
+        "http://localhost:3000/auth/terms",
+        { version, content },
+        {
+          headers: {
+            Authorization: `Bearer ${authData.token}`,
+          },
+        }
+      );
+      setVersion("");
+      setContent("");
+      fetchTerms();
+    } catch (err) {
+      console.error("Erro ao salvar novo termo:", err);
+    }
   };
 
   if (loading) return <Loading />;
@@ -83,12 +96,17 @@ export default function EditTerms() {
         Histórico de Termos
       </Typography>
       <List>
-        {termsList.map((term) => (
+        {(termsList || []).map((term) => (
           <ListItem key={term._id}>
-            <Paper sx={{ padding: 2, width: "100%" }}>
+            <Paper
+              sx={{
+                padding: 2,
+                width: "100%",
+                backgroundColor: term.active ? "#e3f2fd" : "#f5f5f5",
+              }}
+            >
               <Typography variant="subtitle1">
-                Versão: {term.version}{" "}
-                {term.active ? "(Ativo)" : "(Inativo)"}
+                Versão: {term.version} {term.active ? "(Ativo)" : "(Inativo)"}
               </Typography>
               <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
                 {term.content}

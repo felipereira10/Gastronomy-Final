@@ -18,8 +18,8 @@ async function main () {
     const mongoConnection = await Mongo.connect({ mongoConnectionString: process.env.MONGO_CS, mongoDbName: process.env.MONGO_DB_NAME })
     console.log(mongoConnection)
     
-    app.use(express.json())
-    app.use(cors())
+    app.use(express.json());
+    app.use(cors());
 
     app.get('/', (req, res) => {
         res.send({
@@ -30,10 +30,10 @@ async function main () {
     })
 
     // routes
-    app.use('/auth', authRouter)
-    app.use('/users', usersRouter)
-    app.use('/plates', platesRouter)
-    app.use('/orders', ordersRouter)
+    app.use('/auth', authRouter);
+    app.use('/users', usersRouter);
+    app.use('/plates', platesRouter);
+    app.use('/orders', ordersRouter);
     
     app.listen(port, () => {
         console.log(`Server running on: http://${hostname}:${port}`)

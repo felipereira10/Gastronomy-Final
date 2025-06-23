@@ -2,6 +2,7 @@ import express from 'express'
 import UsersControllers from '../controllers/usersController.js'
 import { ensureAuthenticated } from '../middlewares/ensureAuthenticated.js';
 import { checkTermsAccepted } from '../middlewares/checkTerms.js';
+import { Mongo } from '../database/mongo.js';
 
 const usersRouter = express.Router()
 const usersControllers = new UsersControllers()
@@ -34,7 +35,36 @@ usersRouter.put('/:id', async (req, res) => {
     }
 })
 
-export default usersRouter
+// Lista todos os usuários com informações de termos
+usersRouter.get('/admin/users-terms', async (req, res) => {
+  try {
+    const users = await Mongo.db
+      .collection('users')
+      .find({})
+      .project({
+        _id: 1,
+        fullname: 1,
+        email: 1,
+        role: 1,
+        acceptedTerms: 1,
+        acceptedTermsAt: 1
+      })
+      .toArray();
+
+    return res.status(200).send({
+      success: true,
+      users
+    });
+  } catch (err) {
+    return res.status(500).send({
+      success: false,
+      message: 'Erro ao buscar usuários',
+      error: err.message
+    });
+  }
+});
+
+export default usersRouter;
 
 
 // Os dois pontos, indica que vamos enviar um parâmetro

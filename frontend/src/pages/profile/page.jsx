@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button, Checkbox, FormControlLabel } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext.jsx";
 import useAuthServices from "../../services/auth.jsx";
-import Loading from "../../components/loading/Loading.jsx";
+import Loading from "../../components/Loading/Loading.jsx";
 import styles from "./page.module.css";
 import { FiLogOut, FiClock, FiCheckCircle, FiXCircle } from "react-icons/fi";
 
@@ -14,16 +14,10 @@ export default function Profile() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [cookiesAccepted, setCookiesAccepted] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  const [showCookieModal, setShowCookieModal] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
-  const [cookiePreferences, setCookiePreferences] = useState({
-    essential: false,
-    functional: false,
-    analytics: false,
-    personalData: false,
-  });
+
 
   const getUserOrders = async (userId) => {
     try {
@@ -42,12 +36,15 @@ export default function Profile() {
 useEffect(() => {
   if (!authData?.user?._id) {
     navigate("/auth");
-  } else if (!authData?.user?.acceptedTerms) {
-    navigate("/terms");
   } else {
     getUserOrders(authData.user._id);
   }
+
+  if (authData?.activeTerms) {
+    setShowTermsModal(true);
+  }
 }, [authData, navigate]);
+
   
 
   const handleLogout = () => {
@@ -64,30 +61,8 @@ useEffect(() => {
     }));
   };
 
-  const handleAcceptCookies = () => {
-    const anyAccepted = Object.values(cookiePreferences).some((val) => val === true);
-    if (!anyAccepted) {
-      alert("You must accept at least one data usage option.");
-      return;
-    }
+  
 
-    localStorage.setItem("cookiesAccepted", "true");
-    localStorage.setItem("cookiePreferences", JSON.stringify(cookiePreferences));
-    setCookiesAccepted(true);
-    setShowCookieModal(false);
-  };
-
-  const handleReopenModal = () => {
-    setShowCookieModal(true);
-  };
-
-  const handleRejectAll = () => {
-    localStorage.setItem("cookiesAccepted", "false");
-    localStorage.removeItem("cookiePreferences");
-    setCookiesAccepted(false);
-    localStorage.clear();
-    navigate("/auth");
-  };
 
   if (loading) return <Loading />;
 
@@ -98,92 +73,70 @@ useEffect(() => {
   };
 
   return (
-    <div className={styles.pageContainer}>
-      {/* Modal de Cookies com checklist */}
-      {showCookieModal && (
-        <div className={styles.cookieOverlay}>
-          <div className={styles.cookieModalContent}>
-            <h2>🍪 Cookie & Data Preferences</h2>
-            <p>Select the types of data we can use:</p>
-            <div className={styles.cookieChecklist}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={cookiePreferences.essential}
-                    onChange={() => handlePreferenceChange("essential")}
-                    color="primary"
-                  />
-                }
-                label="Essential – Required for site functionality"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={cookiePreferences.functional}
-                    onChange={() => handlePreferenceChange("functional")}
-                    color="primary"
-                  />
-                }
-                label="Functional – Save preferences and UI settings"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={cookiePreferences.analytics}
-                    onChange={() => handlePreferenceChange("analytics")}
-                    color="primary"
-                  />
-                }
-                label="Analytics – Collect usage statistics"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={cookiePreferences.personalData}
-                    onChange={() => handlePreferenceChange("personalData")}
-                    color="primary"
-                  />
-                }
-                label="Personal Data – Store name, email and order history"
-              />
-            </div>
 
-            <div className={styles.cookieActions}>
-              <Button variant="contained" onClick={handleAcceptCookies} color="primary">
-                Accept and close
-              </Button>
-              <Button variant="outlined" onClick={handleRejectAll} color="secondary">
-                Reject all and logout
-              </Button>
-              <p
-                className={styles.privacyLink}
-                onClick={() => setShowPrivacyModal(true)}
-              >
-                See full privacy policy
-              </p>
-            </div>
-          </div>
-        </div>
+    <div className={styles.profilePage}>
+
+      {/* Modal com Usuários e Termos */}
+      {authData.user.role === 'admin' && (
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={() => navigate('/admin/users-terms')}
+        >
+          Ver usuários e termos
+        </Button>
       )}
 
-      {/* Modal com Política de Privacidade */}
-      {showPrivacyModal && (
+      {/* Modal com Termos de Uso */}
+      {showTermsModal && (
         <div className={styles.cookieOverlay}>
           <div className={styles.cookieModalContent}>
-            <h2>Privacy Policy</h2>
-            <p>We use the following data types depending on your preferences:</p>
-            <ul>
-              <li><strong>Essential:</strong> Login, navigation and basic functionality.</li>
-              <li><strong>Functional:</strong> Interface preferences and behavior memory.</li>
-              <li><strong>Analytics:</strong> Website usage statistics and performance data.</li>
-              <li><strong>Personal Data:</strong> Full name, email, and order history for personalization.</li>
-            </ul>
-            <Button variant="contained" onClick={() => setShowPrivacyModal(false)}>
-              Close
+            <h2>📝 Atualização nos Termos de Uso</h2>
+            <p>Você precisa aceitar os novos termos para continuar:</p>
+            <pre style={{ whiteSpace: "pre-wrap", maxHeight: "200px", overflowY: "scroll" }}>
+              {authData.activeTerms?.content}
+            </pre>
+            <Button
+              variant="contained"
+              onClick={async () => {
+                try {
+                  await axios.post(
+                    "http://localhost:3000/auth/accept-terms",
+                    {},
+                    {
+                      headers: {
+                        Authorization: `Bearer ${authData.token}`,
+                      },
+                    }
+                  );
+
+                  // Atualiza authData no contexto
+                  setAuthData((prev) => ({
+                    ...prev,
+                    user: {
+                      ...prev.user,
+                      acceptedTerms: {
+                        version: authData.activeTerms.version,
+                        acceptedAt: new Date()
+                      }
+                    },
+                    activeTerms: null
+                  }));
+
+                  setShowTermsModal(false);
+                } catch (err) {
+                  alert("Erro ao aceitar os termos.");
+                }
+              }}
+              color="primary"
+              sx={{ marginTop: 2 }}
+            >
+              Aceitar Termos
             </Button>
           </div>
         </div>
       )}
+      
 
       {/* Conteúdo principal */}
       <div className={styles.profileContainer}>
@@ -202,16 +155,14 @@ useEffect(() => {
             Logout
           </Button>
 
-          {cookiesAccepted && (
+          {authData?.user?.role === "admin" && (
             <Button
               variant="outlined"
-              onClick={handleReopenModal}
-              color="secondary"
-              className={styles.preferenceButton}
+              onClick={() => navigate("/admin/terms")}
+              style={{ marginTop: "1rem" }}
             >
-              Change Cookie Preferences
-            </Button>
-          )}
+              Gerenciar Termos de Uso
+            </Button> )}
         </div>
 
         <div className={styles.ordersContainer}>

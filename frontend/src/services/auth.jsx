@@ -32,17 +32,17 @@ export default function useAuthServices() {
           const authPayload = {
             token: result.body.token,
             user: result.body.user,
+            mustAcceptTerms: result.body.mustAcceptTerms || false,
+            currentTerms: result.body.currentTerms || null,
           };
 
           localStorage.setItem('auth', JSON.stringify(authPayload));
           setAuthData(authPayload);
-
           return result;
         }
 
         // Caso o login não tenha sucesso, lança erro também
         throw new Error(result?.body?.text || 'Invalid login attempt');
-
       } catch (error) {
         console.error("Erro no login:", error);
         throw error; // repassa erro para o componente usar
@@ -73,14 +73,16 @@ export default function useAuthServices() {
 
         if (result.success && result.body.token) {
             const authPayload = {
-                token: result.body.token,
-                user: result.body.user
-            };
+            token: result.body.token,
+            user: result.body.user,
+            mustAcceptTerms: result.body.mustAcceptTerms,
+            currentTerms: result.body.currentTerms
+          };
 
             localStorage.setItem('auth', JSON.stringify(authPayload));
             setAuthData(authPayload);
 
-            // ✅ Redireciona após o cadastro
+            // Redireciona após o cadastro
             navigate('/profile');
         } else {
             console.error("Erro no signup:", result.body?.text || result);

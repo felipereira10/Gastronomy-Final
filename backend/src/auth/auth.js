@@ -5,6 +5,9 @@ import crypto from 'crypto';
 import { Mongo } from '../database/mongo.js';
 import jwt from 'jsonwebtoken';
 import { ObjectId, MongoClient } from 'mongodb';
+import { checkTermsAccepted } from '../middlewares/checkTerms.js';
+import { ensureAuthenticated } from '../middlewares/ensureAuthenticated.js'; // seu middleware de autenticação
+
 
 const collectionName = 'users'
 
@@ -66,14 +69,16 @@ authRouter.post('/signup', async(req, res) => {
             });
         }
 
-        const result = await Mongo.db
-        .collection(collectionName)
-        .insertOne({
+        const result = await Mongo.db.collection(collectionName).insertOne({
             fullname: req.body.fullname,
             email: req.body.email,
             password: hashedPassword,
             salt,
-        })
+            acceptedTerms: null,
+            birthdate: req.body.birthdate || null,
+            role: req.body.role || 'user'
+        });
+
 
         if(result.insertedId) {
             const user = await Mongo.db
@@ -94,6 +99,125 @@ authRouter.post('/signup', async(req, res) => {
         }
     })
 })
+
+authRouter.post('/terms', async (req, res) => {
+    const { version, content } = req.body;
+
+    if (!version || !content) {
+        return res.status(400).send({
+            success: false,
+            message: 'Version and content are required'
+        });
+    }
+
+    try {
+        // Desativa o termo anterior
+        await Mongo.db.collection('terms').updateMany(
+            { active: true },
+            { $set: { active: false } }
+        );
+
+        // Cria o novo termo
+        const result = await Mongo.db.collection('terms').insertOne({
+            version,
+            content,
+            createdAt: new Date(),
+            active: true
+        });
+
+        return res.status(201).send({
+            success: true,
+            message: 'New terms created successfully',
+            termId: result.insertedId
+        });
+    } catch (err) {
+        return res.status(500).send({
+            success: false,
+            message: 'Internal server error',
+            error: err.message
+        });
+    }
+});
+
+// Histórico dos termos de uso
+authRouter.get('/terms', async (req, res) => {
+    const terms = await Mongo.db.collection('terms')
+        .find({})
+        .sort({ createdAt: -1 })
+        .toArray();
+
+    res.status(200).send({
+        success: true,
+        terms
+    });
+});
+
+// Termos de uso ativos
+authRouter.get('/terms/active', async (req, res) => {
+    const term = await Mongo.db.collection('terms').findOne({ active: true });
+
+    if (!term) {
+        return res.status(404).send({
+            success: false,
+            message: 'No active terms found'
+        });
+    }
+
+    res.status(200).send({
+        success: true,
+        term
+    });
+});
+
+
+
+authRouter.post('/accept-terms', async (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).send({
+            success: false,
+            statusCode: 401,
+            body: { text: 'Unauthorized' }
+        });
+    }
+
+    try {
+        const decoded = jwt.verify(token, 'secret');
+
+        const activeTerm = await Mongo.db.collection('terms').findOne({ active: true });
+
+        if (!activeTerm) {
+            return res.status(404).send({
+                success: false,
+                message: 'No active terms found'
+            });
+        }
+
+        await Mongo.db
+        .collection('users')
+        .updateOne(
+            { _id: new ObjectId(decoded._id) },
+            { $set: { acceptedTerms: { version: activeTerm.version, acceptedAt: new Date() } } }
+        );
+
+        return res.status(200).send({
+            success: true,
+            statusCode: 200,
+            body: { text: 'Terms accepted successfully' }
+        });
+
+    } catch (err) {
+        return res.status(401).send({
+            success: false,
+            statusCode: 401,
+            body: { text: 'Invalid token' }
+        });
+    }
+});
+
+
+
 
 authRouter.post('/login', (req, res) => {
     passport.authenticate('local', (error, user) => {

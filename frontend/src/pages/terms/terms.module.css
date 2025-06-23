@@ -1,0 +1,26 @@
+.termsContainer {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.termsContent {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 2rem;
+}
+
+.acceptButton {
+  padding: 0.7rem 1.5rem;
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.acceptButton:hover {
+  background-color: #004c99;
+}

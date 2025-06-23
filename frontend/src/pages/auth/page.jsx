@@ -32,9 +32,14 @@ export default function Auth() {
 
   useEffect(() => {
     if (authData?.token && delayedRedirect) {
-      navigate('/profile');
+      if (authData.user.acceptedTerms) {
+        navigate('/profile');
+      } else {
+        navigate('/accept-terms');
+      }
     }
   }, [authData?.token, delayedRedirect]);
+
 
   const handleChangeFormType = () => {
     setFormType((prev) => (prev === 'login' ? 'signup' : 'login'));
@@ -64,6 +69,9 @@ export default function Auth() {
       } else if (formType === 'signup') {
         if (formData.password !== formData.confirmPassword) {
           setErrorMessage('Credentials are not correct');
+          return;
+        } else if (!formData.acceptTerms) {
+          setErrorMessage('You must accept the Terms of Service to sign up');
           return;
         }
         await signup(formData);
@@ -282,6 +290,16 @@ export default function Auth() {
                     paddingTop: "3px",
                   }
                 }}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.acceptTerms || false}
+                    onChange={(e) => setFormData({ ...formData, acceptTerms: e.target.checked })}
+                    color="primary"
+                  />
+                }
+                label="I accept the Terms of Service"
               />
               <Button 
                 type="submit" 

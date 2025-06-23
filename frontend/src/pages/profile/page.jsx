@@ -39,23 +39,16 @@ export default function Profile() {
     }
   };
 
-  useEffect(() => {
-    if (!authData?.user?._id) {
-      navigate("/auth");
-    } else {
-      getUserOrders(authData.user._id);
-    }
-
-    const accepted = localStorage.getItem("cookiesAccepted");
-    const prefs = localStorage.getItem("cookiePreferences");
-
-    if (accepted === "true" && prefs) {
-      setCookiesAccepted(true);
-      setCookiePreferences(JSON.parse(prefs));
-    } else {
-      setShowCookieModal(true);
-    }
-  }, [authData, navigate]);
+useEffect(() => {
+  if (!authData?.user?._id) {
+    navigate("/auth");
+  } else if (!authData?.user?.acceptedTerms) {
+    navigate("/terms");
+  } else {
+    getUserOrders(authData.user._id);
+  }
+}, [authData, navigate]);
+  
 
   const handleLogout = () => {
     logout();

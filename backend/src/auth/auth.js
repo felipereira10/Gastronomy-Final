@@ -185,6 +185,7 @@ authRouter.post('/accept-terms', async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, 'secret');
+    const optionalAccepted = req.body.optionalAccepted || {}; // vem do front
 
     const activeTerm = await Mongo.db.collection('terms').findOne({ active: true });
 
@@ -195,13 +196,24 @@ authRouter.post('/accept-terms', async (req, res) => {
       });
     }
 
+    // Monta o array de seções aceitas
+    const sectionsAccepted = activeTerm.sections.map(section => ({
+      title: section.title,
+      required: section.required,
+      acceptedAt: section.required 
+        ? new Date() // obrigatórios sempre tem data de aceite
+        : (optionalAccepted[section.title] ? new Date() : null) // opcionais dependem do que veio do front
+    }));
+
+    // Atualiza o usuário no banco
     await Mongo.db.collection('users').updateOne(
       { _id: new ObjectId(decoded._id) },
       {
         $set: {
           acceptedTerms: {
             version: activeTerm.version,
-            acceptedAt: new Date() // <- padronizado aqui
+            acceptedAt: new Date(),
+            sections: sectionsAccepted
           }
         }
       }
@@ -212,7 +224,9 @@ authRouter.post('/accept-terms', async (req, res) => {
       statusCode: 200,
       body: { text: 'Terms accepted successfully' }
     });
+
   } catch (err) {
+    console.error(err);
     return res.status(401).send({
       success: false,
       statusCode: 401,

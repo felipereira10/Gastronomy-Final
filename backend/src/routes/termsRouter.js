@@ -55,4 +55,37 @@ termsRouter.patch('/:id/disable', ensureAuthenticated, async (req, res) => {
   res.send({ message: 'Termo desativado.' });
 });
 
+// 🔥 Editar um termo existente (Admin)
+termsRouter.put('/:id', ensureAuthenticated, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ message: 'Acesso negado. Admin apenas.' });
+  }
+
+  const { id } = req.params;
+  const { version, sections } = req.body;
+
+  try {
+    const updateResult = await Mongo.db.collection('terms').updateOne(
+      { _id: new Mongo.ObjectId(id) },
+      {
+        $set: {
+          version,
+          sections,
+          updatedAt: new Date(),
+        }
+      }
+    );
+
+    if (updateResult.matchedCount === 0) {
+      return res.status(404).send({ message: 'Termo não encontrado.' });
+    }
+
+    res.send({ message: 'Termo atualizado com sucesso.' });
+  } catch (error) {
+    console.error('Erro ao atualizar termo:', error);
+    res.status(500).send({ message: 'Erro interno no servidor.' });
+  }
+});
+
+
 export default termsRouter;

@@ -11,6 +11,7 @@ import Plates from './pages/plates/page.jsx';
 import Auth from './pages/auth/page.jsx';
 import TermsPage from './pages/terms/TermsPage.jsx';
 import EditTerms from './components/editTerms/EditTerms.jsx';
+
 import ProtectedAdminRoute from './components/protectedRoutes/ProtectedAdminRoute.jsx';
 // IMPORTA O PROVIDER
 import { AuthProvider } from './contexts/AuthContext.jsx';
@@ -34,6 +35,7 @@ const pages = createBrowserRouter([
       { path: '/terms', element: <TermsPage /> },
       { path: '/admin/terms', element: <EditTerms /> },
       { path: '/admin/users-terms', element: <UsersTerms /> },
+      
     ],
   },
 ]);

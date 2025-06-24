@@ -6,6 +6,8 @@ import authRouter from './auth/auth.js';
 import usersRouter from './routes/usersRouter.js';
 import platesRouter from './routes/platesRouter.js';
 import ordersRouter from './routes/ordersRouter.js';
+import termsRouter from './routes/termsRouter.js';
+
 
 config()
 
@@ -34,6 +36,13 @@ async function main () {
     app.use('/users', usersRouter);
     app.use('/plates', platesRouter);
     app.use('/orders', ordersRouter);
+    app.use('/terms', termsRouter);
+    app.use('/admin', usersRouter);
+    app.use('/admin/users-terms', usersRouter);
+    app.use('/admin/plates', platesRouter);
+    app.use('/admin/orders', ordersRouter);
+    app.use('/admin/terms', termsRouter);
+    app.use('/admin/users', usersRouter);
     
     app.listen(port, () => {
         console.log(`Server running on: http://${hostname}:${port}`)

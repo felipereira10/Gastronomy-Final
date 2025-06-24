@@ -3,8 +3,8 @@
   flex-direction: column;
   gap: 2em;
   padding: 3em 2em;
-  font-family: "Segoe UI", sans-serif;
-  
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  background-color: #f5f7f6;
   min-height: 50vh;
 }
 
@@ -13,76 +13,95 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 1em;
-  padding: 1em;
+  gap: 1.5em;
+  padding: 2em;
   background: #ffffff;
   border-radius: 1em;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease;
 }
 
 .userInfo h1 {
-  font-size: 2rem;
-  color: #004643;
+  font-size: 2.2rem;
+  color: #00312e;
+  margin-bottom: 0.2em;
 }
 
 .userInfo h3 {
-  font-size: 1rem;
-  color: #666;
-  font-weight: normal;
+  font-size: 1.1rem;
+  color: #555;
+  font-weight: 400;
+}
+
+.actionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 1em;
+}
+
+.logoutButton {
+  background-color: #004643 !important;
+  color: white !important;
+  font-weight: 600;
+  padding: 0.6em 1.4em;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.logoutButton:hover {
+  background-color: #003b39 !important;
+}
+
+.ordersContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5em;
+  margin-top: 2em;
 }
 
 .orderContainer {
   background-color: #f2fbfa;
   border: 1px solid #c9e8e6;
-  padding: 1em;
+  padding: 1.2em;
   border-radius: 1em;
-  transition: transform 0.3s ease;
+  transition: all 0.25s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
 }
 
 .orderContainer:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.ordersContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5em;
-  margin-top: 1.5em;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
 .pickupStatus {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5em;
   font-weight: 600;
-  font-size: 1rem;
-  padding: 0.4em 0.8em;
+  font-size: 0.95rem;
+  padding: 0.4em 0.9em;
   border-radius: 6px;
   width: fit-content;
 }
 
 .pending {
-  background-color: #fce96a;
+  background-color: #fff7b0;
   color: #5b4b00;
 }
 
 .completed {
-  background-color: #c8f796;
-  color: #275f00;
+  background-color: #d7fbb0;
+  color: #2c6600;
 }
 
 .canceled {
-  background-color: #ffb38a;
+  background-color: #ffcbb3;
   color: #802f00;
-}
-
-.logoutButton {
-  margin-top: 1em;
-  align-self: flex-end;
-  background-color: #004643 !important;
-  color: white !important;
-  font-weight: bold;
 }
 
 .platesLink {
@@ -104,7 +123,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -118,7 +137,7 @@
   border-radius: 1em;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   text-align: center;
   animation: scaleUp 0.3s ease;
 }
@@ -126,12 +145,13 @@
 .cookieModalContent h2 {
   margin-bottom: 0.5em;
   color: #004643;
+  font-size: 1.4rem;
 }
 
 .cookieModalContent p {
   color: #444;
   font-size: 0.95rem;
-  margin: 0.5em 0;
+  margin: 0.8em 0;
 }
 
 .cookieActions {
@@ -148,14 +168,33 @@
   font-weight: 500;
 }
 
+button.MuiButton-outlined:hover {
+  background-color: #f0f0f0;
+}
+
+.userInfo h3 {
+  color: #444;
+}
+
+
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleUp {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* RESPONSIVO */
@@ -170,5 +209,10 @@
 
   .cookieModalContent {
     padding: 1.5em;
+  }
+
+  .actionsRow {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

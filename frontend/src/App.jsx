@@ -39,12 +39,10 @@ export default function App() {
                     currentTerms: null,
                     user: {
                       ...authData.user,
-                      acceptedTerms: {
-                        version: authData.currentTerms.version,
-                        acceptedAt: new Date().toISOString(),
-                      },
-                    },
+                      acceptedTerms: result.acceptedTerms,
+                      }
                   };
+
                   localStorage.setItem("auth", JSON.stringify(updatedAuth));
                   setAuthData(updatedAuth);
                 }
@@ -59,3 +57,4 @@ export default function App() {
     </CartProvider>
   );
 }
+

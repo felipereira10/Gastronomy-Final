@@ -16,6 +16,11 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [editingPreferences, setEditingPreferences] = useState(false);
+  const [currentOptional, setCurrentOptional] = useState({});
+  const [activeTerms, setActiveTerms] = useState(null);
+
+
 
 
 
@@ -38,12 +43,30 @@ useEffect(() => {
     navigate("/auth");
   } else {
     getUserOrders(authData.user._id);
-  }
 
-  if (authData?.activeTerms) {
-    setShowTermsModal(true);
+    // Buscar termos ativos
+    fetch("http://localhost:3000/terms/active")
+      .then(res => res.json())
+      .then(data => {
+        setActiveTerms(data.term);
+
+        // Montar o estado currentOptional baseado nos termos opcionais e no que o usuário aceitou
+        const acceptedSections = authData.user.acceptedTerms?.sections || [];
+        const optionalPrefs = {};
+        data.term.sections.forEach(section => {
+          if (!section.required) {
+            // Acha se o usuário aceitou
+            const userSection = acceptedSections.find(s => s.title === section.title);
+            optionalPrefs[section.title] = !!(userSection && userSection.acceptedAt);
+          }
+        });
+        setCurrentOptional(optionalPrefs);
+      })
+      .catch(console.error);
+
   }
 }, [authData, navigate]);
+
 
   
 
@@ -72,20 +95,103 @@ useEffect(() => {
     Canceled: { icon: <FiXCircle />, className: styles.canceled },
   };
 
+
+
   return (
 
     <div className={styles.profilePage}>
+      {editingPreferences && (
+      <div className={styles.cookieOverlay}>
+        <div className={styles.cookieModalContent}>
+          <h2>Editar Preferências de Privacidade</h2>
+          {Object.keys(currentOptional).map((title) => (
+            <FormControlLabel
+              key={title}
+              control={
+                <Checkbox
+                  checked={currentOptional[title]}
+                  onChange={() =>
+                    setCurrentOptional((prev) => ({
+                      ...prev,
+                      [title]: !prev[title],
+                    }))
+                  }
+                />
+              }
+              label={title}
+            />
+          ))}
+          {activeTerms && activeTerms.sections.map(section => (
+            <FormControlLabel
+              key={section.title}
+              control={
+                <Checkbox
+                  checked={section.required ? true : !!currentOptional[section.title]}
+                  disabled={section.required}
+                  onChange={() => {
+                    if (!section.required) {
+                      setCurrentOptional(prev => ({
+                        ...prev,
+                        [section.title]: !prev[section.title]
+                      }));
+                    }
+                  }}
+                />
+              }
+              label={`${section.required ? "🔒" : ""} ${section.title}`}
+            />
+          ))}
 
-      {/* Modal com Usuários e Termos */}
-      {authData.user.role === 'admin' && (
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={() => navigate('/admin/users-terms')}
-        >
-          Ver usuários e termos
-        </Button>
-      )}
+          <div style={{ marginTop: '1rem' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={async () => {
+                try {
+                  const response = await fetch('http://localhost:3000/auth/update-terms', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization: `Bearer ${authData.token}`,
+                    },
+                    body: JSON.stringify({ optionalAccepted: currentOptional }),
+                  });
+
+                  const result = await response.json();
+
+                  if (result.success) {
+                    // Atualiza o contexto authData com os termos atualizados do backend
+                    setAuthData(prev => ({
+                      ...prev,
+                      user: {
+                        ...prev.user,
+                        acceptedTerms: result.acceptedTerms,
+                      },
+                    }));
+
+                    setEditingPreferences(false);
+                  } else {
+                    alert('Erro ao atualizar preferências: ' + (result.message || 'Erro desconhecido'));
+                  }
+                } catch (err) {
+                  alert('Erro ao atualizar preferências: ' + err.message);
+                }
+              }}
+            >
+              Salvar
+            </Button>
+
+            <Button
+              variant="outlined"
+              onClick={() => setEditingPreferences(false)}
+              style={{ marginLeft: '1rem' }}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      </div>
+    )}
 
       {/* Modal com Termos de Uso */}
       {showTermsModal && (
@@ -143,6 +249,17 @@ useEffect(() => {
         <div className={styles.userInfo}>
           <h1>{authData.user.fullname}</h1>
           <h3>{authData.user.email}</h3>
+          <div style={{ marginTop: '1rem' }}>
+          <h4>📋 Suas preferências:</h4>
+          <ul>
+            {(authData.user.acceptedTerms?.sections || []).map((section) => (
+              <li key={section.title}>
+                {section.required ? '🔒' : section.acceptedAt ? '✅' : '❌'} {section.title}
+              </li>
+            ))}
+          </ul>
+        </div>
+
         </div>
 
         <div className={styles.actionsRow}>
@@ -163,6 +280,33 @@ useEffect(() => {
             >
               Gerenciar Termos de Uso
             </Button> )}
+
+            {/* Modal com Usuários e Termos */}
+            {authData.user.role === 'admin' && (
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => navigate('/admin/users-terms')}
+              >
+                Ver usuários e termos
+              </Button>
+            )}
+              <Button
+                onClick={() => {
+                  const optionalPrefs = {};
+                  (authData.user.acceptedTerms?.sections || []).forEach(section => {
+                    if (!section.required) {
+                      optionalPrefs[section.title] = !!section.acceptedAt;
+                    }
+                  });
+                  setCurrentOptional(optionalPrefs); // Define uma vez só, para o modal
+                  setEditingPreferences(true);
+                }}
+              >
+                Editar Preferências de Privacidade
+              </Button>
+
+
         </div>
 
         <div className={styles.ordersContainer}>

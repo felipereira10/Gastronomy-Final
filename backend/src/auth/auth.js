@@ -74,7 +74,7 @@ authRouter.post('/signup', async(req, res) => {
             email: req.body.email,
             password: hashedPassword,
             salt,
-            acceptedTerms: null,
+            acceptedTerms: req.body.acceptedTerms || null,
             birthdate: req.body.birthdate || null,
             role: req.body.role || 'user'
         });
@@ -222,8 +222,14 @@ authRouter.post('/accept-terms', async (req, res) => {
     return res.status(200).send({
       success: true,
       statusCode: 200,
-      body: { text: 'Terms accepted successfully' }
+      message: 'Terms accepted successfully',
+      acceptedTerms: {
+        version: activeTerm.version,
+        acceptedAt: new Date(),
+        sections: sectionsAccepted
+      }
     });
+
 
   } catch (err) {
     console.error(err);
@@ -288,6 +294,46 @@ authRouter.post('/login', async (req, res) => {
     });
   })(req, res);
 });
+
+authRouter.post('/update-terms', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).send({ success: false, message: 'Unauthorized' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, 'secret');
+    const { optionalAccepted = {} } = req.body;
+
+    const user = await Mongo.db.collection('users').findOne({ _id: new ObjectId(decoded._id) });
+    const existingSections = user?.acceptedTerms?.sections || [];
+
+    const updatedSections = existingSections.map(section => ({
+      ...section,
+      acceptedAt: section.required ? section.acceptedAt : (optionalAccepted[section.title] ? new Date() : null)
+    }));
+
+    await Mongo.db.collection('users').updateOne(
+      { _id: new ObjectId(decoded._id) },
+      { $set: { 'acceptedTerms.sections': updatedSections } }
+    );
+
+    // Buscar novamente o usuário atualizado para enviar no response
+    const updatedUser = await Mongo.db.collection('users').findOne({ _id: new ObjectId(decoded._id) });
+
+    return res.status(200).send({
+      success: true,
+      message: 'Preferences updated',
+      acceptedTerms: updatedUser.acceptedTerms
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({ success: false, message: 'Server error', error: err.message });
+  }
+});
+
 
 
 export default authRouter

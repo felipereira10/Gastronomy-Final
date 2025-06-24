@@ -66,7 +66,27 @@ export default function TermsPage() {
       const result = await res.json();
 
       if (result.success) {
-        navigate("/profile");
+      // atualiza authData com nova versão dos termos
+      const updatedAuth = {
+        ...authData,
+        user: {
+          ...authData.user,
+          acceptedTerms: {
+            version: terms.version,
+            acceptedAt: new Date().toISOString(),
+            sections: terms.sections.map(section => ({
+              title: section.title,
+              required: section.required,
+              acceptedAt: new Date().toISOString()
+            }))
+          }
+        }
+      };
+
+      localStorage.setItem("auth", JSON.stringify(updatedAuth));
+      setAuthData(updatedAuth);
+
+      navigate("/profile");
       } else {
         setError("Erro ao aceitar os termos.");
       }

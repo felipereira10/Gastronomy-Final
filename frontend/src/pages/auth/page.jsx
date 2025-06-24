@@ -13,6 +13,8 @@ import { useNavigate } from "react-router-dom";
 import useAuthServices from "../../services/auth";
 import { useAuth } from '../../contexts/AuthContext';
 import Loading from "../../components/Loading/Loading.jsx";
+import { FormControlLabel, Checkbox } from '@mui/material';
+import { Link } from "react-router-dom";
 
 
 export default function Auth() {
@@ -22,6 +24,8 @@ export default function Auth() {
   const { login, signup, authLoading } = useAuthServices();
   const navigate = useNavigate();
   const { authData } = useAuth();
+  const [activeTerms, setActiveTerms] = useState(null);
+
 
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -39,6 +43,24 @@ export default function Auth() {
       }
     }
   }, [authData?.token, delayedRedirect]);
+
+  useEffect(() => {
+    const fetchActiveTerms = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/auth/terms/active");
+        const data = await res.json();
+        if (data.success) {
+          setActiveTerms(data.term); // salva o termo ativo
+        }
+      } catch (err) {
+        console.error("Erro ao buscar termos ativos:", err);
+      }
+    };
+
+    if (formType === "signup") {
+      fetchActiveTerms();
+    }
+  }, [formType]);
 
 
   const handleChangeFormType = () => {
@@ -81,7 +103,18 @@ export default function Auth() {
           return;
         }
 
-        await signup(formData);
+        if (!activeTerms) {
+          setErrorMessage('Erro ao obter a versão dos termos. Tente novamente mais tarde.');
+          return;
+        }
+
+        await signup({
+          ...formData,
+          acceptedTerms: {
+            version: activeTerms.version,
+            acceptedAt: new Date()
+          }
+        });
 
         setIsLoadingAfterLogin(true);
         setTimeout(() => {

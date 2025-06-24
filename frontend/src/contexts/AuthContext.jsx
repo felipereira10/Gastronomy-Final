@@ -1,10 +1,12 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [authData, setAuthData] = useState(null);
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedAuth = localStorage.getItem('auth');
@@ -22,9 +24,30 @@ export const AuthProvider = ({ children }) => {
     }
   }, [authData]);
 
+useEffect(() => {
+    async function checkTermsAcceptance() {
+      if (!authData?.token) return;
+
+      try {
+        const res = await fetch('http://localhost:3000/terms/active');
+        const data = await res.json();
+        const activeVersion = data?.term?.version;
+        const acceptedVersion = authData?.user?.acceptedTerms?.version;
+
+        if (activeVersion && acceptedVersion !== activeVersion) {
+          navigate('/terms'); // redireciona para página de aceitação
+        }
+      } catch (err) {
+        console.error('Erro ao verificar termos:', err);
+      }
+    }
+
+    checkTermsAcceptance();
+  }, [authData]); // roda toda vez que o usuário fizer login
+
   const value = { authData, setAuthData };
 
-  if (!isAuthLoaded) return null; // impede crash antes de carregar
+  if (!isAuthLoaded) return null;
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -24,28 +24,51 @@ export default class UsersDataAccess {
         return result
     }
 
-    async updateUser(userId, userData) {
-        const db = Mongo.getDb()
+async updateUser(userId, userData) {
+  try {
+    const db = Mongo.getDb();
 
-        if (userData.password) {
-            const salt = crypto.randomBytes(16)
-            const hashedPassword = await pbkdf2(userData.password, salt, 310000, 16, 'sha256')
-
-            userData = {
-                ...userData,
-                password: hashedPassword,
-                salt
-            }
-        }
-
-        const result = await db
-            .collection(collectionName)
-            .findOneAndUpdate(
-                { _id: new ObjectId(userId) },
-                { $set: userData },
-                { returnDocument: 'after' }
-            )
-
-        return result
+    // 🛑 Garante que o ID é válido
+    if (!ObjectId.isValid(userId)) {
+      throw new Error("ID de usuário inválido");
     }
+
+    // 🔐 Impede sobrescrita de campos sensíveis
+    delete userData._id;
+    delete userData.acceptedTerms;
+
+    // 🔐 Se estiver alterando senha
+    if (userData.password) {
+      const salt = crypto.randomBytes(16);
+      const hashedPassword = await pbkdf2(userData.password, salt, 310000, 16, 'sha256');
+      userData.password = hashedPassword;
+      userData.salt = salt;
+    }
+
+    // Trata birthdate
+    if (userData.birthdate) {
+      userData.birthdate = new Date(userData.birthdate);
+      if (isNaN(userData.birthdate.getTime())) {
+        throw new Error("Data de nascimento inválida");
+      }
+    }
+
+    const filter = ObjectId.isValid(userId) ? { _id: new ObjectId(userId) } : { _id: userId };
+
+    const result = await db.collection(collectionName).findOneAndUpdate(
+    filter,
+    { $set: userData },
+    { returnDocument: 'after' } // ou returnOriginal: false, dependendo da versão
+    );
+
+    if (!result.value) {
+      throw new Error("Usuário não encontrado");
+    }
+
+    return result.value;
+  } catch (err) {
+    console.error("❌ Erro ao atualizar usuário:", err.message);
+    throw err;
+  }
+}
 }

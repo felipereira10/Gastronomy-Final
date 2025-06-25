@@ -19,6 +19,7 @@ export function authenticateToken(req, res, next) {
         body: { message: 'Token inválido' }
       });
 
+    console.log("✅ Usuário autenticado via token:", user);
     req.user = user; // dados do token ficam disponíveis para a rota
     next();
   });

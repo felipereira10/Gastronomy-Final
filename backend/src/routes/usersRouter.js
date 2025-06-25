@@ -73,15 +73,37 @@ usersRouter.delete('/:id', authenticateToken, async (req, res) => {
   }
 });
 
+usersRouter.put('/:id', authenticateToken, async (req, res) => {
+  try {
+    // ⚠️ Segurança: garantir que o usuário só edite a si mesmo, a menos que seja admin
+    const requester = req.user;
+    const requesterId = requester._id.toString();
+    const targetId = req.params.id;
 
-usersRouter.put('/:id', async (req, res) => {
-    try {
-        const { body, success, statusCode } = await usersControllers.updateUser(req.params.id, req.body)
-        res.status(statusCode).send({ body, success, statusCode })
-    } catch (err) {
-        res.status(500).send({ success: false, statusCode: 500, body: { message: 'Internal server error' } })
+    if (requester.role !== 'admin' && requesterId !== targetId) {
+      return res.status(403).send({
+        success: false,
+        statusCode: 403,
+        body: { message: 'Você só pode editar seu próprio perfil' },
+      });
     }
-})
+
+    if (req.body.birthdate) {
+      req.body.birthdate = new Date(req.body.birthdate);
+    }
+
+    const { body, success, statusCode } = await usersControllers.updateUser(req.params.id, req.body);
+    res.status(statusCode).send({ body, success, statusCode });
+
+  } catch (err) {
+    res.status(500).send({
+      success: false,
+      statusCode: 500,
+      body: { message: 'Internal server error' }
+    });
+  }
+});
+
 
 
 export default usersRouter;

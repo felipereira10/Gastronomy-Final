@@ -16,5 +16,12 @@ export const Mongo = {
     } catch (error) {
       return { text: 'Error during mongo connection', error }
     }
+  },
+
+  getDb() {
+    if (!this.db) {
+      throw new Error("Banco de dados não conectado ainda");
+    }
+    return this.db;
   }
 }

@@ -27,12 +27,17 @@ export default class UsersControllers {
     }
 
     async updateUser(userId, userData) {
-        try {
-            const result = await this.dataAccess.updateUser(userId, userData)
-
-            return ok(result)
-        } catch (error) {
-            return serverError(error)
-        }
+    try {
+        const result = await this.dataAccess.updateUser(userId, userData);
+        return ok(result);
+    } catch (error) {
+        console.error("❌ Erro no controller updateUser:", error);
+        return {
+        success: false,
+        statusCode: 500,
+        body: { message: error.message || "Erro interno no servidor" },
+        };
     }
+    }
+
 }

@@ -8,6 +8,7 @@ import Loading from "../../components/Loading/Loading.jsx";
 import styles from "./page.module.css";
 import { FiLogOut, FiClock, FiCheckCircle, FiXCircle } from "react-icons/fi";
 import { Stack } from "@mui/material";
+import axios from "axios";
 
 export default function Profile() {
   const { authData, setAuthData } = useAuth();
@@ -20,7 +21,14 @@ export default function Profile() {
   const [editingPreferences, setEditingPreferences] = useState(false);
   const [currentOptional, setCurrentOptional] = useState({});
   const [activeTerms, setActiveTerms] = useState(null);
-
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [editForm, setEditForm] = useState({
+    fullname: authData.user.fullname || "",
+    email: authData.user.email || "",
+    birthdate: authData.user.birthdate
+      ? new Date(authData.user.birthdate).toISOString().split("T")[0]
+      : ""
+  });
 
 
 
@@ -85,7 +93,43 @@ useEffect(() => {
     }));
   };
 
-  
+  const handleProfileSave = async () => {
+    try {
+      const res = await fetch(`http://localhost:3000/users/${authData.user._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authData.token}`,
+        },
+        body: JSON.stringify({
+          fullname: editForm.fullname,
+          email: editForm.email,
+          birthdate: new Date(editForm.birthdate),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Atualiza o authData com as infos novas
+        setAuthData((prev) => ({
+          ...prev,
+          user: {
+            ...prev.user,
+            fullname: editForm.fullname,
+            email: editForm.email,
+            birthdate: formattedBirthdate,
+          },
+        }));
+        setEditingProfile(false);
+      } else {
+        alert(data.body?.message || "Erro ao atualizar perfil");
+      }
+    } catch (err) {
+      alert("Erro ao atualizar perfil: " + err.message);
+    }
+  };
+
 
 
   if (loading) return <Loading />;
@@ -105,23 +149,6 @@ useEffect(() => {
       <div className={styles.cookieOverlay}>
         <div className={styles.cookieModalContent}>
           <h2>Editar Preferências de Privacidade</h2>
-          {Object.keys(currentOptional).map((title) => (
-            <FormControlLabel
-              key={title}
-              control={
-                <Checkbox
-                  checked={currentOptional[title]}
-                  onChange={() =>
-                    setCurrentOptional((prev) => ({
-                      ...prev,
-                      [title]: !prev[title],
-                    }))
-                  }
-                />
-              }
-              label={title}
-            />
-          ))}
           {activeTerms && activeTerms.sections.map(section => (
             <FormControlLabel
               key={section.title}
@@ -244,6 +271,58 @@ useEffect(() => {
         </div>
       )}
       
+      {editingProfile && (
+      <div className={styles.cookieOverlay}>
+        <div className={styles.cookieModalContent}>
+          <h2>Editar Perfil</h2>
+          <label>
+            Nome Completo:
+            <input
+              type="text"
+              value={editForm.fullname}
+              onChange={(e) =>
+                setEditForm((prev) => ({ ...prev, fullname: e.target.value }))
+              }
+            />
+          </label>
+          <label>
+            Email:
+            <input
+              type="email"
+              value={editForm.email}
+              onChange={(e) =>
+                setEditForm((prev) => ({ ...prev, email: e.target.value }))
+              }
+            />
+          </label>
+          <label>
+            Data de Nascimento:
+            <input
+              type="date"
+              value={editForm.birthdate}
+              onChange={(e) =>
+                setEditForm((prev) => ({ ...prev, birthdate: e.target.value }))
+              }
+            />
+          </label>
+
+
+          <div style={{ marginTop: "1rem" }}>
+            <Button variant="contained" color="primary" onClick={handleProfileSave}>
+              Salvar
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => setEditingProfile(false)}
+              style={{ marginLeft: "1rem" }}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      </div>
+    )}
+
 
       {/* Conteúdo principal */}
       <div className={styles.profileContainer}>
@@ -264,6 +343,20 @@ useEffect(() => {
         </div>
 
         <div className={styles.actionsRow}>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              setEditForm({
+                fullname: authData.user.fullname,
+                email: authData.user.email,
+              });
+              setEditingProfile(true);
+            }}
+          >
+            Editar Perfil
+          </Button>
 
           {authData?.user?.role === "admin" && (
             <Button

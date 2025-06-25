@@ -36,13 +36,14 @@ export default function Auth() {
 
   useEffect(() => {
     if (authData?.token && delayedRedirect) {
-      if (authData.user.acceptedTerms) {
-        navigate('/profile');
+      if (authData.mustAcceptTerms) {
+        navigate('/terms');
       } else {
-        navigate('/accept-terms');
+        navigate('/profile');
       }
     }
   }, [authData?.token, delayedRedirect]);
+
 
   useEffect(() => {
     const fetchActiveTerms = async () => {
@@ -83,14 +84,15 @@ export default function Auth() {
       if (formType === 'login') {
         const res = await login(formData);
 
-        if (res?.user?.acceptedTerms === false) {
-          navigate('/terms');
-        } else {
-          setIsLoadingAfterLogin(true);
-          setTimeout(() => {
-            navigate('/profile');
-          }, 2000);
-        }
+      if (res?.mustAcceptTerms) {
+        navigate('/terms');
+      } else {
+        setIsLoadingAfterLogin(true);
+        setTimeout(() => {
+          navigate('/profile');
+        }, 2000);
+      }
+
 
       } else if (formType === 'signup') {
         if (formData.password !== formData.confirmPassword) {

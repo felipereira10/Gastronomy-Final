@@ -32,8 +32,8 @@ export default function useAuthServices() {
           const authPayload = {
             token: result.body.token,
             user: result.body.user,
-            // mustAcceptTerms: result.body.mustAcceptTerms || false,
-            // currentTerms: result.body.currentTerms || null,
+            mustAcceptTerms: result.body.mustAcceptTerms || false,
+            currentTerms: result.body.currentTerms || null,
           };
 
           localStorage.setItem('auth', JSON.stringify(authPayload));
@@ -75,8 +75,8 @@ export default function useAuthServices() {
             const authPayload = {
               token: result.body.token,
               user: result.body.user,
-              // mustAcceptTerms: result.body.mustAcceptTerms,
-              // currentTerms: result.body.currentTerms
+              mustAcceptTerms: result.body.mustAcceptTerms || false,
+              currentTerms: result.body.currentTerms || null,
             };
 
             localStorage.setItem('auth', JSON.stringify(authPayload));

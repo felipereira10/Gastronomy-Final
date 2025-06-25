@@ -49,11 +49,13 @@
   padding: 0.6em 1.4em;
   border-radius: 8px;
   transition: background-color 0.3s ease;
+  min-width: 140px; /* para consistência */
 }
 
 .logoutButton:hover {
   background-color: #003b39 !important;
 }
+
 
 .ordersContainer {
   display: grid;

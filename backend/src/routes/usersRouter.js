@@ -20,6 +20,7 @@ usersRouter.get('/admin/users-terms', async (req, res) => {
         fullname: 1,
         email: 1,
         role: 1,
+        birthdate: 1,
         acceptedTerms: 1,
         acceptedTermsAt: 1
       })
@@ -52,15 +53,18 @@ usersRouter.delete('/:id', authenticateToken, async (req, res) => {
   const userIdToDelete = req.params.id;
   const requester = req.user; // do authenticateToken
 
+  // Converte para string para garantir comparação correta
+  const requesterIdStr = requester._id.toString();
+  const userIdToDeleteStr = userIdToDelete.toString();
+
   // Se o usuário não é admin e está tentando deletar outra conta que não a dele
-  if (requester.role !== 'admin' && requester._id !== userIdToDelete) {
+  if (requester.role !== 'admin' && requesterIdStr !== userIdToDeleteStr) {
     return res.status(403).send({ 
       success: false, 
       message: 'Forbidden: só pode deletar sua própria conta' 
     });
   }
 
-  // Aqui o delete real (chame sua controller)
   try {
     const { body, success, statusCode } = await usersControllers.deleteUser(userIdToDelete);
     res.status(statusCode).send({ body, success, statusCode });
@@ -68,6 +72,7 @@ usersRouter.delete('/:id', authenticateToken, async (req, res) => {
     res.status(500).send({ success: false, statusCode: 500, body: { message: 'Internal server error' } });
   }
 });
+
 
 usersRouter.put('/:id', async (req, res) => {
     try {

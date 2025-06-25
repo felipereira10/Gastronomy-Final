@@ -281,6 +281,33 @@ export default function Auth() {
                   }
                 }}
               />
+              
+              <TextField
+                required
+                label="Birthdate"
+                type="date"
+                name="birthdate"
+                value={formData.birthdate || ""}
+                onChange={handleFormDataChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+                InputLabelProps={{
+                  shrink: true,
+                  style: { 
+                    color: "#faf0ca"
+                  }
+                }}
+                InputProps={{
+                  style: {
+                    color: "#faf0ca",
+                    backgroundColor: "#003c3c",
+                    borderRadius: "6px",
+                    paddingTop: "3px",
+                  }
+                }}
+              />
+
               <TextField
                 required
                 label="Password"

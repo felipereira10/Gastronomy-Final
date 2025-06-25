@@ -7,6 +7,7 @@ import useAuthServices from "../../services/auth.jsx";
 import Loading from "../../components/Loading/Loading.jsx";
 import styles from "./page.module.css";
 import { FiLogOut, FiClock, FiCheckCircle, FiXCircle } from "react-icons/fi";
+import { Stack } from "@mui/material";
 
 export default function Profile() {
   const { authData, setAuthData } = useAuth();
@@ -263,20 +264,12 @@ useEffect(() => {
         </div>
 
         <div className={styles.actionsRow}>
-          <Button
-            variant="contained"
-            onClick={handleLogout}
-            className={styles.logoutButton}
-            startIcon={<FiLogOut />}
-          >
-            Logout
-          </Button>
 
           {authData?.user?.role === "admin" && (
             <Button
               variant="outlined"
+              color="tertiary"
               onClick={() => navigate("/admin/terms")}
-              style={{ marginTop: "1rem" }}
             >
               Gerenciar Termos de Uso
             </Button> )}
@@ -285,13 +278,16 @@ useEffect(() => {
             {authData.user.role === 'admin' && (
               <Button
                 variant="outlined"
-                color="primary"
+                color="tertiary"
                 onClick={() => navigate('/admin/users-terms')}
               >
                 Ver usuários e termos
               </Button>
             )}
+            <br /><br />
               <Button
+                variant="contained"
+                color="secondary"
                 onClick={() => {
                   const optionalPrefs = {};
                   (authData.user.acceptedTerms?.sections || []).forEach(section => {
@@ -334,7 +330,17 @@ useEffect(() => {
               <Link to="/plates" className={styles.platesLink}>
                 Click here and check out our specialties!
               </Link>
-            </div>
+              <br/><br/><br/><br/>
+              <Button
+                variant="contained"
+                onClick={handleLogout}
+                className={styles.logoutButton}
+                startIcon={<FiLogOut />}
+              >
+                Logout
+            </Button>
+            </div>  
+            
           )}
         </div>
       </div>

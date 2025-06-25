@@ -21,6 +21,7 @@ async function main () {
     console.log(mongoConnection)
     
     app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
     app.use(cors());
 
     app.get('/', (req, res) => {

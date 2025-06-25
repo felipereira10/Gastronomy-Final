@@ -15,8 +15,10 @@ const authRouter = express.Router()
 
 passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, callback) => {
     const user = await Mongo.db
-    .collection(collectionName)
-    .findOne({ email: email })
+      .collection('users')
+      .findOne({ email: email });
+
+
 
     if(!user) {
         return callback(null, false)
@@ -41,86 +43,81 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, passwor
     })
 }))
 
-authRouter.post('/signup', async(req, res) => {
-  const activeTerms = await Mongo.db.collection('terms').findOne({ active: true });
+authRouter.post('/signup', async (req, res) => {
+  try {
+    const { fullname, email, password, birthdate, role } = req.body;
 
-  const sectionsAccepted = activeTerms.sections.map(section => ({
-    title: section.title,
-    required: section.required,
-    acceptedAt: section.required ? new Date() : null // Aceita só as obrigatórias
-  }));
-
-  const result = await Mongo.db.collection(collectionName).insertOne({
-    fullname: req.body.fullname,
-    email: req.body.email,
-    password: hashedPassword,
-    salt,
-    acceptedTerms: activeTerms ? {
-      version: activeTerms.version,
-      acceptedAt: new Date(),
-      sections: sectionsAccepted
-    } : null,
-    birthdate: req.body.birthdate || null,
-    role: req.body.role || 'user'
-  });
-
-    const checkUser = await Mongo.db
-    .collection(collectionName)
-    .findOne({ email: req.body.email })
-
-    if(checkUser) {
-        return res.status(500).send({
-            success: false,
-            statusCode: 500,
-            body: {
-                text: 'User already exists'
-            }
-        })
+    const checkUser = await Mongo.db.collection(collectionName).findOne({ email });
+    if (checkUser) {
+      return res.status(409).send({
+        success: false,
+        statusCode: 409,
+        body: { text: 'User already exists' }
+      });
     }
 
-    const salt = crypto.randomBytes(16)
-    
-    crypto.pbkdf2(req.body.password, salt, 310000, 16, 'sha256', async (error, hashedPassword) => {
-        if(error) {
-            res.status(500).send({
-                success: false,
-                statusCode: 500,
-                body: {
-                    text: 'Internal error while encrypting password'
-                }
-            });
-        }
-
-        const result = await Mongo.db.collection(collectionName).insertOne({
-            fullname: req.body.fullname,
-            email: req.body.email,
-            password: hashedPassword,
-            salt,
-            acceptedTerms: req.body.acceptedTerms || null,
-            birthdate: req.body.birthdate || null,
-            role: req.body.role || 'user'
+    const salt = crypto.randomBytes(16);
+    crypto.pbkdf2(password, salt, 310000, 16, 'sha256', async (error, hashedPassword) => {
+      if (error) {
+        return res.status(500).send({
+          success: false,
+          statusCode: 500,
+          body: { text: 'Internal error while encrypting password' }
         });
+      }
 
+      const activeTerms = await Mongo.db.collection('terms').findOne({ active: true });
 
-        if(result.insertedId) {
-            const user = await Mongo.db
-            .collection(collectionName)
-            .findOne({ _id: new ObjectId(result.insertedId) }, { projection: { password: 0, salt: 0 } })
+      const sectionsAccepted = activeTerms ? activeTerms.sections.map(section => ({
+        title: section.title,
+        required: section.required,
+        acceptedAt: section.required ? new Date() : null
+      })) : [];
 
-            const token = jwt.sign(user, 'secret')
+      const result = await Mongo.db.collection(collectionName).insertOne({
+        fullname,
+        email,
+        password: hashedPassword,
+        salt,
+        acceptedTerms: activeTerms ? {
+          version: activeTerms.version,
+          acceptedAt: new Date(),
+          sections: sectionsAccepted
+        } : null,
+        birthdate: birthdate || null,
+        role: role || 'user',
+        createdAt: new Date()
+      });
 
-            return res.send({
-                success: true,
-                statusCode: 200,
-                body: {
-                    text: 'User registered',
-                    user,
-                    token
-                }
-            })
-        }
-    })
-})
+      if (result.insertedId) {
+        const user = await Mongo.db.collection(collectionName).findOne(
+          { _id: new ObjectId(result.insertedId) },
+          { projection: { password: 0, salt: 0 } }
+        );
+
+        const token = jwt.sign(user, 'secret');
+
+        return res.status(201).send({
+          success: true,
+          statusCode: 201,
+          body: {
+            text: 'User registered',
+            user,
+            token
+          }
+        });
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({
+      success: false,
+      statusCode: 500,
+      body: { text: 'Internal server error', error: err.message }
+    });
+  }
+});
+
 
 authRouter.post('/terms', async (req, res) => {
   const { version, content } = req.body;

@@ -42,6 +42,28 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, passwor
 }))
 
 authRouter.post('/signup', async(req, res) => {
+  const activeTerms = await Mongo.db.collection('terms').findOne({ active: true });
+
+  const sectionsAccepted = activeTerms.sections.map(section => ({
+    title: section.title,
+    required: section.required,
+    acceptedAt: section.required ? new Date() : null // Aceita só as obrigatórias
+  }));
+
+  const result = await Mongo.db.collection(collectionName).insertOne({
+    fullname: req.body.fullname,
+    email: req.body.email,
+    password: hashedPassword,
+    salt,
+    acceptedTerms: activeTerms ? {
+      version: activeTerms.version,
+      acceptedAt: new Date(),
+      sections: sectionsAccepted
+    } : null,
+    birthdate: req.body.birthdate || null,
+    role: req.body.role || 'user'
+  });
+
     const checkUser = await Mongo.db
     .collection(collectionName)
     .findOne({ email: req.body.email })
@@ -275,9 +297,11 @@ authRouter.post('/login', async (req, res) => {
     const { password, salt, ...cleanUser } = user;
 
     // Garante que o campo acceptedTerms seja enviado mesmo se ausente
-    if (!cleanUser.acceptedTerms) {
-      cleanUser.acceptedTerms = null;
-    }
+    cleanUser.acceptedTerms = cleanUser.acceptedTerms || {
+      version: null,
+      acceptedAt: null,
+      sections: []
+    };
 
     const token = jwt.sign(cleanUser, 'secret');
 

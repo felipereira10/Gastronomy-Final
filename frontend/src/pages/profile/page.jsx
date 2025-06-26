@@ -10,6 +10,7 @@ import { FiLogOut, FiClock, FiCheckCircle, FiXCircle } from "react-icons/fi";
 import { Stack } from "@mui/material";
 import axios from "axios";
 
+
 export default function Profile() {
   const { authData, setAuthData } = useAuth();
   const { logout } = useAuthServices(authData, setAuthData);
@@ -35,10 +36,12 @@ export default function Profile() {
 
   const getUserOrders = async (userId) => {
     try {
-      const res = await fetch(`http://localhost:3000/orders/user/${userId}`);
+      const res = await fetch(`http://localhost:3000/orders/user/${userId}`, {
+         headers: { "Authorization": `Bearer ${authData.token}`}
+        });
       const data = await res.json();
       if (data.success) {
-        setOrders(data.orders);
+        setOrders(data.body);
       }
     } catch (err) {
       console.error("Error fetching orders:", err);
@@ -394,6 +397,15 @@ useEffect(() => {
               >
                 Editar Preferências de Privacidade
               </Button>
+              
+              <Button
+                variant="contained"
+                onClick={handleLogout}
+                className={styles.logoutButton}
+                startIcon={<FiLogOut />}
+              >
+                Logout
+            </Button>
 
 
         </div>
@@ -404,8 +416,8 @@ useEffect(() => {
               const statusInfo = statusMap[order.pickupStatus];
               return (
                 <div key={order._id} className={styles.orderContainer}>
-                  <p className={`${styles.pickupStatus} ${statusInfo.className}`}>
-                    {statusInfo.icon} {order.pickupStatus}
+                  <p className={`${styles.pickupStatus} ${statusInfo?.className || ''}`}>
+                    {statusInfo?.icon} {order.pickupStatus || 'Unknown'}
                   </p>
                   <h3>{order.pickupTime}</h3>
                   {order.orderItems.map((item) => (
@@ -424,14 +436,6 @@ useEffect(() => {
                 Click here and check out our specialties!
               </Link>
               <br/><br/><br/><br/>
-              <Button
-                variant="contained"
-                onClick={handleLogout}
-                className={styles.logoutButton}
-                startIcon={<FiLogOut />}
-              >
-                Logout
-            </Button>
             </div>  
             
           )}

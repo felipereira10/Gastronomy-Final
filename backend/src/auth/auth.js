@@ -7,10 +7,12 @@ import jwt from 'jsonwebtoken';
 import { ObjectId, MongoClient } from 'mongodb';
 import { checkTermsAccepted } from '../middlewares/checkTerms.js';
 import { ensureAuthenticated } from '../middlewares/ensureAuthenticated.js'; // seu middleware de autenticação
-import usersRouter from '../routes/usersRouter.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
+
+
 
 const collectionName = 'users'
-
+const now = new Date();
 const authRouter = express.Router()
 
 passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, callback) => {
@@ -71,7 +73,7 @@ authRouter.post('/signup', async (req, res) => {
       const sectionsAccepted = activeTerms ? activeTerms.sections.map(section => ({
         title: section.title,
         required: section.required,
-        acceptedAt: section.required ? new Date() : null
+        acceptedAt: section.required ? now : null
       })) : [];
 
       const result = await Mongo.db.collection(collectionName).insertOne({
@@ -81,12 +83,12 @@ authRouter.post('/signup', async (req, res) => {
         salt,
         acceptedTerms: activeTerms ? {
           version: activeTerms.version,
-          acceptedAt: new Date(),
+          acceptedAt: now,
           sections: sectionsAccepted
         } : null,
         birthdate: birthdate || null,
         role: role || 'user',
-        createdAt: new Date()
+        createdAt: now
       });
 
       if (result.insertedId) {
@@ -220,8 +222,8 @@ authRouter.post('/accept-terms', async (req, res) => {
       title: section.title,
       required: section.required,
       acceptedAt: section.required 
-        ? new Date() // obrigatórios sempre tem data de aceite
-        : (optionalAccepted[section.title] ? new Date() : null) // opcionais dependem do que veio do front
+        ? now // obrigatórios sempre tem data de aceite
+        : (optionalAccepted[section.title] ? now : null) // opcionais dependem do que veio do front
     }));
 
     // Atualiza o usuário no banco
@@ -231,7 +233,7 @@ authRouter.post('/accept-terms', async (req, res) => {
         $set: {
           acceptedTerms: {
             version: activeTerm.version,
-            acceptedAt: new Date(),
+            acceptedAt: now,
             sections: sectionsAccepted
           }
         }
@@ -244,7 +246,7 @@ authRouter.post('/accept-terms', async (req, res) => {
       message: 'Terms accepted successfully',
       acceptedTerms: {
         version: activeTerm.version,
-        acceptedAt: new Date(),
+        acceptedAt: now,
         sections: sectionsAccepted
       }
     });
@@ -332,7 +334,7 @@ authRouter.post('/update-terms', async (req, res) => {
 
     const updatedSections = existingSections.map(section => ({
       ...section,
-      acceptedAt: section.required ? section.acceptedAt : (optionalAccepted[section.title] ? new Date() : null)
+      acceptedAt: section.required ? section.acceptedAt : (optionalAccepted[section.title] ? now : null)
     }));
 
     await Mongo.db.collection('users').updateOne(

@@ -26,7 +26,7 @@ export default class UsersDataAccess {
 
 async updateUser(userId, userData) {
   try {
-    const db = Mongo.getDb();
+    const db = Mongo.db;
 
     // 🛑 Garante que o ID é válido
     if (!ObjectId.isValid(userId)) {

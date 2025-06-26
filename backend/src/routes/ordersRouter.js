@@ -1,5 +1,6 @@
 import express from 'express'
 import OrdersControllers from '../controllers/ordersController.js'
+import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 const ordersRouter = express.Router()
 const ordersControllers = new OrdersControllers()
@@ -10,7 +11,7 @@ ordersRouter.get('/', async (req, res) => {
     res.status(statusCode).send({ body, success, statusCode })
 })
 
-ordersRouter.get('/userorders/:id', async (req, res) => {
+ordersRouter.get('/user/:id', authenticateToken, async (req, res) => {
     const { body, success, statusCode } = await ordersControllers.getOrdersByUserId(req.params.id)
 
     res.status(statusCode).send({ body, success, statusCode })

@@ -42,7 +42,8 @@ export default function Auth() {
         navigate('/profile');
       }
     }
-  }, [authData?.token, delayedRedirect]);
+  }, [authData?.token, delayedRedirect, navigate]);
+
 
 
   useEffect(() => {
@@ -87,10 +88,7 @@ export default function Auth() {
       if (res?.mustAcceptTerms) {
         navigate('/terms');
       } else {
-        setIsLoadingAfterLogin(true);
-        setTimeout(() => {
-          navigate('/profile');
-        }, 2000);
+        setDelayedRedirect(true);
       }
 
 
@@ -128,9 +126,7 @@ export default function Auth() {
     }
   };
 
-
-
-  if (authLoading || isLoadingAfterLogin) {
+  if (authLoading || (delayedRedirect && !authData?.token)) {
     return <Loading />;
   }
 

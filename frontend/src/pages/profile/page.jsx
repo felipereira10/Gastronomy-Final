@@ -18,7 +18,7 @@ export default function Profile() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  const [showTermsModal, setShowTermsModal] = useState(false);
+
   const [editingPreferences, setEditingPreferences] = useState(false);
   const [currentOptional, setCurrentOptional] = useState({});
   const [activeTerms, setActiveTerms] = useState(null);
@@ -223,56 +223,6 @@ useEffect(() => {
         </div>
       </div>
     )}
-
-      {/* Modal com Termos de Uso */}
-      {showTermsModal && (
-        <div className={styles.cookieOverlay}>
-          <div className={styles.cookieModalContent}>
-            <h2>📝 Atualização nos Termos de Uso</h2>
-            <p>Você precisa aceitar os novos termos para continuar:</p>
-            <pre style={{ whiteSpace: "pre-wrap", maxHeight: "200px", overflowY: "scroll" }}>
-              {authData.activeTerms?.content}
-            </pre>
-            <Button
-              variant="contained"
-              onClick={async () => {
-                try {
-                  await axios.post(
-                    "http://localhost:3000/auth/accept-terms",
-                    {},
-                    {
-                      headers: {
-                        Authorization: `Bearer ${authData.token}`,
-                      },
-                    }
-                  );
-
-                  // Atualiza authData no contexto
-                  setAuthData((prev) => ({
-                    ...prev,
-                    user: {
-                      ...prev.user,
-                      acceptedTerms: {
-                        version: authData.activeTerms.version,
-                        acceptedAt: new Date()
-                      }
-                    },
-                    activeTerms: null
-                  }));
-
-                  setShowTermsModal(false);
-                } catch (err) {
-                  alert("Erro ao aceitar os termos.");
-                }
-              }}
-              color="primary"
-              sx={{ marginTop: 2 }}
-            >
-              Aceitar Termos
-            </Button>
-          </div>
-        </div>
-      )}
       
       {editingProfile && (
       <div className={styles.cookieOverlay}>

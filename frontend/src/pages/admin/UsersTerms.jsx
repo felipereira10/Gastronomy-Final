@@ -24,6 +24,8 @@ export default function UsersTerms() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -47,13 +49,17 @@ export default function UsersTerms() {
   }, []);
 
   const handleDelete = async (userId) => {
-    if (!window.confirm("Tem certeza que deseja excluir este usuário?")) return;
-
     try {
       await axios.delete(`http://localhost:3000/users/${userId}`, {
         headers: { Authorization: `Bearer ${authData.token}` },
       });
+
       setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
+      setDeleteSuccess(true); // Exibe a confirmação
+
+      setTimeout(() => {
+        setDeleteSuccess(false);
+      }, 1500);
     } catch (err) {
       console.error("Erro ao excluir usuário", err);
       alert("Erro ao excluir usuário. Tente novamente.");
@@ -92,6 +98,44 @@ export default function UsersTerms() {
 
   return (
     <Box sx={{ padding: 4 }}>
+      {/* Feedback de exclusão */}
+      {deleteSuccess && (
+        <div
+          className="cookieOverlay"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.45)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#ffe0e0",
+              padding: "2em",
+              borderRadius: "1em",
+              width: "90%",
+              maxWidth: "500px",
+              textAlign: "center",
+              animation: "fadeScaleIn 0.3s ease",
+            }}
+          >
+            <ClearIcon
+              style={{ fontSize: 40, color: "red", marginBottom: "1rem" }}
+            />
+            <Typography variant="h6" color="error">
+              Usuário excluído com sucesso!
+            </Typography>
+          </div>
+        </div>
+      )}
+
       <Typography variant="h4" gutterBottom>
         Usuários e Aceite de Termos
       </Typography>
@@ -228,7 +272,7 @@ export default function UsersTerms() {
                       color="error"
                       startIcon={<DeleteIcon />}
                       sx={{ marginTop: 2, alignSelf: "flex-start" }}
-                      onClick={async () => await handleDelete(user._id)}
+                      onClick={() => setConfirmDeleteId(user._id)}
                     >
                       Excluir Usuário
                     </Button>
@@ -241,6 +285,75 @@ export default function UsersTerms() {
           <Typography>Nenhum usuário encontrado.</Typography>
         )}
       </List>
+
+      {/* Modal de confirmação fora do map */}
+      {confirmDeleteId && (
+        <div
+          className="cookieOverlay"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.45)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+            color: "white",
+            backdropFilter: "blur(2px)",
+            animation: "fadeIn 0.3s ease",
+            // border: "2px solid rgba(255, 255, 255, 0.5)",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "rgba(202, 57, 57, 0.51)",
+              padding: "2em",
+              borderRadius: "1em",
+              width: "90%",
+              maxWidth: "500px",
+              textAlign: "center",
+              animation: "fadeScaleIn 0.3s ease",
+              border: "2px solid rgb(255, 255, 255)",
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              Tem certeza que deseja excluir este usuário?
+            </Typography>
+
+            <Stack direction="row" spacing={2} mt={3} justifyContent="center">
+              <Button
+                variant="contained"
+                color="error"
+                onClick={async () => {
+                  await handleDelete(confirmDeleteId);
+                  setConfirmDeleteId(null);
+                }}
+              >
+                Sim, excluir
+              </Button>
+
+              <Button
+                variant="outlined"
+                onClick={() => setConfirmDeleteId(null)}
+                sx={{
+                  color: "white",
+                  borderColor: "white",
+                  "&:hover": {
+                    backgroundColor: "white",
+                    color: "red",
+                    borderColor: "red",
+                  },
+                }}
+              >
+                Cancelar
+              </Button>
+            </Stack>
+          </div>
+        </div>
+      )}
     </Box>
   );
 }

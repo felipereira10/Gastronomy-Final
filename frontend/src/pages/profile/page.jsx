@@ -27,6 +27,9 @@ export default function Profile() {
     email: "",
     birthdate: ""
   });
+  // Após editar
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
 
   useEffect(() => {
     if (!authData?.user?._id) {
@@ -114,10 +117,12 @@ const handleProfileSave = async () => {
           ...prev.user,
           fullname: editForm.fullname,
           email: editForm.email,
-          birthdate: birthdateString, // Atualiza com a string correta
+          birthdate: birthdateString,
         },
       }));
       setEditingProfile(false);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 1500);
     } else {
       alert(data.body?.message || "Erro ao atualizar perfil");
     }
@@ -168,6 +173,16 @@ const handleProfileSave = async () => {
               <Button
                 variant="contained"
                 color="primary"
+                sx={{
+                  backgroundColor: "green",
+                  color: "white",
+                  borderColor: "white",
+                  "&:hover": {
+                    backgroundColor: "white",
+                    color: "green",
+                    borderColor: "green",
+                  },
+                }}
                 onClick={async () => {
                   try {
                     const response = await fetch('http://localhost:3000/auth/update-terms', {
@@ -250,7 +265,18 @@ const handleProfileSave = async () => {
             </label>
 
             <div style={{ marginTop: "1rem" }}>
-              <Button variant="contained" color="primary" onClick={handleProfileSave}>
+              <Button variant="contained" onClick={handleProfileSave}
+                sx={{
+                  backgroundColor: "green",
+                  color: "white",
+                  borderColor: "white",
+                  "&:hover": {
+                    backgroundColor: "white",
+                    color: "green",
+                    borderColor: "green",
+                  },
+                }}
+              >
                 Salvar
               </Button>
               <Button
@@ -264,6 +290,18 @@ const handleProfileSave = async () => {
           </div>
         </div>
       )}
+
+      {saveSuccess && (
+        <div className={styles.cookieOverlay}>
+          <div className={styles.successModalContent}>
+            <FiCheckCircle size={36} color="green" style={{ marginBottom: "1rem" }} />
+            <h2 style={{ color: "green" }}>Perfil atualizado com sucesso!</h2>
+          </div>
+        </div>
+      )}
+
+
+
 
       {/* Conteúdo principal */}
       <div className={styles.profileContainer}>

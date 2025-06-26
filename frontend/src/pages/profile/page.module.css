@@ -218,3 +218,25 @@ button.MuiButton-outlined:hover {
     align-items: stretch;
   }
 }
+
+@keyframes fadeScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.successModalContent {
+  background-color: #e0ffe0;
+  padding: 2em;
+  border-radius: 1em;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  animation: fadeScaleIn 0.8s ease;
+}

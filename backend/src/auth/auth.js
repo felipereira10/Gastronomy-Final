@@ -97,7 +97,16 @@ authRouter.post('/signup', async (req, res) => {
           { projection: { password: 0, salt: 0 } }
         );
 
-        const token = jwt.sign(user, 'secret');
+        const token = jwt.sign(
+          {
+            _id: result.insertedId.toString(),
+            role: user.role,
+            email: user.email,
+          },
+          'secret',
+          { expiresIn: '1h' }
+        );
+
 
         return res.status(201).send({
           success: true,
@@ -302,7 +311,16 @@ authRouter.post('/login', async (req, res) => {
       sections: []
     };
 
-    const token = jwt.sign(cleanUser, 'secret');
+    const token = jwt.sign(
+      {
+        _id: user._id.toString(),  // 🔑 sempre como string
+        role: user.role,
+        email: user.email,
+      },
+      'secret',
+      { expiresIn: '1h' } // ou o tempo que quiser
+    );
+
 
     return res.status(200).send({
       success: true,

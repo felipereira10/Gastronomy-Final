@@ -26,18 +26,19 @@ export default class UsersDataAccess {
 
 async updateUser(userId, userData) {
   try {
-    const db = Mongo.db;
+    const db = Mongo.getDb();
 
-    // 🛑 Garante que o ID é válido
+    console.log("userId recebido:", userId);
     if (!ObjectId.isValid(userId)) {
       throw new Error("ID de usuário inválido");
     }
 
-    // 🔐 Impede sobrescrita de campos sensíveis
     delete userData._id;
     delete userData.acceptedTerms;
 
-    // 🔐 Se estiver alterando senha
+    console.log("userData após remoção de _id e acceptedTerms:", userData);
+
+
     if (userData.password) {
       const salt = crypto.randomBytes(16);
       const hashedPassword = await pbkdf2(userData.password, salt, 310000, 16, 'sha256');
@@ -45,7 +46,6 @@ async updateUser(userId, userData) {
       userData.salt = salt;
     }
 
-    // Trata birthdate
     if (userData.birthdate) {
       userData.birthdate = new Date(userData.birthdate);
       if (isNaN(userData.birthdate.getTime())) {
@@ -53,19 +53,32 @@ async updateUser(userId, userData) {
       }
     }
 
-    const filter = ObjectId.isValid(userId) ? { _id: new ObjectId(userId) } : { _id: userId };
+    console.log("Dados para update:", userData);
 
-    const result = await db.collection(collectionName).findOneAndUpdate(
-    filter,
-    { $set: userData },
-    { returnDocument: 'after' } // ou returnOriginal: false, dependendo da versão
-    );
 
-    if (!result.value) {
+    const filter = { _id: new ObjectId(userId) };
+    console.log("Filtro usado no update:", filter); 
+
+    const existingUser = await db.collection(collectionName).findOne(filter);
+    console.log('Usuário encontrado antes update:', existingUser);
+
+    if (!existingUser) {
       throw new Error("Usuário não encontrado");
     }
 
-    return result.value;
+const result = await db.collection(collectionName).findOneAndUpdate(
+  filter,
+  { $set: userData },
+  { returnDocument: 'after' }
+);
+
+console.log('🟢 Documento atualizado:', result);
+
+if (!result) {
+  throw new Error("Usuário não encontrado após update");
+}
+
+return result;
   } catch (err) {
     console.error("❌ Erro ao atualizar usuário:", err.message);
     throw err;

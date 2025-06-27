@@ -7,6 +7,13 @@ import useAuthServices from "../../services/auth.jsx";
 import Loading from "../../components/Loading/Loading.jsx";
 import styles from "./page.module.css";
 import { FiLogOut, FiClock, FiCheckCircle, FiXCircle } from "react-icons/fi";
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Typography from '@mui/material/Typography';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 
 export default function Profile() {
   const { authData, setAuthData } = useAuth();
@@ -21,6 +28,8 @@ export default function Profile() {
   const [currentOptional, setCurrentOptional] = useState({});
   const [activeTerms, setActiveTerms] = useState(null);
   const [editingProfile, setEditingProfile] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
 
   const [editForm, setEditForm] = useState({
     fullname: "",
@@ -91,45 +100,70 @@ export default function Profile() {
     navigate("/auth");
   };
 
-const handleProfileSave = async () => {
-  try {
-    const birthdateString = editForm.birthdate; // já no formato yyyy-MM-dd
+  const handleDeleteAccount = async () => {
+    if (!window.confirm("Tem certeza que deseja excluir sua conta? Essa ação não poderá ser desfeita.")) return;
 
-    const res = await fetch(`http://localhost:3000/users/${authData.user._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authData.token}`,
-      },
-      body: JSON.stringify({
-        fullname: editForm.fullname,
-        email: editForm.email,
-        birthdate: birthdateString, // Envie como string, não como Date
-      }),
-    });
+    try {
+      const res = await fetch(`http://localhost:3000/users/${authData.user._id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${authData.token}`,
+        },
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data.success) {
-      setAuthData((prev) => ({
-        ...prev,
-        user: {
-          ...prev.user,
+      if (data.success) {
+        alert("Conta excluída com sucesso.");
+        logout(); // sua função de logout já limpa localStorage e redireciona
+      } else {
+        alert(data.body?.message || "Erro ao excluir conta.");
+      }
+    } catch (err) {
+      alert("Erro ao excluir conta: " + err.message);
+    }
+  };
+
+
+  const handleProfileSave = async () => {
+    try {
+      const birthdateString = editForm.birthdate; // já no formato yyyy-MM-dd
+
+      const res = await fetch(`http://localhost:3000/users/${authData.user._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authData.token}`,
+        },
+        body: JSON.stringify({
           fullname: editForm.fullname,
           email: editForm.email,
-          birthdate: birthdateString,
-        },
-      }));
-      setEditingProfile(false);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 1500);
-    } else {
-      alert(data.body?.message || "Erro ao atualizar perfil");
+          birthdate: birthdateString, // Envie como string, não como Date
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setAuthData((prev) => ({
+          ...prev,
+          user: {
+            ...prev.user,
+            fullname: editForm.fullname,
+            email: editForm.email,
+            birthdate: birthdateString,
+          },
+        }));
+        setEditingProfile(false);
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 1500);
+      } else {
+        alert(data.body?.message || "Erro ao atualizar perfil");
+      }
+    } catch (err) {
+      alert("Erro ao atualizar perfil: " + err.message);
     }
-  } catch (err) {
-    alert("Erro ao atualizar perfil: " + err.message);
-  }
-};
+  };
 
 
 
@@ -228,6 +262,98 @@ const handleProfileSave = async () => {
         </div>
       )}
 
+      {/* Modal de exclusão de perfil */}
+{showDeleteModal && (
+  <div
+    className="cookieOverlay"
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0,0,0,0.45)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 9999,
+      color: "white",
+      backdropFilter: "blur(2px)",
+      animation: "fadeIn 0.3s ease",
+    }}
+  >
+    <div
+      style={{
+        backgroundColor: "rgba(202, 57, 57, 0.9)",
+        padding: "2em",
+        borderRadius: "1em",
+        width: "90%",
+        maxWidth: "500px",
+        textAlign: "center",
+        animation: "fadeScaleIn 0.3s ease",
+        border: "2px solid rgb(255, 255, 255)",
+      }}
+    >
+      <Typography variant="h6" gutterBottom>
+        Tem certeza que deseja excluir sua conta?
+      </Typography>
+      <Typography variant="body2">
+        Esta ação é irreversível e apagará todos os seus dados.
+      </Typography>
+
+      <Stack direction="row" spacing={2} mt={3} justifyContent="center">
+        <Button
+          variant="contained"
+          color="error"
+          onClick={async () => {
+            try {
+              const res = await fetch(`http://localhost:3000/users/${authData.user._id}`, {
+                method: "DELETE",
+                headers: {
+                  Authorization: `Bearer ${authData.token}`,
+                },
+              });
+
+              const data = await res.json();
+
+              if (data.success) {
+                setShowDeleteModal(false);
+                alert("Conta excluída com sucesso.");
+                logout();
+                navigate("/auth");
+              } else {
+                alert(data.body?.message || "Erro ao excluir conta.");
+              }
+            } catch (err) {
+              alert("Erro ao excluir conta: " + err.message);
+            }
+          }}
+        >
+          Sim, excluir
+        </Button>
+
+        <Button
+          variant="outlined"
+          onClick={() => setShowDeleteModal(false)}
+          sx={{
+            color: "white",
+            borderColor: "white",
+            "&:hover": {
+              backgroundColor: "white",
+              color: "red",
+              borderColor: "red",
+            },
+          }}
+        >
+          Cancelar
+        </Button>
+      </Stack>
+    </div>
+  </div>
+)}
+
+
+
       {/* Modal de edição de perfil */}
       {editingProfile && (
         <div className={styles.cookieOverlay}>
@@ -308,6 +434,7 @@ const handleProfileSave = async () => {
         <div className={styles.userInfo}>
           <h1>{authData.user.fullname}</h1>
           <h3>{authData.user.email}</h3>
+          <h3>{authData.user.birthdate}</h3>
           <div style={{ marginTop: '1rem' }}>
             <h4>📋 Suas preferências:</h4>
             <ul>
@@ -365,6 +492,17 @@ const handleProfileSave = async () => {
           >
             Logout
           </Button>
+
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={() => setShowDeleteModal(true)}
+          >
+            Excluir Conta
+          </Button>
+
+
         </div>
 
         <div className={styles.ordersContainer}>

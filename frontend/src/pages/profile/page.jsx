@@ -15,6 +15,7 @@ import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EmailIcon from '@mui/icons-material/Email';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import Box from '@mui/material/Box';
 
 
 export default function Profile() {
@@ -42,6 +43,7 @@ export default function Profile() {
   });
   // Após editar
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [privacySaveSuccess, setPrivacySaveSuccess] = useState(false);
 
 
   useEffect(() => {
@@ -186,9 +188,16 @@ export default function Profile() {
         <div className={styles.cookieOverlay}>
           <div className={styles.cookieModalContent}>
             <h2>Editar Preferências de Privacidade</h2>
-            {activeTerms && activeTerms.sections.map(section => (
-              <FormControlLabel
-                key={section.title}
+            {activeTerms && (
+              <div style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '1rem' }}>
+                {activeTerms.sections.map(section => (
+                  <FormControlLabel
+                    key={section.title}
+                    sx={{
+                    alignItems: 'flex-start',
+                    marginBottom: '1rem', 
+                    width: '100%',
+                  }}
                 control={
                   <Checkbox
                     checked={section.required ? true : !!currentOptional[section.title]}
@@ -203,9 +212,30 @@ export default function Profile() {
                     }}
                   />
                 }
-                label={`${section.required ? "🔒" : ""} ${section.title}`}
-              />
+                    label={
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          maxHeight: '150px',
+                          overflowY: 'auto',
+                          paddingRight: '0.5rem',
+                          width: '100%',
+                          boxSizing: 'border-box',
+                        }}
+                      >
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                          {section.required ? "🔒 " : ""}{section.title}
+                        </Typography>
+                        <Typography sx={{ whiteSpace: 'pre-line', mt: 1 }}>
+                          {section.content}
+                        </Typography>
+                      </Box>
+                    }
+                  />
             ))}
+              </div>
+            )}  
 
             <div style={{ marginTop: '1rem' }}>
               <Button
@@ -243,6 +273,8 @@ export default function Profile() {
                         },
                       }));
                       setEditingPreferences(false);
+                      setPrivacySaveSuccess(true);
+                      setTimeout(() => setPrivacySaveSuccess(false), 1000);
                     } else {
                       alert('Erro ao atualizar preferências: ' + (result.message || 'Erro desconhecido'));
                     }
@@ -301,7 +333,7 @@ export default function Profile() {
       <Typography variant="h6" gutterBottom>
         Tem certeza que deseja excluir sua conta?
       </Typography>
-      <Typography variant="body2">
+      <Typography variant="body2" sx={{ color: "#f5f5f5" }}>
         Esta ação é irreversível e apagará todos os seus dados.
       </Typography>
 
@@ -428,6 +460,16 @@ export default function Profile() {
           </div>
         </div>
       )}
+
+      {privacySaveSuccess && (
+        <div className={styles.cookieOverlay}>
+          <div className={styles.successModalContent}>
+            <FiCheckCircle size={36} color="green" style={{ marginBottom: "1rem" }} />
+            <h2 style={{ color: "green" }}>Preferências atualizadas com sucesso!</h2>
+          </div>
+        </div>
+      )}
+
 
 
 

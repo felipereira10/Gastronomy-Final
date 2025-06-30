@@ -80,6 +80,16 @@ export default function Auth() {
     }
   }, [formType]);
 
+  useEffect(() => {
+    if (showTermsModal === false && formType === 'signup') {
+      setFormData((prev) => ({
+        ...prev,
+        acceptTerms: true, // força a continuar marcado
+      }));
+    }
+  }, [showTermsModal, formType]);
+
+
   // Inicializa acceptedOptionalSections quando ativoTerms carregar
   // useEffect(() => {
   //   if (showTermsModal && activeTerms) {
@@ -263,7 +273,7 @@ export default function Auth() {
         </Box>
       ))}
       <Button variant="contained" onClick={() => setShowTermsModal(false)} sx={{ mt: 2 }}>
-        Fechar
+        Salvar Preferências e Fechar
       </Button>
     </Box>
   </Modal>

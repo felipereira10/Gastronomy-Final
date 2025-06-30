@@ -136,7 +136,7 @@ export default function Auth() {
         }
 
         if (!formData.acceptTerms) {
-          setErrorMessage('You must accept the Terms of Service to sign up');
+          setErrorMessage('Você deve aceitar os Termos de Serviço para se inscrever');
           return;
         }
 

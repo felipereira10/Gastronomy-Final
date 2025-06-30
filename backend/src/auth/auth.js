@@ -48,6 +48,7 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, passwor
 authRouter.post('/signup', async (req, res) => {
   try {
     const { fullname, email, password, birthdate, role } = req.body;
+    const now = new Date();
 
     const checkUser = await Mongo.db.collection(collectionName).findOne({ email });
     if (checkUser) {
@@ -73,7 +74,7 @@ authRouter.post('/signup', async (req, res) => {
       const sectionsAccepted = activeTerms ? activeTerms.sections.map(section => ({
         title: section.title,
         required: section.required,
-        acceptedAt: section.required ? now : null
+        acceptedAt: now // ✅ Marca TODOS como aceitos
       })) : [];
 
       const result = await Mongo.db.collection(collectionName).insertOne({
@@ -107,7 +108,6 @@ authRouter.post('/signup', async (req, res) => {
           { expiresIn: '1h' }
         );
 
-
         return res.status(201).send({
           success: true,
           statusCode: 201,
@@ -128,7 +128,6 @@ authRouter.post('/signup', async (req, res) => {
     });
   }
 });
-
 
 authRouter.post('/terms', async (req, res) => {
   const { version, content } = req.body;

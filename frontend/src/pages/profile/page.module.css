@@ -144,6 +144,37 @@
   animation: scaleUp 0.3s ease;
 }
 
+.cookieModalContent label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  color: #004643;
+  font-weight: 500;
+  width: 90%;
+}
+
+.cookieModalContent input {
+  width: 100%;
+  padding: 0.6em 1em;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 0.4em;
+  font-size: 1rem;
+  background-color: #f9f9f9;
+}
+
+.cookieModalContent input:focus {
+  outline: none;
+  border-color: #004643;
+  background-color: #fff;
+}
+
+.cookieModalContent h2 {
+  margin-bottom: 1.2rem;
+}
+
+
 .cookieModalContent h2 {
   margin-bottom: 0.5em;
   color: #004643;

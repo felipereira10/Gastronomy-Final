@@ -6,16 +6,18 @@ import {
   Button,
   IconButton,
   InputAdornment,
-  Typography
+  Typography,
+  Modal,
+  Box,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import styles from './page.module.css';
 import { useNavigate } from "react-router-dom";
 import useAuthServices from "../../services/auth";
 import { useAuth } from '../../contexts/AuthContext';
 import Loading from "../../components/Loading/Loading.jsx";
-import { FormControlLabel, Checkbox } from '@mui/material';
 import { Link } from "react-router-dom";
-
 
 export default function Auth() {
   const [formType, setFormType] = useState('login');
@@ -25,6 +27,8 @@ export default function Auth() {
   const navigate = useNavigate();
   const { authData } = useAuth();
   const [activeTerms, setActiveTerms] = useState(null);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [acceptedOptionalSections, setAcceptedOptionalSections] = useState({});
 
 
 
@@ -64,6 +68,24 @@ export default function Auth() {
     }
   }, [formType]);
 
+  // Inicializa acceptedOptionalSections quando ativoTerms carregar
+  useEffect(() => {
+    if (showTermsModal && activeTerms) {
+      const initialAccepted = {};
+      activeTerms.sections.forEach((section) => {
+        // Começa marcado
+        initialAccepted[section.title] = true;
+      });
+      setAcceptedOptionalSections(initialAccepted);
+    }
+  }, [showTermsModal, activeTerms]);
+
+    const toggleSectionAcceptance = (title) => {
+    setAcceptedOptionalSections(prev => ({
+      ...prev,
+      [title]: !prev[title],
+    }));
+  };
 
   const handleChangeFormType = () => {
     setFormType((prev) => (prev === 'login' ? 'signup' : 'login'));
@@ -80,17 +102,17 @@ export default function Auth() {
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     setErrorMessage('');
+    setSuccessMessage('');
 
     try {
       if (formType === 'login') {
         const res = await login(formData);
 
-      if (res?.mustAcceptTerms) {
-        navigate('/terms');
-      } else {
-        setDelayedRedirect(true);
-      }
-
+        if (res?.mustAcceptTerms) {
+          navigate('/terms');
+        } else {
+          setDelayedRedirect(true);
+        }
 
       } else if (formType === 'signup') {
         if (formData.password !== formData.confirmPassword) {
@@ -104,16 +126,26 @@ export default function Auth() {
         }
 
         if (!activeTerms) {
-          setErrorMessage('Erro ao obter a versão dos termos. Tente novamente mais tarde.');
+          setErrorMessage('Erro ao obter os termos. Tente novamente mais tarde.');
           return;
         }
 
+        const acceptedTerms = {
+          version: activeTerms.version,
+          acceptedAt: new Date(),
+          sections: activeTerms.sections.map(section => ({
+            title: section.title,
+            acceptedAt: new Date(),
+            accepted:
+              section.required || // sempre aceito se obrigatório
+              (formData.acceptTerms && acceptedOptionalSections[section.title]), // se opcional, só aceita se marcado no modal e checkbox geral marcado
+          })),
+        };
+
+
         await signup({
           ...formData,
-          acceptedTerms: {
-            version: activeTerms.version,
-            acceptedAt: new Date()
-          }
+          acceptedTerms
         });
 
         setIsLoadingAfterLogin(true);
@@ -125,6 +157,7 @@ export default function Auth() {
       setErrorMessage(err.message);
     }
   };
+
 
   if (authLoading || (delayedRedirect && !authData?.token)) {
     return <Loading />;
@@ -145,11 +178,73 @@ export default function Auth() {
             {successMessage}
           </Typography>
         )}
+
+
+         {/* Modal de termos */}
+  <Modal
+    open={showTermsModal}
+    onClose={() => setShowTermsModal(false)}
+    aria-labelledby="terms-modal-title"
+    aria-describedby="terms-modal-description"
+  >
+    <Box sx={{
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      bgcolor: '#fff', // fundo branco para melhor leitura
+      color: '#000',
+      boxShadow: 24,
+      p: 4,
+      width: { xs: '90%', sm: '70%', md: '50%' },
+      maxHeight: '80vh',
+      overflowY: 'auto',
+      borderRadius: 2,
+    }}>
+      <Typography id="terms-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
+        Termos e Serviços (v{activeTerms?.version || ''})
+      </Typography>
+      {activeTerms?.sections?.map((section, i) => (
+        <Box key={i} sx={{ mb: 3 }}>
+          {section.required ? (
+            <>
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{section.title} (Obrigatório)</Typography>
+              <Typography sx={{ whiteSpace: 'pre-line' }}>{section.content}</Typography>
+            </>
+          ) : (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={acceptedOptionalSections[section.title] || false}
+                  onChange={() => toggleSectionAcceptance(section.title)}
+                />
+              }
+              label={
+                <Box>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', display: 'inline' }}>
+                    {section.title} (Opcional)
+                  </Typography>
+                  <Typography sx={{ whiteSpace: 'pre-line', mt: 1 }}>
+                    {section.content}
+                  </Typography>
+                </Box>
+              }
+            />
+          )}
+        </Box>
+      ))}
+      <Button variant="contained" onClick={() => setShowTermsModal(false)} sx={{ mt: 2 }}>
+        Fechar
+      </Button>
+    </Box>
+  </Modal>
+
+
         {formType === 'login' ? (
           <>
             <h2>Login</h2>
             <button className={styles.switchFormBtn} onClick={handleChangeFormType}>
-              Don't have an account? Click here
+              Não tem uma conta? Clique aqui
             </button>
             <form className={styles.authForm} onSubmit={handleSubmitForm}>
               <TextField
@@ -179,7 +274,7 @@ export default function Auth() {
               />
               <TextField
                 required
-                label="Password"
+                label="Senha"
                 type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password || ""}
@@ -225,14 +320,14 @@ export default function Auth() {
           </>
         ) : (
           <>
-            <h2>Signup</h2>
+            <h2>Cadastro</h2>
             <button className={styles.switchFormBtn} onClick={handleChangeFormType}>
-              Already have an account? Click here
+               Já tem uma conta? Clique aqui
             </button>
             <form className={styles.authForm} onSubmit={handleSubmitForm}>
               <TextField
                 required
-                label="Fullname"
+                label="Nome Completo"
                 name="fullname"
                 value={formData.fullname || ""}
                 onChange={handleFormDataChange}
@@ -282,7 +377,7 @@ export default function Auth() {
               
               <TextField
                 required
-                label="Birthdate"
+                label="Nascimento"
                 type="date"
                 name="birthdate"
                 value={formData.birthdate || ""}
@@ -308,7 +403,7 @@ export default function Auth() {
 
               <TextField
                 required
-                label="Password"
+                label="Senha"
                 type="password"
                 name="password"
                 value={formData.password || ""}
@@ -333,7 +428,7 @@ export default function Auth() {
               />
               <TextField
                 required
-                label="Confirm Password"
+                label="Confirme a Senha"
                 type="password"
                 name="confirmPassword"
                 value={formData.confirmPassword || ""}
@@ -356,20 +451,32 @@ export default function Auth() {
                   }
                 }}
               />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={formData.acceptTerms || false}
-                    onChange={(e) => setFormData({ ...formData, acceptTerms: e.target.checked })}
-                    color="primary"
-                  />
-                }
-                label={
-                  <span>
-                    I accept the <Link to="/terms">Terms of Service</Link>
-                  </span>
-                }
-              />
+<FormControlLabel
+  control={
+    <Checkbox
+      checked={formData.acceptTerms || false}
+      onChange={(e) => setFormData({ ...formData, acceptTerms: e.target.checked })}
+      color="primary"
+    />
+  }
+  label={
+    <span>
+      Eu aceito os{" "}
+      <span
+        onClick={() => setShowTermsModal(true)}
+        style={{
+          textDecoration: "underline",
+          cursor: "pointer",
+          color: "#1976d2",
+          fontWeight: "bold",
+        }}
+      >
+        Termos e Serviços
+      </span>
+    </span>
+  }
+/>
+
               <Button 
                 type="submit" 
                 variant="contained" 
@@ -379,7 +486,7 @@ export default function Auth() {
                   alignSelf: 'center'
                 }}
               >
-                Signup
+                Cadastrar
               </Button>
             </form>
           </>

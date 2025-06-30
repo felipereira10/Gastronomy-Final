@@ -68,6 +68,7 @@ termsRouter.patch('/:id/disable', ensureAuthenticated, async (req, res) => {
 });
 
 // Editar um termo existente (Admin)
+// Criar uma nova versão do termo existente (Admin)
 termsRouter.put('/:id', ensureAuthenticated, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).send({ message: 'Acesso negado. Admin apenas.' });
@@ -77,27 +78,39 @@ termsRouter.put('/:id', ensureAuthenticated, async (req, res) => {
   const { version, sections } = req.body;
 
   try {
-    const updateResult = await Mongo.db.collection('terms').updateOne(
-      { _id: new Mongo.ObjectId(id) },
-      {
-        $set: {
-          version,
-          sections,
-          updatedAt: new Date(),
-        }
-      }
-    );
+    const existingTerm = await Mongo.db.collection('terms').findOne({ _id: new Mongo.ObjectId(id) });
 
-    if (updateResult.matchedCount === 0) {
+    if (!existingTerm) {
       return res.status(404).send({ message: 'Termo não encontrado.' });
     }
 
-    res.send({ message: 'Termo atualizado com sucesso.' });
+    // Desativar o termo atual
+    await Mongo.db.collection('terms').updateOne(
+      { _id: new Mongo.ObjectId(id) },
+      { $set: { active: false, updatedAt: new Date() } }
+    );
+
+    // Criar um novo termo como ativo
+    const newTerm = {
+      version,
+      sections,
+      active: true,
+      createdAt: new Date(),
+    };
+
+    const insertResult = await Mongo.db.collection('terms').insertOne(newTerm);
+
+    res.status(201).send({
+      message: 'Nova versão criada com sucesso.',
+      termId: insertResult.insertedId
+    });
+
   } catch (error) {
     console.error('Erro ao atualizar termo:', error);
     res.status(500).send({ message: 'Erro interno no servidor.' });
   }
 });
+
 
 
 export default termsRouter;

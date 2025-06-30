@@ -58,6 +58,7 @@ export default function EditTerms() {
     updated[index][key] = value;
     setSections(updated);
   };
+  
 
   const handleEdit = (term) => {
     setSelectedTerm(term);

@@ -90,6 +90,16 @@ termsRouter.put('/:id', ensureAuthenticated, async (req, res) => {
       { $set: { active: false, updatedAt: new Date() } }
     );
 
+    // Verificar se a versão já existe em outro termo
+    const duplicate = await Mongo.db.collection('terms').findOne({
+      version: version,
+      _id: { $ne: new Mongo.ObjectId(id) }
+    });
+
+    if (duplicate) {
+      return res.status(400).send({ message: 'Já existe um termo com essa versão.' });
+    }
+
     // Criar um novo termo como ativo
     const newTerm = {
       version,
@@ -99,6 +109,7 @@ termsRouter.put('/:id', ensureAuthenticated, async (req, res) => {
     };
 
     const insertResult = await Mongo.db.collection('terms').insertOne(newTerm);
+
 
     res.status(201).send({
       message: 'Nova versão criada com sucesso.',
@@ -110,7 +121,5 @@ termsRouter.put('/:id', ensureAuthenticated, async (req, res) => {
     res.status(500).send({ message: 'Erro interno no servidor.' });
   }
 });
-
-
 
 export default termsRouter;

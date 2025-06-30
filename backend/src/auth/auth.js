@@ -152,16 +152,25 @@ authRouter.post('/signup', async (req, res) => {
 });
 
 authRouter.post('/terms', async (req, res) => {
-  const { version, content } = req.body;
+  const { version, sections } = req.body;  // supondo que seu React envia 'sections'
 
-  if (!version || !content) {
+  if (!version || !sections) {
     return res.status(400).send({
       success: false,
-      message: 'Version and content are required'
+      message: 'Version and sections are required'
     });
   }
 
   try {
+    // Verifica se a versão já existe antes de inserir
+    const existingVersion = await Mongo.db.collection('terms').findOne({ version });
+    if (existingVersion) {
+      return res.status(400).send({
+        success: false,
+        message: 'A terms version with this identifier already exists'
+      });
+    }
+
     // Desativa todos os termos ativos
     await Mongo.db.collection('terms').updateMany(
       { active: true },
@@ -171,19 +180,10 @@ authRouter.post('/terms', async (req, res) => {
     // Insere novo termo
     const result = await Mongo.db.collection('terms').insertOne({
       version,
-      content,
+      sections,
       createdAt: new Date(),
       active: true
     });
-
-    const existingVersion = await Mongo.db.collection('terms').findOne({ version });
-    if (existingVersion) {
-      return res.status(400).send({
-        success: false,
-        message: 'A terms version with this identifier already exists'
-      });
-    }
-
 
     res.status(201).send({
       success: true,
@@ -199,6 +199,50 @@ authRouter.post('/terms', async (req, res) => {
   }
 });
 
+authRouter.put('/terms/:id', async (req, res) => {
+  const { id } = req.params;
+  const { version, sections } = req.body;
+
+  if (!version || !sections) {
+    return res.status(400).send({
+      success: false,
+      message: 'Version and sections are required'
+    });
+  }
+
+  try {
+    // Verifica se outra versão com o mesmo número existe (excluindo este id)
+    const existingVersion = await Mongo.db.collection('terms').findOne({ version, _id: { $ne: Mongo.ObjectId(id) } });
+    if (existingVersion) {
+      return res.status(400).send({
+        success: false,
+        message: 'A terms version with this identifier already exists'
+      });
+    }
+
+    await Mongo.db.collection('terms').updateOne(
+      { _id: Mongo.ObjectId(id) },
+      {
+        $set: {
+          version,
+          sections,
+          updatedAt: new Date()
+        }
+      }
+    );
+
+    res.status(200).send({
+      success: true,
+      message: 'Term updated successfully'
+    });
+  } catch (err) {
+    res.status(500).send({
+      success: false,
+      message: 'Internal server error',
+      error: err.message
+    });
+  }
+});
 
 // Histórico dos termos de uso
 authRouter.get('/terms', async (req, res) => {

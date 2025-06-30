@@ -86,9 +86,12 @@ export default function TermsPage() {
               sections: terms.sections.map((section) => ({
                 title: section.title,
                 required: section.required,
-                acceptedAt: new Date().toISOString(),
+                acceptedAt: section.required || optionalAccepted[section.title]
+                  ? new Date().toISOString()
+                  : null,
               })),
-            },
+            }
+
           },
         };
 

@@ -56,31 +56,43 @@ export default function Auth() {
         const res = await fetch("http://localhost:3000/auth/terms/active");
         const data = await res.json();
         if (data.success) {
-          setActiveTerms(data.term); // salva o termo ativo
+          setActiveTerms(data.term);
+          // Inicializa o estado acceptedOptionalSections com todos opcionais como true
+          const initialAccepted = {};
+          data.term.sections.forEach(section => {
+            if (!section.required) {
+              initialAccepted[section.title] = true;
+            }
+          });
+          setAcceptedOptionalSections(initialAccepted);
         }
       } catch (err) {
         console.error("Erro ao buscar termos ativos:", err);
       }
     };
 
-    if (formType === "signup") {
+    if (formType === 'signup') {
       fetchActiveTerms();
+    } else {
+      // Limpa termos e aceitação quando muda para login
+      setActiveTerms(null);
+      setAcceptedOptionalSections({});
     }
   }, [formType]);
 
   // Inicializa acceptedOptionalSections quando ativoTerms carregar
-  useEffect(() => {
-    if (showTermsModal && activeTerms) {
-      const initialAccepted = {};
-      activeTerms.sections.forEach((section) => {
-        // Começa marcado
-        initialAccepted[section.title] = true;
-      });
-      setAcceptedOptionalSections(initialAccepted);
-    }
-  }, [showTermsModal, activeTerms]);
+  // useEffect(() => {
+  //   if (showTermsModal && activeTerms) {
+  //     const initialAccepted = {};
+  //     activeTerms.sections.forEach((section) => {
+  //       // Começa marcado
+  //       initialAccepted[section.title] = true;
+  //     });
+  //     setAcceptedOptionalSections(initialAccepted);
+  //   }
+  // }, [showTermsModal, activeTerms]);
 
-    const toggleSectionAcceptance = (title) => {
+  const toggleSectionAcceptance = (title) => {
     setAcceptedOptionalSections(prev => ({
       ...prev,
       [title]: !prev[title],
@@ -88,16 +100,19 @@ export default function Auth() {
   };
 
   const handleChangeFormType = () => {
-    setFormType((prev) => (prev === 'login' ? 'signup' : 'login'));
+    setFormType(prev => (prev === 'login' ? 'signup' : 'login'));
     setFormData({});
-  }
+    setErrorMessage('');
+    setSuccessMessage('');
+    setDelayedRedirect(false);
+  };
 
   const handleFormDataChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       [e.target.name]: e.target.value
-    });
-  }
+    }));
+  };
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
@@ -130,22 +145,37 @@ export default function Auth() {
           return;
         }
 
+        // const acceptedTerms = {
+        //   version: activeTerms.version,
+        //   acceptedAt: new Date(),
+        //   sections: activeTerms.sections.map(section => ({
+        //     title: section.title,
+        //     acceptedAt: new Date(),
+        //     accepted:
+        //       section.required || // sempre aceito se obrigatório
+        //       (formData.acceptTerms && acceptedOptionalSections[section.title]), // se opcional, só aceita se marcado no modal e checkbox geral marcado
+        //   })),
+        // };
+
         const acceptedTerms = {
           version: activeTerms.version,
           acceptedAt: new Date(),
           sections: activeTerms.sections.map(section => ({
             title: section.title,
             acceptedAt: new Date(),
-            accepted:
-              section.required || // sempre aceito se obrigatório
-              (formData.acceptTerms && acceptedOptionalSections[section.title]), // se opcional, só aceita se marcado no modal e checkbox geral marcado
+            accepted: section.required || (acceptedOptionalSections[section.title] ?? true),
           })),
         };
-
+        const optionalAccepted = {};
+        activeTerms.sections.forEach(section => {
+          if (!section.required) {
+            optionalAccepted[section.title] = acceptedOptionalSections[section.title] ?? true;
+          }
+        });
 
         await signup({
           ...formData,
-          acceptedTerms
+          optionalAccepted,
         });
 
         setIsLoadingAfterLogin(true);
@@ -154,10 +184,9 @@ export default function Auth() {
         }, 2000);
       }
     } catch (err) {
-      setErrorMessage(err.message);
+      setErrorMessage(err.message || 'Erro desconhecido');
     }
   };
-
 
   if (authLoading || (delayedRedirect && !authData?.token)) {
     return <Loading />;

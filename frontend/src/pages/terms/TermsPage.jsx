@@ -1,34 +1,42 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { 
-  Button, 
-  Paper, 
-  Typography, 
-  CircularProgress, 
-  Checkbox, 
-  FormControlLabel, 
-  Box 
+import {
+  Button,
+  Paper,
+  Typography,
+  CircularProgress,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
+import { Box } from "@mui/system";
 
 export default function TermsPage() {
-  const { authData } = useAuth();
+  const { authData, setAuthData } = useAuth(); // ✅ Corrigido
   const navigate = useNavigate();
+
   const [terms, setTerms] = useState(null);
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(false);
   const [error, setError] = useState("");
   const [optionalAccepted, setOptionalAccepted] = useState({});
 
+  // ✅ Protege contra acesso sem login
+  useEffect(() => {
+    if (!authData?.token) {
+      navigate("/login");
+    }
+  }, [authData, navigate]);
+
   useEffect(() => {
     async function fetchTerms() {
       try {
         const res = await fetch("http://localhost:3000/terms/active");
         const data = await res.json();
+
         if (data.success) {
           setTerms(data.term);
 
-          // Inicializa os opcionais como não aceitos
           const optional = {};
           data.term.sections?.forEach((sec) => {
             if (!sec.required) {
@@ -51,44 +59,45 @@ export default function TermsPage() {
 
   const handleAccept = async () => {
     setAccepting(true);
+    setError("");
+
     try {
       const res = await fetch("http://localhost:3000/auth/accept-terms", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authData?.token}`
+          Authorization: `Bearer ${authData?.token}`,
         },
         body: JSON.stringify({
-          optionalAccepted: optionalAccepted
-        })
+          optionalAccepted,
+        }),
       });
 
       const result = await res.json();
 
       if (result.success) {
-      // atualiza authData com nova versão dos termos
-      const updatedAuth = {
-        ...authData,
-        user: {
-          ...authData.user,
-          acceptedTerms: {
-            version: terms.version,
-            acceptedAt: new Date().toISOString(),
-            sections: terms.sections.map(section => ({
-              title: section.title,
-              required: section.required,
-              acceptedAt: new Date().toISOString()
-            }))
-          }
-        }
-      };
+        const updatedAuth = {
+          ...authData,
+          user: {
+            ...authData.user,
+            acceptedTerms: {
+              version: terms.version,
+              acceptedAt: new Date().toISOString(),
+              sections: terms.sections.map((section) => ({
+                title: section.title,
+                required: section.required,
+                acceptedAt: new Date().toISOString(),
+              })),
+            },
+          },
+        };
 
-      localStorage.setItem("auth", JSON.stringify(updatedAuth));
-      setAuthData(updatedAuth);
+        localStorage.setItem("auth", JSON.stringify(updatedAuth));
+        setAuthData(updatedAuth);
 
-      navigate("/profile");
+        navigate("/profile");
       } else {
-        setError("Erro ao aceitar os termos.");
+        setError(result.message || "Erro ao aceitar os termos.");
       }
     } catch (err) {
       setError("Erro ao conectar com o servidor.");
@@ -97,32 +106,70 @@ export default function TermsPage() {
     }
   };
 
-  if (loading) return <CircularProgress />;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-  if (!terms) return <p>Nenhum termo de uso disponível.</p>;
+  // 🚩 Carregando
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", marginTop: "3rem" }}>
+        <CircularProgress />
+      </div>
+    );
+  }
 
+  // 🚩 Erro
+  if (error) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "2rem" }}>
+        <Typography variant="h6" color="error" gutterBottom>
+          {error}
+        </Typography>
+        <Button variant="outlined" onClick={() => window.location.reload()}>
+          Tentar Novamente
+        </Button>
+      </div>
+    );
+  }
+
+  // 🚩 Sem termos
+  if (!terms) {
+    return (
+      <Typography variant="h6" align="center" sx={{ mt: 4 }}>
+        Nenhum termo de uso disponível.
+      </Typography>
+    );
+  }
+
+  // ✅ Página carregada corretamente
   return (
-  <div style={{ padding: "2rem", maxWidth: 800, margin: "0 auto" }}>
-    <Typography variant="h4" gutterBottom>
-      Termos de Uso - v{terms.version}
-    </Typography>
+    <div style={{ padding: "2rem", maxWidth: 800, margin: "0 auto" }}>
+      <Typography variant="h4" gutterBottom>
+        Termos de Uso - v{terms.version}
+      </Typography>
 
-    {terms.sections && terms.sections.length > 0 ? (
-      terms.sections.map((section, idx) => (
-        <Paper key={idx} elevation={2} style={{ padding: "1.5rem", marginBottom: "1rem", whiteSpace: "pre-line" }}>
-          <Typography variant="h6" gutterBottom>{section.title}</Typography>
-          <Typography>{section.content || "Conteúdo não disponível"}</Typography>
+      {terms.sections?.map((section, idx) => (
+        <Paper
+          key={idx}
+          elevation={3}
+          style={{
+            padding: "1.5rem",
+            marginBottom: "1rem",
+            whiteSpace: "pre-line",
+            backgroundColor: section.required ? "#f9f9f9" : "#ffffff",
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            {section.title} {section.required ? "(Obrigatório)" : "(Opcional)"}
+          </Typography>
+          <Typography sx={{ mb: 1 }}>{section.content || "Conteúdo não disponível"}</Typography>
 
-          {/* Checkbox só para os termos opcionais */}
           {!section.required && (
             <FormControlLabel
               control={
                 <Checkbox
                   checked={!!optionalAccepted[section.title]}
-                  onChange={e =>
-                    setOptionalAccepted(prev => ({
+                  onChange={(e) =>
+                    setOptionalAccepted((prev) => ({
                       ...prev,
-                      [section.title]: e.target.checked
+                      [section.title]: e.target.checked,
                     }))
                   }
                   name={section.title}
@@ -133,23 +180,18 @@ export default function TermsPage() {
             />
           )}
         </Paper>
-      ))
-          ) : (
-            <Paper elevation={2} style={{ padding: "1.5rem", marginBottom: "2rem", whiteSpace: "pre-line" }}>
-              {terms.content}
-            </Paper>
-          )}
+      ))}
 
-
-    <Button
-      variant="contained"
-      color="primary"
-      onClick={handleAccept}
-      disabled={accepting}
-    >
-      {accepting ? "Aceitando..." : "Aceitar Termos e Prosseguir"}
-    </Button>
-  </div>
-);
-
+      <Box sx={{ textAlign: "center", mt: 4 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleAccept}
+          disabled={accepting}
+        >
+          {accepting ? "Aceitando..." : "Aceitar Termos e Prosseguir"}
+        </Button>
+      </Box>
+    </div>
+  );
 }

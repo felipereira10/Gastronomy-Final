@@ -12,8 +12,15 @@ export const Mongo = {
       this.client = client
       this.db = db
 
+      await db.collection('users').createIndex(
+        { email: 1 },
+        { unique: true }
+      )
+
+      console.log('Connected to MongoDB and ensured indexes!')
       return 'Connected to mongo!'
     } catch (error) {
+      console.error('Error during mongo connection:', error)
       return { text: 'Error during mongo connection', error }
     }
   },

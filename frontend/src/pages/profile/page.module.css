@@ -33,6 +33,46 @@
   font-weight: 400;
 }
 
+.label {
+  font-weight: 600;
+  color: #93e4c1;
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+}
+
+.value {
+  font-size: 1.1rem;
+  color: #fafafa;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  background-color: #014141;
+  padding: 14px 20px;
+  border-radius: 10px;
+  color: #fafafa;
+  transition: background-color 0.3s ease;
+  margin-bottom: 1em;
+  max-width: 400px;
+  width: 40%;
+}
+
+.infoItem:hover {
+  background-color: #015e5e;
+}
+
+.icon {
+  color: #93e4c1;
+  font-size: 30px;
+}
+
+.infoContent {
+  display: flex;
+  flex-direction: column;
+}
+
 .actionsRow {
   display: flex;
   flex-wrap: wrap;

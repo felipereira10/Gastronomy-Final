@@ -71,10 +71,23 @@ authRouter.post('/signup', async (req, res) => {
 
       const activeTerms = await Mongo.db.collection('terms').findOne({ active: true });
 
+      // const allRequiredAccepted = activeTerms.sections
+      //   .filter(section => section.required)
+      //   .every(requiredSection => 
+      //     body.acceptedTerms.sections.find(s => s.title === requiredSection.title)?.accepted
+      //   );
+
+      // if (!allRequiredAccepted) {
+      //   return res.status(400).json({ error: 'All required terms must be accepted.' });
+      // }
+
+      const optionalAccepted = req.body.optionalAccepted || {}; // espera que o frontend envie isso
+
       const sectionsAccepted = activeTerms ? activeTerms.sections.map(section => ({
         title: section.title,
         required: section.required,
-        acceptedAt: now // ✅ Marca TODOS como aceitos
+        accepted: section.required || !!optionalAccepted[section.title], // obrigatório sempre true, opcional conforme front
+        acceptedAt: section.required || !!optionalAccepted[section.title] ? now : null
       })) : [];
 
       const result = await Mongo.db.collection(collectionName).insertOne({
@@ -121,6 +134,15 @@ authRouter.post('/signup', async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+
+    if (err.code === 11000) {
+      // Erro de índice único (email duplicado)
+      return res.status(409).send({
+        success: false,
+        statusCode: 409,
+        body: { text: 'Email already in use' }
+      });
+    }
     return res.status(500).send({
       success: false,
       statusCode: 500,
@@ -153,6 +175,15 @@ authRouter.post('/terms', async (req, res) => {
       createdAt: new Date(),
       active: true
     });
+
+    const existingVersion = await Mongo.db.collection('terms').findOne({ version });
+    if (existingVersion) {
+      return res.status(400).send({
+        success: false,
+        message: 'A terms version with this identifier already exists'
+      });
+    }
+
 
     res.status(201).send({
       success: true,
@@ -214,7 +245,7 @@ authRouter.post('/accept-terms', async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, 'secret');
-    const optionalAccepted = req.body.optionalAccepted || {}; // vem do front
+    const optionalAccepted = req.body.optionalAccepted || {};
 
     const activeTerm = await Mongo.db.collection('terms').findOne({ active: true });
 
@@ -225,16 +256,19 @@ authRouter.post('/accept-terms', async (req, res) => {
       });
     }
 
-    // Monta o array de seções aceitas
-    const sectionsAccepted = activeTerm.sections.map(section => ({
-      title: section.title,
-      required: section.required,
-      acceptedAt: section.required 
-        ? now // obrigatórios sempre tem data de aceite
-        : (optionalAccepted[section.title] ? now : null) // opcionais dependem do que veio do front
-    }));
+    const now = new Date();
 
-    // Atualiza o usuário no banco
+    const sectionsAccepted = activeTerm.sections.map(section => {
+      const isAccepted = section.required ? true : !!optionalAccepted[section.title];
+
+      return {
+        title: section.title,
+        required: section.required,
+        accepted: isAccepted,
+        acceptedAt: isAccepted ? now : null
+      };
+    });
+
     await Mongo.db.collection('users').updateOne(
       { _id: new ObjectId(decoded._id) },
       {
@@ -259,7 +293,6 @@ authRouter.post('/accept-terms', async (req, res) => {
       }
     });
 
-
   } catch (err) {
     console.error(err);
     return res.status(401).send({
@@ -269,6 +302,7 @@ authRouter.post('/accept-terms', async (req, res) => {
     });
   }
 });
+
 
 
 authRouter.post('/login', async (req, res) => {
@@ -347,32 +381,60 @@ authRouter.post('/update-terms', async (req, res) => {
     const { optionalAccepted = {} } = req.body;
 
     const user = await Mongo.db.collection('users').findOne({ _id: new ObjectId(decoded._id) });
-    const existingSections = user?.acceptedTerms?.sections || [];
 
-    const updatedSections = existingSections.map(section => ({
-      ...section,
-      acceptedAt: section.required ? section.acceptedAt : (optionalAccepted[section.title] ? now : null)
-    }));
+    if (!user) {
+      return res.status(404).send({ success: false, message: 'User not found' });
+    }
+
+    const acceptedTerms = user.acceptedTerms;
+
+    if (!acceptedTerms) {
+      return res.status(400).send({ success: false, message: 'No accepted terms found for user' });
+    }
+
+    const updatedSections = acceptedTerms.sections.map(section => {
+      if (section.required) {
+        return {
+          ...section,
+          accepted: true,
+          acceptedAt: section.acceptedAt || new Date() // garante que tenha data
+        };
+      } else {
+        const isAccepted = !!optionalAccepted[section.title];
+        return {
+          ...section,
+          accepted: isAccepted,
+          acceptedAt: isAccepted ? new Date() : null
+        };
+      }
+    });
 
     await Mongo.db.collection('users').updateOne(
       { _id: new ObjectId(decoded._id) },
       { $set: { 'acceptedTerms.sections': updatedSections } }
     );
 
-    // Buscar novamente o usuário atualizado para enviar no response
-    const updatedUser = await Mongo.db.collection('users').findOne({ _id: new ObjectId(decoded._id) });
+    const updatedUser = await Mongo.db.collection('users').findOne(
+      { _id: new ObjectId(decoded._id) },
+      { projection: { password: 0, salt: 0 } }
+    );
 
     return res.status(200).send({
       success: true,
-      message: 'Preferences updated',
+      message: 'Preferences updated successfully',
       acceptedTerms: updatedUser.acceptedTerms
     });
 
   } catch (err) {
     console.error(err);
-    return res.status(500).send({ success: false, message: 'Server error', error: err.message });
+    return res.status(500).send({
+      success: false,
+      message: 'Server error',
+      error: err.message
+    });
   }
 });
+
 
 
 

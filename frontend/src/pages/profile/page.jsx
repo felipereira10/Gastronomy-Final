@@ -13,6 +13,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EmailIcon from '@mui/icons-material/Email';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 
 export default function Profile() {
@@ -29,6 +31,8 @@ export default function Profile() {
   const [activeTerms, setActiveTerms] = useState(null);
   const [editingProfile, setEditingProfile] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const isoDate = new Date(authData.user.birthdate);
+  const dateForInput = isoDate.toISOString().split('T')[0];
 
 
   const [editForm, setEditForm] = useState({
@@ -51,7 +55,7 @@ export default function Profile() {
       fullname: authData.user.fullname || "",
       email: authData.user.email || "",
       birthdate: authData.user.birthdate
-        ? new Date(authData.user.birthdate).toISOString().split("T")[0]
+        ? authData.user.birthdate.split('T')[0]
         : ""
     });
 
@@ -263,37 +267,37 @@ export default function Profile() {
       )}
 
       {/* Modal de exclusão de perfil */}
-{showDeleteModal && (
-  <div
-    className="cookieOverlay"
-    style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      backgroundColor: "rgba(0,0,0,0.45)",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      zIndex: 9999,
-      color: "white",
-      backdropFilter: "blur(2px)",
-      animation: "fadeIn 0.3s ease",
-    }}
-  >
-    <div
-      style={{
-        backgroundColor: "rgba(202, 57, 57, 0.9)",
-        padding: "2em",
-        borderRadius: "1em",
-        width: "90%",
-        maxWidth: "500px",
-        textAlign: "center",
-        animation: "fadeScaleIn 0.3s ease",
-        border: "2px solid rgb(255, 255, 255)",
-      }}
-    >
+      {showDeleteModal && (
+        <div
+          className="cookieOverlay"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.45)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+            color: "white",
+            backdropFilter: "blur(2px)",
+            animation: "fadeIn 0.3s ease",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "rgba(202, 57, 57, 0.9)",
+              padding: "2em",
+              borderRadius: "1em",
+              width: "90%",
+              maxWidth: "500px",
+              textAlign: "center",
+              animation: "fadeScaleIn 0.3s ease",
+              border: "2px solid rgb(255, 255, 255)",
+            }}
+          >
       <Typography variant="h6" gutterBottom>
         Tem certeza que deseja excluir sua conta?
       </Typography>
@@ -383,11 +387,10 @@ export default function Profile() {
               Data de Nascimento:
               <input
                 type="date"
-                value={editForm.birthdate}
-                onChange={(e) =>
-                  setEditForm((prev) => ({ ...prev, birthdate: e.target.value }))
-                }
+                value={editForm.birthdate || ""}
+                onChange={(e) => setEditForm(prev => ({ ...prev, birthdate: e.target.value }))}
               />
+
             </label>
 
             <div style={{ marginTop: "1rem" }}>
@@ -433,19 +436,28 @@ export default function Profile() {
       <div className={styles.profileContainer}>
         <div className={styles.userInfo}>
           <h1>{authData.user.fullname}</h1>
-          <h3>{authData.user.email}</h3>
-          <h3>{authData.user.birthdate}</h3>
-          <div style={{ marginTop: '1rem' }}>
-            <h4>📋 Suas preferências:</h4>
-            <ul>
-              {(authData.user.acceptedTerms?.sections || []).map((section) => (
-                <li key={section.title}>
-                  {section.required ? '🔒' : section.acceptedAt ? '✅' : '❌'} {section.title}
-                </li>
-              ))}
-            </ul>
+
+          <div className={styles.infoItem}>
+            <EmailIcon className={styles.icon} />
+            <div>
+              <span className={styles.label}>Email: </span>
+              <span className={styles.value}>{authData.user.email}</span>
+            </div>
           </div>
-        </div>
+
+          <div className={styles.infoItem}>
+            <CalendarTodayIcon className={styles.icon} />
+            <div>
+              <span className={styles.label}>Nascimento: </span>
+                <span className={styles.value}>
+                  {authData.user.birthdate
+                    ? new Date(new Date(authData.user.birthdate).getTime() + 24 * 60 * 60 * 1000)
+                        .toLocaleDateString("pt-BR")
+                    : "Não informado"}
+                </span>
+            </div>
+          </div>
+      </div>
 
         <div className={styles.actionsRow}>
           <Button

@@ -455,9 +455,20 @@ export default function Profile() {
                         .toLocaleDateString("pt-BR")
                     : "Não informado"}
                 </span>
+              </div>
+        </div>
+
+            <div className={styles.infoItem}>
+              <h4>📋 Suas preferências:</h4>
+              <ul>
+                {(authData.user.acceptedTerms?.sections || []).map((section) => (
+                  <li key={section.title}>
+                    {section.required ? '🔒' : section.acceptedAt ? '✅' : '❌'} {section.title}
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-      </div>
+           </div>
 
         <div className={styles.actionsRow}>
           <Button

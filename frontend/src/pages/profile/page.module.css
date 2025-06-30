@@ -63,6 +63,38 @@
   background-color: #015e5e;
 }
 
+.infoItem ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+.infoItem li {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.infoItem li:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.infoItem li span.icon {
+  font-size: 1.2rem;
+}
+
+.infoItem h4 {
+  margin-bottom: 0.5rem;
+  color: #93e4c1;
+  font-weight: 600;
+}
+
 .icon {
   color: #93e4c1;
   font-size: 30px;

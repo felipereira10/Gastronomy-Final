@@ -267,6 +267,8 @@ export default function UsersTerms() {
                       </Typography>
                     )}
 
+                    <Button onClick={() => handleAdminReset(user.email)}>Enviar Redefinição</Button>
+
                     <Button
                       variant="outlined"
                       color="error"

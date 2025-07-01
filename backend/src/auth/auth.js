@@ -479,6 +479,42 @@ authRouter.post('/update-terms', async (req, res) => {
   }
 });
 
+// Rota para solicitar redefinição de senha
+// authRouter.js
+authRouter.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+
+  const user = await Mongo.db.collection('users').findOne({ email });
+  if (!user) return res.status(404).send({ message: 'Usuário não encontrado' });
+
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+
+  // Enviar token por e-mail ou SMS (você escolhe)
+  // Exemplo: await sendEmail(user.email, `http://localhost:3000/reset-password?token=${token}`);
+
+  res.send({ message: 'Link de redefinição enviado com sucesso' });
+});
+
+// Rota para redefinir senha
+authRouter.post('/reset-password', async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    const { userId } = jwt.verify(token, process.env.JWT_SECRET);
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await Mongo.db.collection('users').updateOne(
+      { _id: new Mongo.ObjectId(userId) },
+      { $set: { password: hashed } }
+    );
+
+    res.send({ message: 'Senha redefinida com sucesso' });
+  } catch (err) {
+    res.status(400).send({ message: 'Token inválido ou expirado' });
+  }
+});
+
+
 
 
 

@@ -31,7 +31,33 @@ export default function Profile() {
   const isoDate = new Date(authData.user.birthdate);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const dateForInput = isoDate.toISOString().split('T')[0];
+    const handleRequestPasswordReset = () => {
+    if (!authData?.user?.email) {
+      alert("Email não encontrado. Por favor, verifique suas informações de perfil.");
+      return;
+    }
+    fetch("http://localhost:3000/auth/request-password-reset", {
+      method: "POST",
 
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authData.token}`,
+      },
+      body: JSON.stringify({ email: authData.user.email }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          alert("Solicitação de redefinição de senha enviada com sucesso. Verifique seu email.");
+        } else {
+          alert(data.body?.message || "Erro ao solicitar redefinição de senha.");
+        }
+      })
+      .catch((err) => {
+        console.error("Erro ao solicitar redefinição de senha:", err);
+        alert("Erro ao solicitar redefinição de senha: " + err.message);
+      });
+  };
 
   const [editForm, setEditForm] = useState({
     fullname: "",
@@ -447,6 +473,8 @@ export default function Profile() {
 
             </label>
 
+              <Button variant="contained" color="secondary  " onClick={handleRequestPasswordReset}>Redefinir Senha</Button>
+
             <div style={{ marginTop: "1rem" }}>
               <Button variant="contained" color="secondary" onClick={handleProfileSave}
                 sx={{
@@ -585,7 +613,7 @@ export default function Profile() {
       {authData?.user?.role === "admin" && (
         <div className={styles.adminPanel}>
           <div className={`${styles.infoItem} ${styles.cardHover}`}>
-            <h3>Área Administrativa</h3>
+            <h2>Área Administrativa</h2>
             <div className={styles.actionsRow}>
               <Button
                 variant="contained"

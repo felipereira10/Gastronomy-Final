@@ -127,7 +127,7 @@
 }
 
 .infoItem ul {
-  padding: 0;
+  padding-top: 12px;
   margin-top: 0.5rem;
   list-style: none;
   width: 100%;
@@ -145,6 +145,8 @@
 .infoItem h2 {
   color: #93e4c1;
   margin-bottom: 0.5em;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ddd;
 }
 
 .editProfileButton {
@@ -182,7 +184,6 @@
   gap: 1.2em;
   flex-wrap: wrap;
   padding-top: 1em;
-  border-top: 1px solid #ddd;
 }
 
 .logoutButton {

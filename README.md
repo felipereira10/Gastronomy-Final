@@ -50,20 +50,11 @@ cd frontend
 npm install
 ```
 
-3. Inicie o projeto Expo:
+3. Inicie o projeto Vite:
 
 ```bash
-npm run start
+npm run dev
 ```
-
-*Ou, para rodar em plataformas específicas:*
-
-```bash
-npm run android
-npm run ios
-npm run web
-```
-### Nota: Para rodar no iOS, é necessário estar em um macOS com Xcode instalado.
 
 ## 📁 Estrutura do Projeto
 ```bash

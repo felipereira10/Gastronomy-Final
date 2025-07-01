@@ -475,65 +475,60 @@ export default function Profile() {
 
 
       {/* Conteúdo principal */}
-      <div className={styles.profileContainer}>
-        <div className={styles.userInfo}>
-          <h1>{authData.user.fullname}</h1>
+<div className={styles.pageContainer}>
+  <div className={styles.profileContainer}>
 
-          <div className={styles.infoItem}>
-            <EmailIcon className={styles.icon} />
-            <div>
-              <span className={styles.label}>Email: </span>
-              <span className={styles.value}>{authData.user.email}</span>
-            </div>
+    <div className={styles.topSection}>
+      {/* 🧑 Dados do usuário */}
+      <div className={styles.userSection}>
+        <h1>{authData.user.fullname}</h1>
+
+        <div className={styles.infoItem}>
+          <EmailIcon className={styles.icon} />
+          <div>
+            <div className={styles.label}>Email:</div>
+            <div className={styles.value}>{authData.user.email}</div>
           </div>
-
-          <div className={styles.infoItem}>
-            <CalendarTodayIcon className={styles.icon} />
-            <div>
-              <span className={styles.label}>Nascimento: </span>
-                <span className={styles.value}>
-                  {authData.user.birthdate
-                    ? new Date(new Date(authData.user.birthdate).getTime() + 24 * 60 * 60 * 1000)
-                        .toLocaleDateString("pt-BR")
-                    : "Não informado"}
-                </span>
-              </div>
         </div>
 
-            <div className={styles.infoItem}>
-              <h4>📋 Suas preferências:</h4>
-              <ul>
-                {(authData.user.acceptedTerms?.sections || []).map((section) => (
-                  <li key={section.title}>
-                    {section.required ? '🔒' : section.acceptedAt ? '✅' : '❌'} {section.title}
-                  </li>
-                ))}
-              </ul>
+        <div className={styles.infoItem}>
+          <CalendarTodayIcon className={styles.icon} />
+          <div>
+            <div className={styles.label}>Nascimento:</div>
+            <div className={styles.value}>
+              {authData.user.birthdate
+                ? new Date(new Date(authData.user.birthdate).getTime() + 24 * 60 * 60 * 1000)
+                    .toLocaleDateString("pt-BR")
+                : "Não informado"}
             </div>
-           </div>
+          </div>
+        </div>
 
-        <div className={styles.actionsRow}>
+        <Button
+          variant="contained"
+          className={styles.editProfileButton}
+          onClick={() => setEditingProfile(true)}
+          color="secondary"
+        >
+          Editar Perfil
+        </Button>
+      </div>
+
+      {/* 🔒 Preferências */}
+      <div className={styles.preferencesSection}>
+        <div className={styles.infoItem}>
+          <h4>📋 Suas preferências:</h4>
+          <ul>
+            {(authData.user.acceptedTerms?.sections || []).map((section) => (
+              <li key={section.title}>
+                {section.required ? '🔒' : section.acceptedAt ? '✅' : '❌'} {section.title}
+              </li>
+            ))}
+          </ul>
+
           <Button
             variant="contained"
-            color="primary"
-            onClick={() => setEditingProfile(true)}
-          >
-            Editar Perfil
-          </Button>
-
-          {authData.user.role === "admin" && (
-            <>
-              <Button variant="outlined" onClick={() => navigate("/admin/terms")}>
-                Gerenciar Termos de Uso
-              </Button>
-              <Button variant="outlined" onClick={() => navigate('/admin/users-terms')}>
-                Ver usuários e termos
-              </Button>
-            </>
-          )}
-
-          <Button
-            variant="contained"
+            className={styles.privacyButton}
             color="secondary"
             onClick={() => {
               const optionalPrefs = {};
@@ -548,58 +543,75 @@ export default function Profile() {
           >
             Editar Preferências de Privacidade
           </Button>
-
-          <Button
-            variant="contained"
-            onClick={handleLogout}
-            className={styles.logoutButton}
-            startIcon={<FiLogOut />}
-          >
-            Logout
-          </Button>
-
-          <Button
-            variant="outlined"
-            color="error"
-            startIcon={<DeleteIcon />}
-            onClick={() => setShowDeleteModal(true)}
-          >
-            Excluir Conta
-          </Button>
-
-
-        </div>
-
-        <div className={styles.ordersContainer}>
-          {orders.length > 0 ? (
-            orders.map((order) => {
-              const statusInfo = statusMap[order.pickupStatus];
-              return (
-                <div key={order._id} className={styles.orderContainer}>
-                  <p className={`${styles.pickupStatus} ${statusInfo?.className || ''}`}>
-                    {statusInfo?.icon} {order.pickupStatus || 'Unknown'}
-                  </p>
-                  <h3>{order.pickupTime}</h3>
-                  {order.orderItems.map((item) => (
-                    <div key={item._id}>
-                      <h4>{item.itemDetails[0]?.name}</h4>
-                      <p>Quantidade: {item.quantity}</p>
-                    </div>
-                  ))}
-                </div>
-              );
-            })
-          ) : (
-            <div>
-              <p>Você ainda não tem pedidos.</p>
-              <Link to="/plates" className={styles.platesLink}>
-                Clique aqui e conheça nossos pratos!
-              </Link>
-              <br/><br/><br/><br/>
-            </div>
-          )}
         </div>
       </div>
     </div>
+
+    {/* 🚀 Ações */}
+    <div className={styles.actionsRow}>
+      {authData.user.role === "admin" && (
+        <>
+          <Button variant="outlined" onClick={() => navigate("/admin/terms")}>
+            Gerenciar Termos de Uso
+          </Button>
+          <Button variant="outlined" onClick={() => navigate("/admin/users-terms")}>
+            Ver Usuários e Termos
+          </Button>
+        </>
+      )}
+
+      <Button
+        variant="contained"
+        onClick={handleLogout}
+        className={styles.logoutButton}
+        startIcon={<FiLogOut />}
+      >
+        Logout
+      </Button>
+
+      <Button
+        variant="outlined"
+        color="error"
+        startIcon={<DeleteIcon />}
+        onClick={() => setShowDeleteModal(true)}
+      >
+        Excluir Conta
+      </Button>
+    </div>
+
+    {/* 🍽️ Pedidos */}
+    <div className={styles.ordersContainer}>
+      {orders.length > 0 ? (
+        orders.map((order) => {
+          const statusInfo = statusMap[order.pickupStatus] || {};
+          return (
+            <div key={order._id} className={styles.orderContainer}>
+              <p className={`${styles.pickupStatus} ${statusInfo.className || ""}`}>
+                {statusInfo.icon} {order.pickupStatus || "Unknown"}
+              </p>
+              <h3>{order.pickupTime}</h3>
+              {order.orderItems.map((item) => (
+                <div key={item._id}>
+                  <h4>{item.itemDetails[0]?.name}</h4>
+                  <p>Quantidade: {item.quantity}</p>
+                </div>
+              ))}
+            </div>
+          );
+        })
+      ) : (
+        <div>
+          <p>Você ainda não tem pedidos.</p>
+          <Link to="/plates" className={styles.platesLink}>
+            Clique aqui e conheça nossos pratos!
+          </Link>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+
+    </div>
   );
-}
+} 
+

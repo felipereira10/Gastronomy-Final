@@ -287,6 +287,19 @@ export default function Profile() {
                 variant="outlined"
                 onClick={() => setEditingPreferences(false)}
                 style={{ marginLeft: '1rem' }}
+                sx={{
+                  borderColor: "red",
+                  backgroundColor: "red",
+                  color: "white",
+                  borderRadius: "8px",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "white",
+                    color: "red",
+                    borderColor: "red",
+                    borderRadius: "18px",
+                  },
+                }}
               >
                 Cancelar
               </Button>
@@ -368,15 +381,19 @@ export default function Profile() {
         <Button
           variant="outlined"
           onClick={() => setShowDeleteModal(false)}
-          sx={{
-            color: "white",
-            borderColor: "white",
-            "&:hover": {
-              backgroundColor: "white",
-              color: "red",
+            sx={{
               borderColor: "red",
-            },
-          }}
+              backgroundColor: "red",
+              color: "white",
+              borderRadius: "8px",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                backgroundColor: "white",
+                color: "red",
+                borderColor: "red",
+                borderRadius: "18px",
+              },
+            }}
         >
           Cancelar
         </Button>
@@ -425,22 +442,34 @@ export default function Profile() {
             <div style={{ marginTop: "1rem" }}>
               <Button variant="contained" color="secondary" onClick={handleProfileSave}
                 sx={{
-                  backgroundColor: "green",
-                  color: "white",
                   borderColor: "white",
+                  borderRadius: "8px",
+                  transition: "all 0.3s ease",
                   "&:hover": {
-                    backgroundColor: "white",
-                    color: "green",
-                    borderColor: "green",
+                    backgroundColor: "#1976d2",
+                    borderRadius: "18px",
                   },
                 }}
               >
                 Salvar
               </Button>
               <Button
-                variant="outlined"
+                variant="contained"
                 onClick={() => setEditingProfile(false)}
                 style={{ marginLeft: "1rem" }}
+                sx={{
+                  borderColor: "red",
+                  backgroundColor: "red",
+                  color: "white",
+                  borderRadius: "8px",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "white",
+                    color: "red",
+                    borderColor: "red",
+                    borderRadius: "18px",
+                  },
+                }}
               >
                 Cancelar
               </Button>
@@ -545,23 +574,34 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className={`${styles.infoItem} ${styles.cardHover}`}>
-      {authData.user.role === "admin" && (
-      <div className={styles.adminPanel}>
-        <h3>Área Administrativa</h3>
-      <div className={styles.actionsRow}>
-        {authData.user.role === "admin" && (
-          <>
-            <Button variant="contained" color="secondary" className={styles.privacyButton} onClick={() => navigate("/admin/terms")}>
-              ⚙️ Gerenciar Termos de Uso
-            </Button>
-            <Button variant="contained" color="secondary" className={styles.privacyButton} onClick={() => navigate("/admin/users-terms")}>
-              Ver Usuários e Termos
-            </Button>
-          </>
-        )}
+      {authData?.user?.role === "admin" && (
+        <div className={styles.adminPanel}>
+          <div className={`${styles.infoItem} ${styles.cardHover}`}>
+            <h3>Área Administrativa</h3>
+            <div className={styles.actionsRow}>
+              <Button
+                variant="contained"
+                color="secondary"
+                className={styles.privacyButton}
+                onClick={() => navigate("/admin/terms")}
+              >
+                ⚙️ Gerenciar Termos de Uso
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                className={styles.privacyButton}
+                onClick={() => navigate("/admin/users-terms")}
+              >
+                Ver Usuários e Termos
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
-        {/* <button className={styles.adminButton}>
+
+              {/* <button className={styles.adminButton}>
           ⚙️ Gerenciar Termos de Uso
         </button>
 
@@ -582,10 +622,7 @@ export default function Profile() {
           <span>👤 Usuários:</span>
           <span>12 registrados</span>
         </div> */}
-      </div>
-    </div>
-      )}
-    </div>
+
 
     {/* 🚀 Ações */}
 
@@ -646,7 +683,20 @@ export default function Profile() {
           <Button
             variant="outlined"
             onClick={() => setShowLogoutConfirm(false)}
-            sx={{ ml: 2 }}
+              sx={{
+                  borderColor: "red",
+                  backgroundColor: "red",
+                  color: "white",
+                  borderRadius: "8px",
+                  transition: "all 0.3s ease",
+                  ml: 2,
+                  "&:hover": {
+                    backgroundColor: "white",
+                    color: "red",
+                    borderColor: "red",
+                    borderRadius: "18px",
+                  },
+                }}
           >
             Cancelar
           </Button>

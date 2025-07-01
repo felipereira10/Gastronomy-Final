@@ -42,6 +42,11 @@ termsRouter.post('/', ensureAuthenticated, async (req, res) => {
     return res.status(400).send({ message: 'Versão já existe.' });
   }
 
+  await Mongo.db.collection('terms').updateMany(
+    { active: true },
+    { $set: { active: false } }
+  );
+
   await Mongo.db.collection('terms').insertOne({
     version,
     content,
@@ -84,10 +89,10 @@ termsRouter.put('/:id', ensureAuthenticated, async (req, res) => {
       return res.status(404).send({ message: 'Termo não encontrado.' });
     }
 
-    // Desativar o termo atual
-    await Mongo.db.collection('terms').updateOne(
-      { _id: new Mongo.ObjectId(id) },
-      { $set: { active: false, updatedAt: new Date() } }
+    // Desativar todos os termos ativos
+    await Mongo.db.collection('terms').updateMany(
+      { active: true },
+      { $set: { active: false } }
     );
 
     // Verificar se a versão já existe em outro termo

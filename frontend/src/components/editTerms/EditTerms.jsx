@@ -35,9 +35,15 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 function SortableSection({ index, section, onRemove, onChange }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: index.toString(),
-  });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: section.title || index.toString() });
+
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -46,40 +52,61 @@ function SortableSection({ index, section, onRemove, onChange }) {
   };
 
   return (
-    <Paper ref={setNodeRef} style={style} {...attributes} {...listeners} sx={{ padding: 2 }}>
-      <TextField
-        fullWidth
-        label="Título"
-        value={section.title}
-        onChange={(e) => onChange(index, 'title', e.target.value)}
-        sx={{ marginBottom: 2 }}
+<Paper
+  ref={setNodeRef}
+  style={{
+    transform: CSS.Transform.toString(transform),
+    transition: 'background-color 0.2s',
+    marginBottom: '16px',
+    backgroundColor: isDragging ? '#eeeeee' : 'white',
+  }}
+  {...attributes}
+  sx={{ padding: 2 }}
+>
+  <Box display="flex" justifyContent="space-between">
+    <Typography 
+      variant="subtitle2" 
+      {...listeners}
+      sx={{ cursor: 'grab', userSelect: 'none', display: 'flex', alignItems: 'center' }}
+    >
+      ⠿ Arraste
+    </Typography>
+
+    <IconButton onClick={() => onRemove(index)} color="error">
+      <DeleteIcon />
+    </IconButton>
+  </Box>
+
+  <TextField
+    fullWidth
+    label="Título"
+    value={section.title}
+    onChange={(e) => onChange(index, 'title', e.target.value)}
+    sx={{ marginBottom: 2 }}
+  />
+
+  <TextField
+    fullWidth
+    label="Conteúdo"
+    multiline
+    rows={4}
+    value={section.content}
+    onChange={(e) => onChange(index, 'content', e.target.value)}
+    sx={{ marginBottom: 2 }}
+  />
+
+  <FormControlLabel
+    control={
+      <Checkbox
+        checked={section.required}
+        onChange={(e) => onChange(index, 'required', e.target.checked)}
       />
-      <TextField
-        fullWidth
-        label="Conteúdo"
-        multiline
-        rows={4}
-        value={section.content}
-        onChange={(e) => onChange(index, 'content', e.target.value)}
-        sx={{ marginBottom: 2 }}
-      />
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={section.required}
-            onChange={(e) => onChange(index, 'required', e.target.checked)}
-          />
-        }
-        label="Obrigatório"
-      />
-      <IconButton onClick={() => onRemove(index)} color="error" sx={{ float: 'right' }}>
-        <DeleteIcon />
-      </IconButton>
-    </Paper>
+    }
+    label="Obrigatório"
+  />
+</Paper>
   );
 }
-
-
 
   export default function EditTerms() {
     const { authData } = useAuth();
@@ -257,10 +284,13 @@ function SortableSection({ index, section, onRemove, onChange }) {
           />
 
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={sections.map((_, i) => i.toString())} strategy={verticalListSortingStrategy}>
+            <SortableContext
+              items={sections.map((s, i) => s.title || i.toString())}
+              strategy={verticalListSortingStrategy}
+            >
               {sections.map((section, index) => (
                 <SortableSection
-                  key={index}
+                  key={section.title + index}
                   index={index}
                   section={section}
                   onRemove={handleRemoveSection}

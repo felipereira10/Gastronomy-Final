@@ -142,7 +142,7 @@
   padding-left: 2rem;
 }
 
-.infoItem h4 {
+.infoItem h2 {
   color: #93e4c1;
   margin-bottom: 0.5em;
 }
@@ -263,7 +263,8 @@
 }
 
 .modalContent {
-  background-color: #fff;
+  background-color: #004643;
+  color: #93e4c1;
   padding: 2em 2.5em;
   border-radius: 1em;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -288,7 +289,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.4em;
-  color: #004643;
+  color: #e2f7e1;
   font-weight: 500;
   margin-bottom: 1rem;
 }
@@ -309,7 +310,7 @@
 }
 
 .successModalContent {
-  background-color: #e2f7e1; /* 💚 Verde bem clarinho */
+  background-color: #e2f7e1;
   padding: 2em;
   border-radius: 1em;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
@@ -323,7 +324,7 @@
 }
 
 .successModalContent h2 {
-  color: #2e7d32; /* Verde mais forte para o texto */
+  color: #2e7d32;
   margin: 0;
 }
 

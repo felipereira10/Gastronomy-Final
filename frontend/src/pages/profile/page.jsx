@@ -211,20 +211,29 @@ export default function Profile() {
                 }
                     label={
                       <Box
-                        sx={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          overflowY: 'auto',
-                          paddingRight: '0.5rem',
-                          width: '95%',
-                          boxSizing: 'border-box',
-                          marginLeft: '0.8rem',
-                        }}
-                      >
-                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflowY: 'auto',
+                        paddingRight: '0.5rem',
+                        width: '95%',
+                        boxSizing: 'border-box',
+                        marginLeft: '0.8rem',
+                        borderRadius: '8px',
+                        padding: '0.5rem',
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                        transition: 'background-color 0.3s ease',
+                        backgroundColor: section.required ? '#ffe6e6' : '#f0f0f0',
+                        '&:hover': {
+                          backgroundColor: section.required ? '#ffcccc' : '#e0e0e0',
+                        },
+                        color: 'inherit', // não força cor errada
+                      }}
+                    >
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#000 !important', }}>
                           {section.required ? "🔒 " : ""}{section.title}
                         </Typography>
-                        <Typography sx={{ whiteSpace: 'pre-line', mt: 1 }}>
+                        <Typography sx={{ whiteSpace: 'pre-line', mt: 1, color: '#000 !important',  }}>
                           {section.content}
                         </Typography>
                       </Box>
@@ -237,15 +246,14 @@ export default function Profile() {
             <div style={{ marginTop: '1rem' }}>
               <Button
                 variant="contained"
-                color="primary"
+                color="secondary"
                 sx={{
-                  backgroundColor: "green",
-                  color: "white",
                   borderColor: "white",
+                  borderRadius: "8px",
+                  transition: "all 0.3s ease",
                   "&:hover": {
-                    backgroundColor: "white",
-                    color: "green",
-                    borderColor: "green",
+                    backgroundColor: "#1976d2",
+                    borderRadius: "18px",
                   },
                 }}
                 onClick={async () => {
@@ -522,7 +530,7 @@ export default function Profile() {
         <div className={styles.infoItem}>
           <CalendarTodayIcon className={styles.icon} />
           <div>
-            <div className={styles.label}>Nascimento:</div>
+            <div className={styles.label}>Data de Nascimento:</div>
             <div className={styles.value}>
               {authData.user.birthdate
                 ? new Date(new Date(authData.user.birthdate).getTime() + 24 * 60 * 60 * 1000)
@@ -545,7 +553,7 @@ export default function Profile() {
       {/* 🔒 Preferências */}
       <div className={styles.preferencesSection}>
         <div className={styles.infoItem}>
-          <h4>📋 Suas preferências:</h4>
+          <h2>📋 Suas preferências:</h2>
           <ul>
             {(authData.user.acceptedTerms?.sections || []).map((section) => (
               <li key={section.title}>
@@ -622,7 +630,6 @@ export default function Profile() {
           <span>👤 Usuários:</span>
           <span>12 registrados</span>
         </div> */}
-
 
     {/* 🚀 Ações */}
 

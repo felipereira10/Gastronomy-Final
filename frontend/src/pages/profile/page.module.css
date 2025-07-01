@@ -86,14 +86,28 @@
 }
 
 .infoItem {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   background-color: #014141;
   color: white;
   padding: 14px 20px;
   border-radius: 10px;
-  margin-bottom: 1em;
+  margin-bottom: 0.5em;
   display: flex;
   flex-direction: column;
   gap: 0.8em;
+}
+
+.infoItem:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cardHover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cardHover:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .label {
@@ -145,11 +159,11 @@
 }
 
 .editProfileButton:hover {
-  background-color: #005f56;
+  background-color: #1976d2;
+  border-radius: 18px;
 }
 
 .privacyButton {
-  background-color: #1976d2;
   color: white;
   border-radius: 8px;
   padding: 0.6em 1.4em;
@@ -160,6 +174,7 @@
 
 .privacyButton:hover {
   background-color: #1565c0;
+  border-radius: 18px;
 }
 
 .actionsRow {
@@ -176,7 +191,8 @@
 }
 
 .logoutButton:hover {
-  background-color: #003b39 !important;
+  background-color: #1976d2;
+  border-radius: 18px;
 }
 
 .ordersContainer {
@@ -361,6 +377,7 @@
 .deleteButton:hover {
   background-color: red !important;
   color: white !important;
+  border-radius: 18px;
 }
 
 @media screen and (max-width: 768px) {

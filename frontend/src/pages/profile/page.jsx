@@ -7,15 +7,13 @@ import useAuthServices from "../../services/auth.jsx";
 import Loading from "../../components/Loading/Loading.jsx";
 import styles from "./page.module.css";
 import { FiLogOut, FiClock, FiCheckCircle, FiXCircle } from "react-icons/fi";
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EmailIcon from '@mui/icons-material/Email';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
 
 
 export default function Profile() {
@@ -25,14 +23,13 @@ export default function Profile() {
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-
   const [editingPreferences, setEditingPreferences] = useState(false);
   const [currentOptional, setCurrentOptional] = useState({});
   const [activeTerms, setActiveTerms] = useState(null);
   const [editingProfile, setEditingProfile] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const isoDate = new Date(authData.user.birthdate);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const dateForInput = isoDate.toISOString().split('T')[0];
 
 
@@ -482,6 +479,7 @@ export default function Profile() {
       {/* 🧑 Dados do usuário */}
       <div className={styles.userSection}>
         <div className={styles.userNameBox}>
+          <AccountBoxIcon className={styles.icon} />
           <h1>{authData.user.fullname}</h1>
         </div>
         <div className={styles.infoItem}>
@@ -546,17 +544,18 @@ export default function Profile() {
           </Button>
         </div>
       </div>
+
+      <div className={`${styles.infoItem} ${styles.cardHover}`}>
       {authData.user.role === "admin" && (
       <div className={styles.adminPanel}>
         <h3>Área Administrativa</h3>
-
       <div className={styles.actionsRow}>
         {authData.user.role === "admin" && (
           <>
-            <Button variant="contained" color="secondary" onClick={() => navigate("/admin/terms")}>
+            <Button variant="contained" color="secondary" className={styles.privacyButton} onClick={() => navigate("/admin/terms")}>
               ⚙️ Gerenciar Termos de Uso
             </Button>
-            <Button variant="contained" color="secondary" onClick={() => navigate("/admin/users-terms")}>
+            <Button variant="contained" color="secondary" className={styles.privacyButton} onClick={() => navigate("/admin/users-terms")}>
               Ver Usuários e Termos
             </Button>
           </>
@@ -586,14 +585,14 @@ export default function Profile() {
       </div>
     </div>
       )}
-    
+    </div>
 
     {/* 🚀 Ações */}
 
       <div className={styles.actionsPanel}>
         <Button
           variant="contained"
-          onClick={handleLogout}
+          onClick={() => setShowLogoutConfirm(true)}
           className={styles.logoutButton}
           startIcon={<FiLogOut />}
         >
@@ -610,6 +609,51 @@ export default function Profile() {
         </Button>
       </div>
     </div>
+
+    {/* Modal de confirmação de logout */}
+    <Modal
+      open={showLogoutConfirm}
+      onClose={() => setShowLogoutConfirm(false)}
+      aria-labelledby="logout-confirm-title"
+      aria-describedby="logout-confirm-description"
+    >
+      <Box sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        bgcolor: '#fff',
+        p: 4,
+        borderRadius: 2,
+        boxShadow: 24,
+        width: '90%',
+        maxWidth: 400,
+      }}>
+        <Typography id="logout-confirm-title" variant="h6" gutterBottom>
+          Tem certeza que deseja sair?
+        </Typography>
+        <Typography id="logout-confirm-description" sx={{ mb: 3 }}>
+          Você será desconectado da sua conta.
+        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleLogout}
+          >
+            Sair
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => setShowLogoutConfirm(false)}
+            sx={{ ml: 2 }}
+          >
+            Cancelar
+          </Button>
+        </Box>
+      </Box>
+    </Modal>
+
 
     {/* 🍽️ Pedidos */}
     <div className={styles.ordersContainer}>

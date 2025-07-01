@@ -185,8 +185,8 @@ export default function Profile() {
     <div className={styles.profilePage}>
       {/* Modal de Preferências */}
       {editingPreferences && (
-        <div className={styles.cookieOverlay}>
-          <div className={styles.cookieModalContent}>
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
             <h2>Editar Preferências de Privacidade</h2>
             {activeTerms && (
               <div style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '1rem' }}>
@@ -217,11 +217,11 @@ export default function Profile() {
                         sx={{
                           display: 'flex',
                           flexDirection: 'column',
-                          maxHeight: '150px',
                           overflowY: 'auto',
                           paddingRight: '0.5rem',
-                          width: '100%',
+                          width: '95%',
                           boxSizing: 'border-box',
+                          marginLeft: '0.8rem',
                         }}
                       >
                         <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
@@ -392,8 +392,8 @@ export default function Profile() {
 
       {/* Modal de edição de perfil */}
       {editingProfile && (
-        <div className={styles.cookieOverlay}>
-          <div className={styles.cookieModalContent}>
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
             <h2>Editar Perfil</h2>
             <label>
               Nome Completo:
@@ -426,7 +426,7 @@ export default function Profile() {
             </label>
 
             <div style={{ marginTop: "1rem" }}>
-              <Button variant="contained" onClick={handleProfileSave}
+              <Button variant="contained" color="secondary" onClick={handleProfileSave}
                 sx={{
                   backgroundColor: "green",
                   color: "white",
@@ -453,7 +453,7 @@ export default function Profile() {
       )}
 
       {saveSuccess && (
-        <div className={styles.cookieOverlay}>
+        <div className={styles.modalOverlay}>
           <div className={styles.successModalContent}>
             <FiCheckCircle size={36} color="green" style={{ marginBottom: "1rem" }} />
             <h2 style={{ color: "green" }}>Perfil atualizado com sucesso!</h2>
@@ -462,7 +462,7 @@ export default function Profile() {
       )}
 
       {privacySaveSuccess && (
-        <div className={styles.cookieOverlay}>
+        <div className={styles.modalOverlay}>
           <div className={styles.successModalContent}>
             <FiCheckCircle size={36} color="green" style={{ marginBottom: "1rem" }} />
             <h2 style={{ color: "green" }}>Preferências atualizadas com sucesso!</h2>
@@ -481,8 +481,9 @@ export default function Profile() {
     <div className={styles.topSection}>
       {/* 🧑 Dados do usuário */}
       <div className={styles.userSection}>
-        <h1>{authData.user.fullname}</h1>
-
+        <div className={styles.userNameBox}>
+          <h1>{authData.user.fullname}</h1>
+        </div>
         <div className={styles.infoItem}>
           <EmailIcon className={styles.icon} />
           <div>
@@ -545,38 +546,69 @@ export default function Profile() {
           </Button>
         </div>
       </div>
+      {authData.user.role === "admin" && (
+      <div className={styles.adminPanel}>
+        <h3>Área Administrativa</h3>
+
+      <div className={styles.actionsRow}>
+        {authData.user.role === "admin" && (
+          <>
+            <Button variant="contained" color="secondary" onClick={() => navigate("/admin/terms")}>
+              ⚙️ Gerenciar Termos de Uso
+            </Button>
+            <Button variant="contained" color="secondary" onClick={() => navigate("/admin/users-terms")}>
+              Ver Usuários e Termos
+            </Button>
+          </>
+        )}
+
+        {/* <button className={styles.adminButton}>
+          ⚙️ Gerenciar Termos de Uso
+        </button>
+
+        <button className={styles.adminButton}>
+          👥 Ver Usuários e Termos
+        </button> */}
+
+        {/* <button className={styles.adminButton}>
+          ➕ Novo Termo
+        </button> */}
+
+        {/* <div className={styles.statsBox}>
+          <span>📄 Termos:</span>
+          <span>5 ativos</span>
+        </div> */}
+
+        {/* <div className={styles.statsBox}>
+          <span>👤 Usuários:</span>
+          <span>12 registrados</span>
+        </div> */}
+      </div>
     </div>
+      )}
+    
 
     {/* 🚀 Ações */}
-    <div className={styles.actionsRow}>
-      {authData.user.role === "admin" && (
-        <>
-          <Button variant="outlined" onClick={() => navigate("/admin/terms")}>
-            Gerenciar Termos de Uso
-          </Button>
-          <Button variant="outlined" onClick={() => navigate("/admin/users-terms")}>
-            Ver Usuários e Termos
-          </Button>
-        </>
-      )}
 
-      <Button
-        variant="contained"
-        onClick={handleLogout}
-        className={styles.logoutButton}
-        startIcon={<FiLogOut />}
-      >
-        Logout
-      </Button>
+      <div className={styles.actionsPanel}>
+        <Button
+          variant="contained"
+          onClick={handleLogout}
+          className={styles.logoutButton}
+          startIcon={<FiLogOut />}
+        >
+          Logout
+        </Button>
 
-      <Button
-        variant="outlined"
-        color="error"
-        startIcon={<DeleteIcon />}
-        onClick={() => setShowDeleteModal(true)}
-      >
-        Excluir Conta
-      </Button>
+        <Button
+          variant="outlined"
+          className={styles.deleteButton}
+          startIcon={<DeleteIcon />}
+          onClick={() => setShowDeleteModal(true)}
+        >
+          Excluir Conta
+        </Button>
+      </div>
     </div>
 
     {/* 🍽️ Pedidos */}

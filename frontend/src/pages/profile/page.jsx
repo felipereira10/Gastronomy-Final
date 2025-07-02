@@ -14,7 +14,9 @@ import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
-
+import { FiClipboard } from 'react-icons/fi';
+import SecurityIcon from '@mui/icons-material/Security';
+import { FiPhone } from 'react-icons/fi';
 
 export default function Profile() {
   const { authData, setAuthData } = useAuth();
@@ -30,6 +32,42 @@ export default function Profile() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const isoDate = new Date(authData.user.birthdate);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
+  const maxPhoneDigits = 11; // DDD + número, só números
+  function formatPhoneNumber(value) {
+    // Remove tudo que não for número
+    const cleaned = value.replace(/\D/g, '');
+
+    // Limita a 11 dígitos (DDD + número)
+    const match = cleaned.match(/^(\d{0,2})(\d{0,5})(\d{0,4})$/);
+
+    if (!match) return '';
+
+    let formatted = '';
+
+    if (match[1]) {
+      formatted = `(${match[1]}`;
+    }
+
+    if (match[1] && match[1].length === 2) {
+      formatted += ') ';
+    }
+
+    if (match[2]) {
+      formatted += match[2];
+    }
+
+    if (match[3]) {
+      formatted += `-${match[3]}`;
+    }
+
+    return formatted;
+  }
+
+  function cleanPhoneNumber(value) {
+    return value.replace(/\D/g, '');
+  }
+
   const dateForInput = isoDate.toISOString().split('T')[0];
     const handleRequestPasswordReset = () => {
     if (!authData?.user?.email) {
@@ -62,7 +100,8 @@ export default function Profile() {
   const [editForm, setEditForm] = useState({
     fullname: "",
     email: "",
-    birthdate: ""
+    birthdate: "",
+    phoneNumber: ""
   });
   // Após editar
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -79,9 +118,8 @@ export default function Profile() {
     setEditForm({
       fullname: authData.user.fullname || "",
       email: authData.user.email || "",
-      birthdate: authData.user.birthdate
-        ? authData.user.birthdate.split('T')[0]
-        : ""
+      birthdate: authData.user.birthdate ? authData.user.birthdate.split('T')[0] : "",
+      phoneNumber: formatPhoneNumber(authData.user.phoneNumber || "")
     });
 
     const getUserOrders = async (userId) => {
@@ -167,7 +205,8 @@ export default function Profile() {
         body: JSON.stringify({
           fullname: editForm.fullname,
           email: editForm.email,
-          birthdate: birthdateString, // Envie como string, não como Date
+          birthdate: birthdateString,
+          phoneNumber: cleanPhoneNumber(editForm.phoneNumber)
         }),
       });
 
@@ -181,6 +220,7 @@ export default function Profile() {
             fullname: editForm.fullname,
             email: editForm.email,
             birthdate: birthdateString,
+            phoneNumber: cleanPhoneNumber(editForm.phoneNumber),
           },
         }));
         setEditingProfile(false);
@@ -473,6 +513,34 @@ export default function Profile() {
 
             </label>
 
+            <label>
+              Celular:
+              <input
+                type="text"
+                value={editForm.phoneNumber}
+                onChange={(e) => {
+                  const rawDigits = e.target.value.replace(/\D/g, '');
+                  if (rawDigits.length > maxPhoneDigits) {
+                    setPhoneError(`Telefone não pode ter mais que ${maxPhoneDigits} dígitos.`);
+                    // NÃO atualiza o estado para evitar apagar o campo
+                    return;
+                  }
+                  setPhoneError(''); // Limpa erro se corrigido
+                  setEditForm((prev) => ({
+                    ...prev,
+                    phoneNumber: formatPhoneNumber(e.target.value),
+                  }));
+                }}
+                placeholder="(11) 91234-5678"
+              />
+            </label>
+            {phoneError && (
+              <span style={{ background:'#93e4c1' , color: 'red', fontSize: '0.85rem', marginTop: '0.25rem', display: 'block', borderRadius: '4px', padding: '0.25rem' }}>
+                {phoneError}
+              </span>
+            )}
+
+
               <Button variant="contained" color="secondary  " onClick={handleRequestPasswordReset}>Redefinir Senha</Button>
 
             <div style={{ marginTop: "1rem" }}>
@@ -547,18 +615,24 @@ export default function Profile() {
           <AccountBoxIcon className={styles.icon} />
           <h1>{authData.user.fullname}</h1>
         </div>
+
         <div className={styles.infoItem}>
-          <EmailIcon className={styles.icon} />
           <div>
-            <div className={styles.label}>Email:</div>
+            <div className={styles.label}>
+              <EmailIcon className={styles.icon} />
+              Email:
+              </div>
             <div className={styles.value}>{authData.user.email}</div>
           </div>
         </div>
 
         <div className={styles.infoItem}>
-          <CalendarTodayIcon className={styles.icon} />
+          
           <div>
-            <div className={styles.label}>Data de Nascimento:</div>
+            <div className={styles.label}>
+              <CalendarTodayIcon className={styles.icon} />
+              Data de Nascimento:
+              </div>
             <div className={styles.value}>
               {authData.user.birthdate
                 ? new Date(new Date(authData.user.birthdate).getTime() + 24 * 60 * 60 * 1000)
@@ -567,6 +641,20 @@ export default function Profile() {
             </div>
           </div>
         </div>
+
+        <div className={styles.infoItem}>
+          <div className={styles.label}>
+            <FiPhone size={24} style={{ marginRight: '0.5rem' }} />
+            Celular:
+          </div>
+          <div className={styles.value}>
+            {authData.user.phoneNumber 
+              ? formatPhoneNumber(authData.user.phoneNumber) 
+              : "Não informado"}
+          </div>
+        </div>
+
+
 
         <Button
           variant="contained"
@@ -581,7 +669,10 @@ export default function Profile() {
       {/* 🔒 Preferências */}
       <div className={styles.preferencesSection}>
         <div className={styles.infoItem}>
-          <h2>📋 Suas preferências:</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <FiClipboard size={24} />
+            Suas preferências:
+          </h2>
           <ul>
             {(authData.user.acceptedTerms?.sections || []).map((section) => (
               <li key={section.title}>
@@ -613,7 +704,7 @@ export default function Profile() {
       {authData?.user?.role === "admin" && (
         <div className={styles.adminPanel}>
           <div className={`${styles.infoItem} ${styles.cardHover}`}>
-            <h2>Área Administrativa</h2>
+            <h2><SecurityIcon style={{ marginRight: 6 }} /> Área Administrativa</h2>
             <div className={styles.actionsRow}>
               <Button
                 variant="contained"

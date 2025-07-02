@@ -36,12 +36,27 @@ async updateUser(userId, userData) {
     delete userData._id;
     delete userData.acceptedTerms;
 
-    console.log("userData após remoção de _id e acceptedTerms:", userData);
+    const allowedFields = ['fullname', 'email', 'birthdate', 'phoneNumber', 'password', 'salt'];
 
+    Object.keys(userData).forEach(key => {
+      if (!allowedFields.includes(key)) {
+        delete userData[key];
+      }
+    });
 
     if (userData.password) {
+      const password = userData.password;
+
+      const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+      if (!passwordRegex.test(password)) {
+        throw new Error(
+          "A senha deve ter pelo menos 8 caracteres, incluindo uma letra, um número e um caractere especial."
+        );
+      }
+
       const salt = crypto.randomBytes(16);
-      const hashedPassword = await pbkdf2(userData.password, salt, 310000, 16, 'sha256');
+      const hashedPassword = await pbkdf2(password, salt, 310000, 16, 'sha256');
       userData.password = hashedPassword;
       userData.salt = salt;
     }
@@ -53,35 +68,36 @@ async updateUser(userId, userData) {
       }
     }
 
-    console.log("Dados para update:", userData);
-
+    if (userData.phoneNumber) {
+      const phoneRegex = /^[0-9]{9,15}$/;
+      if (!phoneRegex.test(userData.phoneNumber)) {
+        throw new Error("Número de telefone inválido");
+      }
+    }
 
     const filter = { _id: new ObjectId(userId) };
-    console.log("Filtro usado no update:", filter); 
 
     const existingUser = await db.collection(collectionName).findOne(filter);
-    console.log('Usuário encontrado antes update:', existingUser);
 
     if (!existingUser) {
       throw new Error("Usuário não encontrado");
     }
 
-const result = await db.collection(collectionName).findOneAndUpdate(
-  filter,
-  { $set: userData },
-  { returnDocument: 'after' }
-);
+    const result = await db.collection(collectionName).findOneAndUpdate(
+      filter,
+      { $set: userData },
+      { returnDocument: 'after' }
+    );
 
-console.log('🟢 Documento atualizado:', result);
+    if (!result) {
+      throw new Error("Usuário não encontrado após update");
+    }
 
-if (!result) {
-  throw new Error("Usuário não encontrado após update");
-}
-
-return result;
+    return result;
   } catch (err) {
     console.error("❌ Erro ao atualizar usuário:", err.message);
     throw err;
   }
 }
+
 }

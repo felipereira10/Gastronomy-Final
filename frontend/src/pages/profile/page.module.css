@@ -89,12 +89,12 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   background-color: #014141;
   color: white;
-  padding: 14px 20px;
+  padding: 16px 20px;
   border-radius: 10px;
   margin-bottom: 0.5em;
   display: flex;
   flex-direction: column;
-  gap: 0.8em;
+  gap: 0.5em;
 }
 
 .infoItem:hover {
@@ -123,7 +123,9 @@
 
 .icon {
   color: #93e4c1;
-  font-size: 30px;
+  font-size: 24px;
+  flex-shrink: 0;
+  margin-right: 0.5rem; 
 }
 
 .infoItem ul {
@@ -131,6 +133,7 @@
   margin-top: 0.5rem;
   list-style: none;
   width: 100%;
+  margin-bottom: 0.5rem;
 }
 
 .infoItem li {

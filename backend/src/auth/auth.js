@@ -47,7 +47,7 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, passwor
 
 authRouter.post('/signup', async (req, res) => {
   try {
-    const { fullname, email, password, birthdate, role } = req.body;
+    const { fullname, email, password, birthdate, role, phoneNumber } = req.body;
     const now = new Date();
 
     const checkUser = await Mongo.db.collection(collectionName).findOne({ email });
@@ -101,6 +101,7 @@ authRouter.post('/signup', async (req, res) => {
           sections: sectionsAccepted
         } : null,
         birthdate: birthdate || null,
+        phoneNumber: phoneNumber || null,
         role: role || 'user',
         createdAt: now
       });
@@ -502,20 +503,33 @@ authRouter.post('/reset-password', async (req, res) => {
   try {
     const { userId } = jwt.verify(token, process.env.JWT_SECRET);
 
-    const hashed = await bcrypt.hash(newPassword, 10);
-    await Mongo.db.collection('users').updateOne(
-      { _id: new Mongo.ObjectId(userId) },
-      { $set: { password: hashed } }
-    );
+    const salt = crypto.randomBytes(16);
+    crypto.pbkdf2(newPassword, salt, 310000, 16, 'sha256', async (err, hashedPassword) => {
+      if (err) {
+        return res.status(500).send({ message: 'Error while encrypting password' });
+      }
 
-    res.send({ message: 'Senha redefinida com sucesso' });
+      const result = await Mongo.db.collection('users').updateOne(
+        { _id: new ObjectId(userId) },
+        {
+          $set: {
+            password: hashedPassword,
+            salt: salt
+          }
+        }
+      );
+
+      if (result.modifiedCount === 1) {
+        return res.send({ message: 'Password reset successfully' });
+      } else {
+        return res.status(404).send({ message: 'User not found' });
+      }
+    });
+
   } catch (err) {
-    res.status(400).send({ message: 'Token inválido ou expirado' });
+    console.error(err);
+    return res.status(400).send({ message: 'Invalid or expired token' });
   }
 });
-
-
-
-
 
 export default authRouter

@@ -29,6 +29,56 @@ export default function Auth() {
   const [activeTerms, setActiveTerms] = useState(null);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [acceptedOptionalSections, setAcceptedOptionalSections] = useState({});
+  const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const maxPhoneDigits = 11; // DDD + número, só números
+  function formatPhoneNumber(value) {
+    // Remove tudo que não for número
+    const cleaned = value.replace(/\D/g, '');
+
+    // Limita a 11 dígitos (DDD + número)
+    const match = cleaned.match(/^(\d{0,2})(\d{0,5})(\d{0,4})$/);
+
+    if (!match) return '';
+
+    let formatted = '';
+
+    if (match[1]) {
+      formatted = `(${match[1]}`;
+    }
+
+    if (match[1] && match[1].length === 2) {
+      formatted += ') ';
+    }
+
+    if (match[2]) {
+      formatted += match[2];
+    }
+
+    if (match[3]) {
+      formatted += `-${match[3]}`;
+    }
+
+    return formatted;
+  }
+
+  function cleanPhoneNumber(value) {
+    return value.replace(/\D/g, '');
+  }
+    const checkPasswordStrength = (password) => {
+      let strength = 0;
+    
+    if (password.length >= 8) strength += 1;
+    if (/[a-z]/.test(password)) strength += 1;
+    if (/[A-Z]/.test(password)) strength += 1;
+    if (/\d/.test(password)) strength += 1;
+    if (/[@$!%*?&]/.test(password)) strength += 1;
+
+    if (strength <= 2) return 'fraca';
+    if (strength === 3 || strength === 4) return 'média';
+    if (strength >= 5) return 'forte';
+  };
+
+
 
 
 
@@ -36,6 +86,8 @@ export default function Auth() {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoadingAfterLogin, setIsLoadingAfterLogin] = useState(false);
   const [delayedRedirect, setDelayedRedirect] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState('');
+
 
 
   useEffect(() => {
@@ -118,11 +170,36 @@ export default function Auth() {
   };
 
   const handleFormDataChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    const { name, value } = e.target;
+
+    if (name === 'phoneNumber') {
+      // Remove não dígitos pra contar
+      const digitsOnly = value.replace(/\D/g, '');
+
+      if (digitsOnly.length > maxPhoneDigits) {
+        setErrorMessage(`Telefone não pode ter mais que ${maxPhoneDigits} dígitos.`);
+        return; // não atualiza o formData
+      } else {
+        setErrorMessage(''); // limpa erro caso tenha corrigido
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        [name]: formatPhoneNumber(value),
+      }));
+
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+      }));
+
+      if (name === 'password') {
+        setPasswordStrength(checkPasswordStrength(value));
+      }
+    }
   };
+
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
@@ -141,7 +218,12 @@ export default function Auth() {
 
       } else if (formType === 'signup') {
         if (formData.password !== formData.confirmPassword) {
-          setErrorMessage('Passwords do not match');
+          setErrorMessage('As senhas não coincidem');
+          return;
+        }
+
+        if (!passwordRegex.test(formData.password)) {
+          setErrorMessage('A senha deve ter no mínimo 8 caracteres, com pelo menos uma letra, um número e um caractere especial.');
           return;
         }
 
@@ -185,6 +267,7 @@ export default function Auth() {
 
         await signup({
           ...formData,
+          phoneNumber: cleanPhoneNumber(formData.phoneNumber),
           optionalAccepted,
         });
 
@@ -231,7 +314,7 @@ export default function Auth() {
       top: '50%',
       left: '50%',
       transform: 'translate(-50%, -50%)',
-      bgcolor: '#fff', // fundo branco para melhor leitura
+      bgcolor: '#fff',
       color: '#000',
       boxShadow: 24,
       p: 4,
@@ -439,7 +522,29 @@ export default function Auth() {
                   }
                 }}
               />
-
+              <TextField
+                label="Telefone"
+                name="phoneNumber"
+                value={formData.phoneNumber || ''}
+                onChange={handleFormDataChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+                InputLabelProps={{
+                  style: {
+                    color: "#faf0ca",
+                    top: "-10px",
+                  }
+                }}
+                InputProps={{
+                  style: {
+                    color: "#faf0ca",
+                    backgroundColor: "#003c3c",
+                    borderRadius: "6px",
+                    paddingTop: "3px",
+                  }
+                }}
+              />
               <TextField
                 required
                 label="Senha"
@@ -465,6 +570,52 @@ export default function Auth() {
                   }
                 }}
               />
+              {formData.password && (
+              <div style={{ width: '100%', marginBottom: '10px' }}>
+                <div
+                  style={{
+                    height: '8px',
+                    width: '100%',
+                    backgroundColor: '#ccc',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      height: '100%',
+                      width:
+                        passwordStrength === 'fraca'
+                          ? '33%'
+                          : passwordStrength === 'média'
+                          ? '66%'
+                          : '100%',
+                      backgroundColor:
+                        passwordStrength === 'fraca'
+                          ? '#e74c3c'
+                          : passwordStrength === 'média'
+                          ? '#f1c40f'
+                          : '#2ecc71',
+                      transition: 'width 0.3s',
+                    }}
+                  />
+                </div>
+                <Typography
+                  variant="caption"
+                  style={{
+                    color:
+                      passwordStrength === 'fraca'
+                        ? '#e74c3c'
+                        : passwordStrength === 'média'
+                        ? '#f1c40f'
+                        : '#2ecc71',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Senha {passwordStrength}
+                </Typography>
+              </div>
+            )}
               <TextField
                 required
                 label="Confirme a Senha"
@@ -490,31 +641,31 @@ export default function Auth() {
                   }
                 }}
               />
-<FormControlLabel
-  control={
-    <Checkbox
-      checked={formData.acceptTerms || false}
-      onChange={(e) => setFormData({ ...formData, acceptTerms: e.target.checked })}
-      color="primary"
-    />
-  }
-  label={
-    <span>
-      Eu aceito os{" "}
-      <span
-        onClick={() => setShowTermsModal(true)}
-        style={{
-          textDecoration: "underline",
-          cursor: "pointer",
-          color: "#1976d2",
-          fontWeight: "bold",
-        }}
-      >
-        Termos e Serviços
-      </span>
-    </span>
-  }
-/>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.acceptTerms || false}
+                    onChange={(e) => setFormData({ ...formData, acceptTerms: e.target.checked })}
+                    color="primary"
+                  />
+                }
+                label={
+                  <span>
+                    Eu aceito os{" "}
+                    <span
+                      onClick={() => setShowTermsModal(true)}
+                      style={{
+                        textDecoration: "underline",
+                        cursor: "pointer",
+                        color: "#1976d2",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Termos e Serviços
+                    </span>
+                  </span>
+                }
+              />
 
               <Button 
                 type="submit" 

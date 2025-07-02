@@ -210,6 +210,11 @@ export default function Auth() {
       if (formType === 'login') {
         const res = await login(formData);
 
+        if ( !formData.email || !formData.password) {
+          setErrorMessage('Preencha todos os campos obrigatórios.');
+          return;
+        }
+
         if (res?.mustAcceptTerms) {
           navigate('/terms');
         } else {
@@ -219,6 +224,11 @@ export default function Auth() {
       } else if (formType === 'signup') {
         if (formData.password !== formData.confirmPassword) {
           setErrorMessage('As senhas não coincidem');
+          return;
+        }
+
+        if (!formData.fullname || !formData.email || !formData.birthdate || !formData.password || !formData.confirmPassword) {
+          setErrorMessage('Preencha todos os campos obrigatórios.');
           return;
         }
 
@@ -386,12 +396,11 @@ export default function Auth() {
                   }
                 }}
                  InputProps={{
-                  style: {
+                  sx: {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
                     borderRadius: "6px",
-                    paddingTop: "3px", // aumenta espaço interno no topo
-                  }
+                  },
                 }}
               />
               <TextField
@@ -411,19 +420,25 @@ export default function Auth() {
                   }
                 }}
                  InputProps={{
-                  style: {
+                  sx: {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
                     borderRadius: "6px",
-                    paddingTop: "3px",
+                    paddingTop: "1px",
                   },
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      <IconButton onClick={() => setShowPassword(!showPassword)} 
+                        edge="end"
+                        sx={{ 
+                          padding: "4px",
+                          marginRight: "-8px",
+                         }}
+                      >
                         {showPassword ? (
-                          <VisibilityOff style={{ color: "#faf0ca" }} />
+                          <VisibilityOff sx={{ color: "#faf0ca" }} />
                         ) : (
-                          <Visibility style={{ color: "#faf0ca" }} />
+                          <Visibility sx={{ color: "#faf0ca" }} />
                         )}
                       </IconButton>
                     </InputAdornment>
@@ -566,8 +581,10 @@ export default function Auth() {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
                     borderRadius: "6px",
-                    paddingTop: "3px",
-                  }
+                    minHeight: "56px", // Altura padrão dos TextFields do MUI
+                    paddingTop: 0,
+                    paddingBottom: 0
+                  },
                 }}
               />
               {formData.password && (
@@ -626,6 +643,7 @@ export default function Auth() {
                 fullWidth
                 margin="normal"
                 variant="outlined"
+
                 InputLabelProps={{
                   style: { 
                     color: "#faf0ca",
@@ -633,12 +651,14 @@ export default function Auth() {
                   }
                 }}
                  InputProps={{
-                  style: {
-                    color: "#faf0ca",
-                    backgroundColor: "#003c3c",
-                    borderRadius: "6px",
-                    paddingTop: "3px",
-                  }
+                    style: {
+                      color: "#faf0ca",
+                      backgroundColor: "#003c3c",
+                      borderRadius: "6px",
+                      minHeight: "56px", // Altura padrão dos TextFields do MUI
+                      paddingTop: 0,
+                      paddingBottom: 0
+                    }
                 }}
               />
               <FormControlLabel

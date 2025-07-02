@@ -30,9 +30,11 @@ export default function Profile() {
   const [activeTerms, setActiveTerms] = useState(null);
   const [editingProfile, setEditingProfile] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const isoDate = new Date(authData.user.birthdate);
+  const isoDate = authData?.user?.birthdate ? new Date(authData.user.birthdate) : null;
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [phoneError, setPhoneError] = useState('');
+  const [resetSuccess, setResetSuccess] = useState(false);
+  
   const maxPhoneDigits = 11; // DDD + número, só números
   function formatPhoneNumber(value) {
     // Remove tudo que não for número
@@ -68,13 +70,13 @@ export default function Profile() {
     return value.replace(/\D/g, '');
   }
 
-  const dateForInput = isoDate.toISOString().split('T')[0];
+  const dateForInput = isoDate ? isoDate.toISOString().split('T')[0] : '';
     const handleRequestPasswordReset = () => {
     if (!authData?.user?.email) {
       alert("Email não encontrado. Por favor, verifique suas informações de perfil.");
       return;
     }
-    fetch("http://localhost:3000/auth/request-password-reset", {
+    fetch("http://localhost:3000/auth/forgot-password", {
       method: "POST",
 
       headers: {
@@ -85,8 +87,10 @@ export default function Profile() {
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
         if (data.success) {
-          alert("Solicitação de redefinição de senha enviada com sucesso. Verifique seu email.");
+          setResetSuccess(true); // Exibe o modal de sucesso
+          setTimeout(() => setResetSuccess(false), 3500); // Fecha após 1.5 segundos
         } else {
           alert(data.body?.message || "Erro ao solicitar redefinição de senha.");
         }
@@ -190,7 +194,6 @@ export default function Profile() {
       alert("Erro ao excluir conta: " + err.message);
     }
   };
-
 
   const handleProfileSave = async () => {
     try {
@@ -543,6 +546,16 @@ export default function Profile() {
 
               <Button variant="contained" color="secondary  " onClick={handleRequestPasswordReset}>Redefinir Senha</Button>
 
+                {/* Novo Modal de Sucesso para Redefinição de Senha */}
+                  {resetSuccess && (
+                    <div className={styles.modalOverlay}>
+                      <div className={styles.successModalContent}>
+                        <FiCheckCircle size={36} color="green" style={{ marginBottom: "1rem" }} />
+                        <h2 style={{ color: "green" }}>Solicitação de redefinição de senha enviada com sucesso. Verifique seu email.</h2>
+                      </div>
+                    </div>
+                  )}
+
             <div style={{ marginTop: "1rem" }}>
               <Button variant="contained" color="secondary" onClick={handleProfileSave}
                 sx={{
@@ -704,7 +717,10 @@ export default function Profile() {
       {authData?.user?.role === "admin" && (
         <div className={styles.adminPanel}>
           <div className={`${styles.infoItem} ${styles.cardHover}`}>
-            <h2><SecurityIcon style={{ marginRight: 6 }} /> Área Administrativa</h2>
+            <h2>
+              <SecurityIcon style={{ marginRight: 6 }} />
+              Área Administrativa
+            </h2>
             <div className={styles.actionsRow}>
               <Button
                 variant="contained"
@@ -829,7 +845,6 @@ export default function Profile() {
         </Box>
       </Box>
     </Modal>
-
 
     {/* 🍽️ Pedidos */}
     <div className={styles.ordersContainer}>

@@ -15,12 +15,15 @@
   background-color: #004643;
   color: #faf0ca;
   padding: 2rem;
+  box-sizing: border-box;
+  text-align: center;
 }
 
 .authForm {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+  width: 100%;
 }
 
 .switchFormBtn {
@@ -59,4 +62,21 @@
   text-align: center;
 }
 
+.authInput .MuiOutlinedInput-root {
+  padding-right: 0 !important;
+}
+
+.authInput .MuiInputAdornment-root {
+  margin-left: 0;
+}
+
+.MuiInputAdornment-root {
+  margin-left: 0 !important;
+  padding: 0 !important;
+}
+
+.MuiIconButton-root {
+  width: 36px !important;
+  height: 36px !important;
+}
 

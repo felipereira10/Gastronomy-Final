@@ -5,15 +5,28 @@ import crypto from 'crypto';
 import { Mongo } from '../database/mongo.js';
 import jwt from 'jsonwebtoken';
 import { ObjectId, MongoClient } from 'mongodb';
+import nodemailer from 'nodemailer';
 import { checkTermsAccepted } from '../middlewares/checkTerms.js';
 import { ensureAuthenticated } from '../middlewares/ensureAuthenticated.js'; // seu middleware de autenticação
 import { authenticateToken } from '../middlewares/authMiddleware.js';
-
-
+import dotenv from 'dotenv';
+dotenv.config();
 
 const collectionName = 'users'
 const now = new Date();
 const authRouter = express.Router()
+
+// Configuração do Nodemailer para envio de e-mails
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,  // Ou 587
+  secure: true, // Usar SSL/TLS
+  auth: {
+    user: process.env.EMAIL_USER, // Ex: suaconta@gmail.com
+    pass: process.env.EMAIL_PASS, // App Password do Gmail
+  },
+});
+
 
 passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, callback) => {
     const user = await Mongo.db
@@ -391,7 +404,7 @@ authRouter.post('/login', async (req, res) => {
 
     const token = jwt.sign(
       {
-        _id: user._id.toString(),  // 🔑 sempre como string
+        _id: user._id.toString(),
         role: user.role,
         email: user.email,
       },
@@ -484,16 +497,47 @@ authRouter.post('/update-terms', async (req, res) => {
 // authRouter.js
 authRouter.post('/forgot-password', async (req, res) => {
   const { email } = req.body;
+  const user = await Mongo.db.collection(collectionName).findOne({ email });
 
-  const user = await Mongo.db.collection('users').findOne({ email });
-  if (!user) return res.status(404).send({ message: 'Usuário não encontrado' });
+  if (!user) {
+    return res.status(404).send({ success: false, message: 'Usuário não encontrado' });
+  }
 
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+  const resetLink = `http://localhost:5173/reset-password?token=${token}`;
 
-  // Enviar token por e-mail ou SMS (você escolhe)
-  // Exemplo: await sendEmail(user.email, `http://localhost:3000/reset-password?token=${token}`);
+  try {
+    console.log('Tentando enviar o e-mail...');
+    // Enviar email real
+    await transporter.sendMail({
+      from: `"Equipe do Sistema" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Redefinição de Senha',
+      html: `
+        <p>Olá, ${user.fullname || 'usuário'}!</p>
+        <p>Você solicitou a redefinição de senha. Clique no botão abaixo:</p>
+        <a href="${resetLink}" style="padding: 10px 20px; background: #1976d2; color: white; text-decoration: none; border-radius: 5px;">Redefinir Senha</a>
+        <p>Ou copie e cole o link no navegador:</p>
+        <p>${resetLink}</p>
+        <p>Este link é válido por 15 minutos.</p>
+      `,
+    });
 
-  res.send({ message: 'Link de redefinição enviado com sucesso' });
+    // Retorna o link também na resposta para fallback local
+    return res.send({
+      success: true,
+      message: 'Email enviado com sucesso!',
+      resetLink,
+    });
+
+  } catch (err) {
+    console.error('Erro ao enviar email:', err);
+    return res.status(500).send({
+      success: false,
+      message: 'Erro ao enviar o email de redefinição',
+      resetLink, // fallback ainda disponível
+    });
+  }
 });
 
 // Rota para redefinir senha

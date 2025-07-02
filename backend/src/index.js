@@ -1,15 +1,14 @@
+import { config } from 'dotenv';
+config();
+
 import express from 'express';
 import cors from 'cors';
 import { Mongo } from './database/mongo.js';
-import { config } from 'dotenv';
 import authRouter from './auth/auth.js';
 import usersRouter from './routes/usersRouter.js';
 import platesRouter from './routes/platesRouter.js';
 import ordersRouter from './routes/ordersRouter.js';
 import termsRouter from './routes/termsRouter.js';
-
-
-config()
 
 async function main () {
     const hostname = 'localhost'

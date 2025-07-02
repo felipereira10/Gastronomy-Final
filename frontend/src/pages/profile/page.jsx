@@ -319,7 +319,7 @@ export default function Profile() {
                 sx={{
                   borderColor: "white",
                   borderRadius: "8px",
-                  transition: "all 0.3s ease",
+                  transition: "all 0.4s ease",
                   "&:hover": {
                     backgroundColor: "#1976d2",
                     borderRadius: "18px",
@@ -369,7 +369,7 @@ export default function Profile() {
                   backgroundColor: "red",
                   color: "white",
                   borderRadius: "8px",
-                  transition: "all 0.3s ease",
+                  transition: "all 0.4s ease",
                   "&:hover": {
                     backgroundColor: "white",
                     color: "red",
@@ -428,6 +428,7 @@ export default function Profile() {
         <Button
           variant="contained"
           color="error"
+          sx={{ transition: "all 0.4s ease", "&:hover": { borderRadius: "16px" } }}
           onClick={async () => {
             try {
               const res = await fetch(`http://localhost:3000/users/${authData.user._id}`, {
@@ -463,12 +464,12 @@ export default function Profile() {
               backgroundColor: "red",
               color: "white",
               borderRadius: "8px",
-              transition: "all 0.3s ease",
+              transition: "all 0.4s ease",
               "&:hover": {
                 backgroundColor: "white",
                 color: "red",
                 borderColor: "red",
-                borderRadius: "18px",
+                borderRadius: "16px",
               },
             }}
         >
@@ -544,7 +545,14 @@ export default function Profile() {
             )}
 
 
-              <Button variant="contained" color="secondary  " onClick={handleRequestPasswordReset}>Redefinir Senha</Button>
+              <Button 
+                variant="outlined" 
+                color="tertiary"
+                sx={{ transition: "all 0.4s ease", "&:hover": { borderRadius: "16px" } }}
+                onClick={handleRequestPasswordReset}
+                >
+                  Redefinir Senha
+                </Button>
 
                 {/* Novo Modal de Sucesso para Redefinição de Senha */}
                   {resetSuccess && (
@@ -561,7 +569,7 @@ export default function Profile() {
                 sx={{
                   borderColor: "white",
                   borderRadius: "8px",
-                  transition: "all 0.3s ease",
+                  transition: "all 0.4s ease",
                   "&:hover": {
                     backgroundColor: "#1976d2",
                     borderRadius: "18px",
@@ -579,7 +587,7 @@ export default function Profile() {
                   backgroundColor: "red",
                   color: "white",
                   borderRadius: "8px",
-                  transition: "all 0.3s ease",
+                  transition: "all 0.4s ease",
                   "&:hover": {
                     backgroundColor: "white",
                     color: "red",
@@ -618,265 +626,268 @@ export default function Profile() {
 
 
       {/* Conteúdo principal */}
-<div className={styles.pageContainer}>
-  <div className={styles.profileContainer}>
+  <div className={styles.pageContainer}>
+    <div className={styles.profileContainer}>
 
-    <div className={styles.topSection}>
-      {/* 🧑 Dados do usuário */}
-      <div className={styles.userSection}>
-        <div className={styles.userNameBox}>
-          <AccountBoxIcon className={styles.icon} />
-          <h1>{authData.user.fullname}</h1>
-        </div>
-
-        <div className={styles.infoItem}>
-          <div>
-            <div className={styles.label}>
-              <EmailIcon className={styles.icon} />
-              Email:
-              </div>
-            <div className={styles.value}>{authData.user.email}</div>
+      <div className={styles.topSection}>
+        {/* 🧑 Dados do usuário */}
+        <div className={styles.userSection}>
+          <div className={styles.userNameBox}>
+            <AccountBoxIcon className={styles.icon} />
+            <h1>{authData.user.fullname}</h1>
           </div>
-        </div>
 
-        <div className={styles.infoItem}>
-          
-          <div>
-            <div className={styles.label}>
-              <CalendarTodayIcon className={styles.icon} />
-              Data de Nascimento:
+          <div className={styles.infoItem}>
+            <div>
+              <div className={styles.label}>
+                <EmailIcon className={styles.icon} />
+                Email:
+                </div>
+              <div className={styles.value}>{authData.user.email}</div>
+            </div>
+          </div>
+
+          <div className={styles.infoItem}>
+            
+            <div>
+              <div className={styles.label}>
+                <CalendarTodayIcon className={styles.icon} />
+                Data de Nascimento:
+                </div>
+              <div className={styles.value}>
+                {authData.user.birthdate
+                  ? new Date(new Date(authData.user.birthdate).getTime() + 24 * 60 * 60 * 1000)
+                      .toLocaleDateString("pt-BR")
+                  : "Não informado"}
               </div>
+            </div>
+          </div>
+
+          <div className={styles.infoItem}>
+            <div className={styles.label}>
+              <FiPhone size={24} style={{ marginRight: '0.5rem' }} />
+              Celular:
+            </div>
             <div className={styles.value}>
-              {authData.user.birthdate
-                ? new Date(new Date(authData.user.birthdate).getTime() + 24 * 60 * 60 * 1000)
-                    .toLocaleDateString("pt-BR")
+              {authData.user.phoneNumber 
+                ? formatPhoneNumber(authData.user.phoneNumber) 
                 : "Não informado"}
             </div>
           </div>
-        </div>
-
-        <div className={styles.infoItem}>
-          <div className={styles.label}>
-            <FiPhone size={24} style={{ marginRight: '0.5rem' }} />
-            Celular:
-          </div>
-          <div className={styles.value}>
-            {authData.user.phoneNumber 
-              ? formatPhoneNumber(authData.user.phoneNumber) 
-              : "Não informado"}
-          </div>
-        </div>
-
-
-
-        <Button
-          variant="contained"
-          className={styles.editProfileButton}
-          onClick={() => setEditingProfile(true)}
-          color="secondary"
-        >
-          Editar Perfil
-        </Button>
-      </div>
-
-      {/* 🔒 Preferências */}
-      <div className={styles.preferencesSection}>
-        <div className={styles.infoItem}>
-          <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <FiClipboard size={24} />
-            Suas preferências:
-          </h2>
-          <ul>
-            {(authData.user.acceptedTerms?.sections || []).map((section) => (
-              <li key={section.title}>
-                {section.required ? '🔒' : section.acceptedAt ? '✅' : '❌'} {section.title}
-              </li>
-            ))}
-          </ul>
 
           <Button
             variant="contained"
-            className={styles.privacyButton}
+            sx={{ transition: "all 0.4s ease", "&:hover": { borderRadius: "16px" } }}
+            className={styles.editProfileButton}
+            onClick={() => setEditingProfile(true)}
             color="secondary"
-            onClick={() => {
-              const optionalPrefs = {};
-              (authData.user.acceptedTerms?.sections || []).forEach(section => {
-                if (!section.required) {
-                  optionalPrefs[section.title] = !!section.acceptedAt;
-                }
-              });
-              setCurrentOptional(optionalPrefs);
-              setEditingPreferences(true);
-            }}
           >
-            Editar Preferências de Privacidade
+            Editar Perfil
           </Button>
         </div>
-      </div>
 
-      {authData?.user?.role === "admin" && (
-        <div className={styles.adminPanel}>
-          <div className={`${styles.infoItem} ${styles.cardHover}`}>
-            <h2>
-              <SecurityIcon style={{ marginRight: 6 }} />
-              Área Administrativa
+        {/* 🔒 Preferências */}
+        <div className={styles.preferencesSection}>
+          <div className={styles.infoItem}>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <FiClipboard size={24} />
+              Suas preferências:
             </h2>
-            <div className={styles.actionsRow}>
-              <Button
-                variant="contained"
-                color="secondary"
-                className={styles.privacyButton}
-                onClick={() => navigate("/admin/terms")}
-              >
-                ⚙️ Gerenciar Termos de Uso
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                className={styles.privacyButton}
-                onClick={() => navigate("/admin/users-terms")}
-              >
-                Ver Usuários e Termos
-              </Button>
+            <ul>
+              {(authData.user.acceptedTerms?.sections || []).map((section) => (
+                <li key={section.title}>
+                  {section.required ? '🔒' : section.acceptedAt ? '✅' : '❌'} {section.title}
+                </li>
+              ))}
+            </ul>
+
+            <Button
+              variant="contained"
+              className={styles.privacyButton}
+              sx={{ transition: "all 0.4s ease", "&:hover": { borderRadius: "16px" } }}
+              color="secondary"
+              onClick={() => {
+                const optionalPrefs = {};
+                (authData.user.acceptedTerms?.sections || []).forEach(section => {
+                  if (!section.required) {
+                    optionalPrefs[section.title] = !!section.acceptedAt;
+                  }
+                });
+                setCurrentOptional(optionalPrefs);
+                setEditingPreferences(true);
+              }}
+            >
+              Editar Preferências de Privacidade
+            </Button>
+          </div>
+        </div>
+
+        {authData?.user?.role === "admin" && (
+          <div className={styles.adminPanel}>
+            <div className={`${styles.infoItem} ${styles.cardHover}`}>
+              <h2>
+                <SecurityIcon style={{ marginRight: 6 }} />
+                Área Administrativa
+              </h2>
+              <div className={styles.actionsRow}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  sx={{ transition: "all 0.4s ease", "&:hover": { borderRadius: "16px" } }}
+                  className={styles.privacyButton}
+                  onClick={() => navigate("/admin/terms")}
+                >
+                  ⚙️ Gerenciar Termos de Uso
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  sx={{ transition: "all 0.4s ease", "&:hover": { borderRadius: "16px" } }}
+                  className={styles.privacyButton}
+                  onClick={() => navigate("/admin/users-terms")}
+                >
+                  Ver Usuários e Termos
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
 
-              {/* <button className={styles.adminButton}>
-          ⚙️ Gerenciar Termos de Uso
-        </button>
+                {/* <button className={styles.adminButton}>
+            ⚙️ Gerenciar Termos de Uso
+          </button>
 
-        <button className={styles.adminButton}>
-          👥 Ver Usuários e Termos
-        </button> */}
+          <button className={styles.adminButton}>
+            👥 Ver Usuários e Termos
+          </button> */}
 
-        {/* <button className={styles.adminButton}>
-          ➕ Novo Termo
-        </button> */}
+          {/* <button className={styles.adminButton}>
+            ➕ Novo Termo
+          </button> */}
 
-        {/* <div className={styles.statsBox}>
-          <span>📄 Termos:</span>
-          <span>5 ativos</span>
-        </div> */}
+          {/* <div className={styles.statsBox}>
+            <span>📄 Termos:</span>
+            <span>5 ativos</span>
+          </div> */}
 
-        {/* <div className={styles.statsBox}>
-          <span>👤 Usuários:</span>
-          <span>12 registrados</span>
-        </div> */}
+          {/* <div className={styles.statsBox}>
+            <span>👤 Usuários:</span>
+            <span>12 registrados</span>
+          </div> */}
 
-    {/* 🚀 Ações */}
-
-      <div className={styles.actionsPanel}>
-        <Button
-          variant="contained"
-          onClick={() => setShowLogoutConfirm(true)}
-          className={styles.logoutButton}
-          startIcon={<FiLogOut />}
-        >
-          Logout
-        </Button>
-
-        <Button
-          variant="outlined"
-          className={styles.deleteButton}
-          startIcon={<DeleteIcon />}
-          onClick={() => setShowDeleteModal(true)}
-        >
-          Excluir Conta
-        </Button>
-      </div>
-    </div>
-
-    {/* Modal de confirmação de logout */}
-    <Modal
-      open={showLogoutConfirm}
-      onClose={() => setShowLogoutConfirm(false)}
-      aria-labelledby="logout-confirm-title"
-      aria-describedby="logout-confirm-description"
-    >
-      <Box sx={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        bgcolor: '#fff',
-        p: 4,
-        borderRadius: 2,
-        boxShadow: 24,
-        width: '90%',
-        maxWidth: 400,
-      }}>
-        <Typography id="logout-confirm-title" variant="h6" gutterBottom>
-          Tem certeza que deseja sair?
-        </Typography>
-        <Typography id="logout-confirm-description" sx={{ mb: 3 }}>
-          Você será desconectado da sua conta.
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+      {/* 🚀 Ações */}
+        <div className={styles.actionsPanel}>
           <Button
             variant="contained"
-            color="error"
-            onClick={handleLogout}
+            sx={{ transition: "all 0.4s ease", "&:hover": { borderRadius: "16px" } }}
+            onClick={() => setShowLogoutConfirm(true)}
+            className={styles.logoutButton}
+            startIcon={<FiLogOut />}
           >
-            Sair
+            Logout
           </Button>
+
           <Button
             variant="outlined"
-            onClick={() => setShowLogoutConfirm(false)}
-              sx={{
-                  borderColor: "red",
-                  backgroundColor: "red",
-                  color: "white",
-                  borderRadius: "8px",
-                  transition: "all 0.3s ease",
-                  ml: 2,
-                  "&:hover": {
-                    backgroundColor: "white",
-                    color: "red",
-                    borderColor: "red",
-                    borderRadius: "18px",
-                  },
-                }}
+            sx={{ transition: "all 0.4s ease", "&:hover": { borderRadius: "16px" } }}
+            className={styles.deleteButton}
+            startIcon={<DeleteIcon />}
+            onClick={() => setShowDeleteModal(true)}
           >
-            Cancelar
+            Excluir Conta
           </Button>
-        </Box>
-      </Box>
-    </Modal>
-
-    {/* 🍽️ Pedidos */}
-    <div className={styles.ordersContainer}>
-      {orders.length > 0 ? (
-        orders.map((order) => {
-          const statusInfo = statusMap[order.pickupStatus] || {};
-          return (
-            <div key={order._id} className={styles.orderContainer}>
-              <p className={`${styles.pickupStatus} ${statusInfo.className || ""}`}>
-                {statusInfo.icon} {order.pickupStatus || "Unknown"}
-              </p>
-              <h3>{order.pickupTime}</h3>
-              {order.orderItems.map((item) => (
-                <div key={item._id}>
-                  <h4>{item.itemDetails[0]?.name}</h4>
-                  <p>Quantidade: {item.quantity}</p>
-                </div>
-              ))}
-            </div>
-          );
-        })
-      ) : (
-        <div>
-          <p>Você ainda não tem pedidos.</p>
-          <Link to="/plates" className={styles.platesLink}>
-            Clique aqui e conheça nossos pratos!
-          </Link>
         </div>
-      )}
+      </div>
+
+      {/* Modal de confirmação de logout */}
+      <Modal
+        open={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        aria-labelledby="logout-confirm-title"
+        aria-describedby="logout-confirm-description"
+      >
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          bgcolor: '#fff',
+          p: 4,
+          borderRadius: 2,
+          boxShadow: 24,
+          width: '90%',
+          maxWidth: 400,
+        }}>
+          <Typography id="logout-confirm-title" variant="h6" gutterBottom>
+            Tem certeza que deseja sair?
+          </Typography>
+          <Typography id="logout-confirm-description" sx={{ mb: 3 }}>
+            Você será desconectado da sua conta.
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleLogout}
+            >
+              Sair
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => setShowLogoutConfirm(false)}
+                sx={{
+                    borderColor: "red",
+                    backgroundColor: "red",
+                    color: "white",
+                    borderRadius: "8px",
+                    transition: "all 0.4s ease",
+                    ml: 2,
+                    "&:hover": {
+                      backgroundColor: "white",
+                      color: "red",
+                      borderColor: "red",
+                      borderRadius: "18px",
+                    },
+                  }}
+            >
+              Cancelar
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* 🍽️ Pedidos */}
+      <div className={styles.ordersContainer}>
+        {orders.length > 0 ? (
+          orders.map((order) => {
+            const statusInfo = statusMap[order.pickupStatus] || {};
+            return (
+              <div key={order._id} className={styles.orderContainer}>
+                <p className={`${styles.pickupStatus} ${statusInfo.className || ""}`}>
+                  {statusInfo.icon} {order.pickupStatus || "Unknown"}
+                </p>
+                <h3>{order.pickupTime}</h3>
+                {order.orderItems.map((item) => (
+                  <div key={item._id}>
+                    <h4>{item.itemDetails[0]?.name}</h4>
+                    <p>Quantidade: {item.quantity}</p>
+                  </div>
+                ))}
+              </div>
+            );
+          })
+        ) : (
+          <div>
+            <p>Você ainda não tem pedidos.</p>
+            <Link to="/plates" className={styles.platesLink}>
+              Clique aqui e conheça nossos pratos!
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   </div>
-</div>
 
     </div>
   );

@@ -34,7 +34,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-function SortableSection({ index, section, onRemove, onChange }) {
+function SortableSection({ section, index, onRemove, onChange }) {
   const {
     attributes,
     listeners,
@@ -42,7 +42,8 @@ function SortableSection({ index, section, onRemove, onChange }) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: section.title || index.toString() });
+  } = useSortable({ id: section.id }); // ID fixo
+
 
 
   const style = {
@@ -158,8 +159,12 @@ function SortableSection({ index, section, onRemove, onChange }) {
     }, [authData]);
 
     const handleAddSection = () => {
-      setSections([...sections, { title: "", content: "", required: true }]);
+      setSections([
+        ...sections,
+        { id: Date.now().toString(), title: "", content: "", required: true }
+      ]);
     };
+
 
     const handleRemoveSection = (index) => {
       const updated = [...sections];
@@ -285,12 +290,12 @@ function SortableSection({ index, section, onRemove, onChange }) {
 
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext
-              items={sections.map((s, i) => s.title || i.toString())}
+              items={sections.map((s) => s.id)}
               strategy={verticalListSortingStrategy}
             >
               {sections.map((section, index) => (
                 <SortableSection
-                  key={section.title + index}
+                  key={section.id}
                   index={index}
                   section={section}
                   onRemove={handleRemoveSection}

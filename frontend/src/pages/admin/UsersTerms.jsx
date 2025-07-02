@@ -18,6 +18,7 @@ import Loading from "../../components/Loading/Loading.jsx";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
+import { Grid } from "@mui/material";
 
 export default function UsersTerms() {
   const { authData } = useAuth();
@@ -170,6 +171,7 @@ export default function UsersTerms() {
       />
 
       <List disablePadding>
+      <Grid container spacing={2}>
         {filteredUsers.length > 0 ? (
           filteredUsers.map((user) => {
             const statusColor = getStatusColor(user.acceptedTerms);
@@ -181,12 +183,17 @@ export default function UsersTerms() {
                 : "red";
 
             return (
-              <ListItem key={user._id} disableGutters sx={{ marginBottom: 2 }}>
+              <Grid item xs={12} sm={6} md={4} lg={3} key={user._id}>
                 <Paper
                   elevation={4}
                   sx={{
+                    marginTop: 6,
                     padding: 3,
-                    width: "100%",
+                    // display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    height: "90%",
+                    width: "520px", 
                     borderLeft: `6px solid ${borderColor}`,
                     backgroundColor:
                       statusColor === "success"
@@ -194,23 +201,28 @@ export default function UsersTerms() {
                         : statusColor === "warning"
                         ? "#fff8e1"
                         : "#ffebee",
+                      transition: "all 0.3s ease-in-out",
+                        "&:hover": {
+                          boxShadow: 8,
+                          transform: "scale(1.02)",
+                          // cursor: "pointer",
+                          // backgroundColor: theme =>
+                          //   theme.palette.grey[statusColor === "success" ? 100 : statusColor === "warning" ? 200 : 300],
+                        }
                   }}
                 >
+                <Box sx={{ flex: 1 }}></Box>
                   <Stack spacing={1}>
                     <Typography variant="h6">{user.fullname}</Typography>
 
-                    <Typography>
-                      <strong>Email:</strong> {user.email}
-                    </Typography>
+                    <Typography> <strong>Email:</strong> {user.email}</Typography>
 
-                    <Typography>
-                      <strong>Função:</strong> {user.role}
-                    </Typography>
+                    <Typography> <strong>Função:</strong> {user.role}</Typography>
 
                     <Typography>
                       <strong>Nascimento:</strong>{" "}
                       {user.birthdate
-                        ? new Date(user.birthdate).toLocaleDateString()
+                        ? new Date(new Date(user.birthdate).setDate(new Date(user.birthdate).getDate() + 1)).toLocaleDateString()
                         : "Não informado"}
                     </Typography>
 
@@ -237,10 +249,8 @@ export default function UsersTerms() {
 
                     {user.acceptedTerms?.sections?.length > 0 && (
                       <Box>
-                        <Typography>
-                          <strong>Detalhamento das seções:</strong>
-                        </Typography>
-                        <Stack direction="row" spacing={1} flexWrap="wrap" mt={1}>
+                        <Typography> <strong>Detalhamento das seções:</strong></Typography>
+                        <Box display="flex" flexWrap="wrap">
                           {user.acceptedTerms.sections.map((section, index) => {
                             const accepted = section.required
                               ? true
@@ -248,45 +258,71 @@ export default function UsersTerms() {
                             return (
                               <Chip
                                 key={index}
-                                label={`${section.title} ${
-                                  section.required ? "(Obrigatório)" : "(Opcional)"
-                                }`}
+                                label={`${section.title} ${section.required ? "(Obrigatório)" : "(Opcional)"}`}
                                 color={accepted ? "success" : "error"}
                                 variant="outlined"
                                 size="small"
+                                sx={{ mb: 1, mr: 1 }}
                               />
                             );
                           })}
-                        </Stack>
+                        </Box>
                       </Box>
                     )}
 
-                    {!user.acceptedTerms && (
+                    {!user.acceptedTerms && ( 
                       <Typography color="error">
                         ⚠️ Usuário criado antes da implementação dos termos.
                       </Typography>
                     )}
 
-                    <Button onClick={() => handleAdminReset(user.email)}>Enviar Redefinição</Button>
+                    <Box sx={{ 
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 1,
+                      marginTop: 2,
+                      alignItems: "flex-start",
+                     }}>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      sx={{ marginTop: 2, alignSelf: "flex-start", transition: "all 0.4s ease", "&:hover": { borderRadius: "16px",} }}
+                      onClick={() => {
+                        window.location.href = `/admin/terms/${user._id}`;
+                      }}
+                    >
+                      Ver Termos
+                    </Button>
+                    <Button 
+                      variant="contained"
+                      color="secondary" 
+                      sx={{ alignSelf: "flex-start", transition: "all 0.4s ease", "&:hover": { borderRadius: "16px",} }}
+                      onClick={() => handleAdminReset(user.email)}
+                      >
+                        Enviar Redefinição
+                      </Button>
 
                     <Button
                       variant="outlined"
                       color="error"
                       startIcon={<DeleteIcon />}
-                      sx={{ marginTop: 2, alignSelf: "flex-start" }}
+                      sx={{ marginTop: 2, alignSelf: "flex-start", transition: "all 0.4s ease", "&:hover": { borderRadius: "16px",} }}
                       onClick={() => setConfirmDeleteId(user._id)}
                     >
                       Excluir Usuário
                     </Button>
+                    </Box>
                   </Stack>
                 </Paper>
-              </ListItem>
+              </Grid>
             );
           })
         ) : (
           <Typography>Nenhum usuário encontrado.</Typography>
         )}
+        </Grid>
       </List>
+
 
       {/* Modal de confirmação fora do map */}
       {confirmDeleteId && (
@@ -329,6 +365,7 @@ export default function UsersTerms() {
               <Button
                 variant="contained"
                 color="error"
+                sx={{ transition: "all 0.4s ease", "&:hover": { borderRadius: "16px",}}}
                 onClick={async () => {
                   await handleDelete(confirmDeleteId);
                   setConfirmDeleteId(null);
@@ -343,10 +380,12 @@ export default function UsersTerms() {
                 sx={{
                   color: "white",
                   borderColor: "white",
+                  transition: "all 0.4s ease",
                   "&:hover": {
                     backgroundColor: "white",
                     color: "red",
                     borderColor: "red",
+                    borderRadius: "16px",
                   },
                 }}
               >

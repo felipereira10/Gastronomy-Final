@@ -23,6 +23,8 @@ export default function Auth() {
   const [formType, setFormType] = useState('login');
   const [formData, setFormData] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { login, signup, authLoading } = useAuthServices();
   const navigate = useNavigate();
   const { authData } = useAuth();
@@ -423,7 +425,7 @@ export default function Auth() {
                   sx: {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
-                    borderRadius: "6px",
+                    borderRadius: "10px",
                     paddingTop: "1px",
                   },
                   endAdornment: (
@@ -431,9 +433,13 @@ export default function Auth() {
                       <IconButton onClick={() => setShowPassword(!showPassword)} 
                         edge="end"
                         sx={{ 
-                          padding: "4px",
-                          marginRight: "-8px",
-                         }}
+                            padding: "4px",
+                            marginRight: "-8px",
+                            minHeight: "36px",
+                            minWidth: "16px",
+                            maxWidth: "36px",
+                            maxHeight: "36px",
+                          }}
                       >
                         {showPassword ? (
                           <VisibilityOff sx={{ color: "#faf0ca" }} />
@@ -563,7 +569,7 @@ export default function Auth() {
               <TextField
                 required
                 label="Senha"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password || ""}
                 onChange={handleFormDataChange}
@@ -577,14 +583,35 @@ export default function Auth() {
                   }
                 }}
                  InputProps={{
-                  style: {
+                  sx: {
                     color: "#faf0ca",
                     backgroundColor: "#003c3c",
-                    borderRadius: "6px",
-                    minHeight: "56px", // Altura padrão dos TextFields do MUI
+                    borderRadius: "10px",
+                    minHeight: "56px",
                     paddingTop: 0,
                     paddingBottom: 0
                   },
+                  endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setShowPassword(!showPassword)} 
+                          edge="end"
+                          sx={{ 
+                            padding: "4px",
+                            marginRight: "-8px",
+                            minHeight: "36px",
+                            minWidth: "16px",
+                            maxWidth: "36px",
+                            maxHeight: "36px",
+                          }}
+                        >
+                          {showPassword ? (
+                            <VisibilityOff sx={{ color: "#faf0ca" }} />
+                          ) : (
+                            <Visibility sx={{ color: "#faf0ca" }} />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    )
                 }}
               />
               {formData.password && (
@@ -606,12 +633,16 @@ export default function Auth() {
                           ? '33%'
                           : passwordStrength === 'média'
                           ? '66%'
+                          : passwordStrength === 'forte'
+                          ? '100%'
                           : '100%',
                       backgroundColor:
                         passwordStrength === 'fraca'
                           ? '#e74c3c'
                           : passwordStrength === 'média'
                           ? '#f1c40f'
+                          : passwordStrength === 'média'
+                          ? '#2ecc71'
                           : '#2ecc71',
                       transition: 'width 0.3s',
                     }}
@@ -625,7 +656,9 @@ export default function Auth() {
                         ? '#e74c3c'
                         : passwordStrength === 'média'
                         ? '#f1c40f'
-                        : '#2ecc71',
+                        : passwordStrength === 'forte'
+                        ? '#2ecc71'
+                        : '100%',
                     fontWeight: 'bold',
                   }}
                 >
@@ -636,7 +669,7 @@ export default function Auth() {
               <TextField
                 required
                 label="Confirme a Senha"
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
                 value={formData.confirmPassword || ""}
                 onChange={handleFormDataChange}
@@ -654,12 +687,35 @@ export default function Auth() {
                     style: {
                       color: "#faf0ca",
                       backgroundColor: "#003c3c",
-                      borderRadius: "6px",
-                      minHeight: "56px", // Altura padrão dos TextFields do MUI
+                      borderRadius: "10px",
+                      minHeight: "56px",
                       paddingTop: 0,
                       paddingBottom: 0
-                    }
-                }}
+                    },
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
+                          edge="end"
+                          sx={{ 
+                            padding: "4px",
+                            marginRight: "-8px",
+                            minHeight: "36px",
+                            minWidth: "16px",
+                            maxWidth: "36px",
+                            maxHeight: "36px",
+                          }}
+                        >
+                          {showConfirmPassword ? (
+                            <VisibilityOff sx={{ color: "#faf0ca" }} />
+                          ) : (
+                            <Visibility sx={{ color: "#faf0ca" }} />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                
+                
               />
               <FormControlLabel
                 control={

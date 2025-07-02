@@ -44,6 +44,10 @@ Este projeto foi desenvolvido como parte do curso de Análise e Desenvolvimento 
 
 - JWT (Autenticação)
 
+## Link para notificar o usuário
+
+https://github.com/felipereira10/Gastronomy-Final/tree/enzo
+
 ### 🔥 Frontend (Web)
 - React com Vite
 

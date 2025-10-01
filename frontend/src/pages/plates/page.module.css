@@ -1,0 +1,84 @@
+/* .platesWrapper {
+  padding: 3rem 2rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  color: #2c2c2c;
+}
+
+.platesTitle {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+  font-weight: 600;
+  color: #004d4d;
+}
+
+.platesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.plateCard {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.plateCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.1);
+}
+
+.plateImage {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.plateName {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #005555;
+  margin-bottom: 0.4rem;
+}
+
+.plateDesc {
+  font-size: 0.95rem;
+  color: #666;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
+
+.platePrice {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #ffaa00;
+  margin-bottom: 1rem;
+}
+
+.addBtn {
+  background: #ffaa00;
+  color: #004d4d;
+  font-weight: 600;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.addBtn:hover {
+  background: #ffb733;
+  transform: translateY(-2px);
+} */

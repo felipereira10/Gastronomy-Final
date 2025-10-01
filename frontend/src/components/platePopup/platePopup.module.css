@@ -1,10 +1,18 @@
+body {
+  overflow-x: hidden;
+}
+
 .popupContainer {
-    background-color: #faf0ca;
+    background-color: #fffbea;
     color: #004643;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #004643;
     border-radius: 1rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
     overflow: hidden;
-    max-width: 500px;
+    max-width: 480px;
+    width: 100%;
     margin: auto;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
@@ -12,53 +20,93 @@
     animation: fadeIn 0.25s ease;
 }
 
-.popupContainer img {
-    width: 100%;
-    height: auto;
-    max-height: 300px; /* limita pra não estourar o popup */
-    object-fit: contain;
-    background-color: #e0e0e0; /* cor de fundo opcional pra áreas vazias */
-    border-top-left-radius: 1rem;
-    border-top-right-radius: 1rem;
-    display: block;
+.MuiDialog-paper {
+  margin: 0 !important;        /* remove margem padrão */
+  border-radius: 1rem !important; /* deixa arredondado */
+  overflow-x: hidden !important; /* garante sem scroll lateral */
 }
 
+.MuiDialog-container {
+  overflow-x: hidden !important;
+}
 
-
+.popupContainer img {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  display: block;
+}
 
 .popupContent {
     display: flex;
     flex-direction: column;
-    gap: 0.8em;
+    gap: 1em;
     padding: 1.5em;
     font-size: 1rem;
+}
+
+.popupContent h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #001e1d;
 }
 
 .ingredients {
     color: #6c757d;
     font-style: italic;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
-/* Botão estilizado */
+.price {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #e63946;
+}
+
 .popupContent button {
     background-color: #004643;
     color: #faf0ca;
     border: none;
-    padding: 0.75em 1.5em;
-    border-radius: 0.5rem;
+    padding: 0.9em 1.5em;
+    border-radius: 0.6rem;
     font-weight: bold;
     cursor: pointer;
-    transition: background 0.3s ease;
-    width: fit-content;
-    align-self: flex-end;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-align: center;
+    margin-top: 0.5em;
+    font-size: 1rem;
 }
 
 .popupContent button:hover {
     background-color: #002f2f;
+    transform: translateY(-2px);
 }
 
-/* Fade in animation */
+.popupContent button:active {
+    transform: translateY(0);
+}
+
+.platesBtn {
+    margin-top: 10em;
+    align-self: flex-center;
+    background-color: #004643 !important;
+    color: white !important;
+    font-weight: bold;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    align-items: center;
+}
+
+.platesBtn:hover, .rmvBtn:hover, .confirmBtn:hover {
+    background-color: #48c098 !important;
+    cursor: pointer;
+    color: #004643 !important;
+    border-radius: 18px;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -67,5 +115,19 @@
     to {
         opacity: 1;
         transform: scale(1);
+    }
+}
+
+@media (max-width: 480px) {
+    .popupContainer {
+        max-width: 90%;
+    }
+
+    .popupContent h2 {
+        font-size: 1.2rem;
+    }
+
+    .price {
+        font-size: 1.1rem;
     }
 }

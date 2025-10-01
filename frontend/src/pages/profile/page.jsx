@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button, Checkbox, FormControlLabel, Stack } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext.jsx";
 import useAuthServices from "../../services/auth.jsx";
-import Loading from "../../components/Loading/Loading.jsx";
+import Loading from "../../components/loading/Loading.jsx";
 import styles from "./page.module.css";
 import { FiLogOut, FiClock, FiCheckCircle, FiXCircle } from "react-icons/fi";
 import Typography from '@mui/material/Typography';

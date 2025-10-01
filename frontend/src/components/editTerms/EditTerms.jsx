@@ -15,7 +15,7 @@
     Alert,
   } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext";
-import Loading from "../Loading/Loading";
+import Loading from "../loading/Loading.jsx";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";

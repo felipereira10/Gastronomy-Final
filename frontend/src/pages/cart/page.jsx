@@ -1,28 +1,29 @@
 import { useState } from "react"
 import { useCartContext } from "../../contexts/useCartContext"
 import styles from './page.module.css'
-import { LuMinus } from 'react-icons/lu'
 import { FiMinus } from "react-icons/fi";
 import ConfirmOrderPopup from "../../components/confirmOrderPopup/confirmOrderPopup"
 import orderServices from "../../services/order"
+import { useNavigate } from "react-router-dom"
 
 export default function Cart() {
 
     const { cartItems, updateCartItems, removeFromCart, clearCart } = useCartContext()
     const [confirmPopupOpen, setConfirmPopupOpen] = useState(false)
+    const navigate = useNavigate()
     const { sendOrder } = orderServices()
 
     const handleChangeItemQty = (mode, itemId) => {
         const updatedCartItem = cartItems.map((item) => {
             if(item._id === itemId) {
                 if(mode === 'less' && item.quantity > 1) {
-                    item.quantity -= 1 
+                    item.quantity -= 1
                 } else if (mode === 'more') {
                     item.quantity += 1
                 }
             }
 
-            return item 
+            return item
         })
 
         updateCartItems(updatedCartItem)
@@ -31,6 +32,10 @@ export default function Cart() {
     const handleOpenPopup = (e) => {
         e.preventDefault()
         setConfirmPopupOpen(!confirmPopupOpen)
+    }
+
+    const handleReturnToPlates = () => {
+        navigate('/plates')
     }
 
     const handleConfirmOrder = (orderData) => {
@@ -46,9 +51,9 @@ export default function Cart() {
 
     if(!cartItems.length) {
         return(
-            <div> 
-                <h1>Your cart is empty... :/</h1>
-                <button>See our specialities!</button>
+            <div className={styles.pageContainer}> 
+                <h1 className={styles.title}>Your cart is empty... :/</h1>
+                <button className={styles.platesBtn} onClick={handleReturnToPlates}>See our specialities!</button>
             </div>
         )
     }
@@ -56,7 +61,7 @@ export default function Cart() {
     return (
         <>        
             <div className={styles.pageContainer}>
-                <h1>Your items:</h1>
+                <h1 className={styles.title}>Your items:</h1>   
                 <section>
                     <div className={styles.itemsListContainer}>
                         {cartItems.map((item) => (

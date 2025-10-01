@@ -14,7 +14,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext";
-import Loading from "../../components/Loading/Loading.jsx";
+import Loading from "../../components/loading/Loading.jsx";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";

@@ -51,3 +51,127 @@
   font-size: 2.5rem;
   color: #ffaa00;
 }
+
+/* Specialties Section */
+.specialties {
+  margin-top: 5rem;
+  padding: 3rem 1.5rem;
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.specialties h2 {
+  font-size: 2rem;
+  color: #004d4d;
+  margin-bottom: 2rem;
+}
+
+.specialties-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.specialty {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.specialty:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.specialty-icon {
+  font-size: 2.2rem;
+  color: #ffaa00;
+  margin-bottom: 1rem;
+}
+
+.specialty h3 {
+  font-size: 1.3rem;
+  color: #005555;
+  margin-bottom: 0.8rem;
+}
+
+.specialty p {
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Contact / Visit Us Section */
+.contact-home {
+  margin-top: 5rem;
+  padding: 3rem 1.5rem;
+  background: #004d4d;
+  color: #fff;
+  border-radius: 1rem;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.contact-home h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #ffaa00;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-size: 1.1rem;
+}
+
+.contact-info p {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #fff;
+}
+
+.contact-info svg {
+  color: #ffaa00;
+  font-size: 1.3rem;
+}
+
+.contact-btn {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.9rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #004d4d;
+  background: #ffaa00;
+  border-radius: 2rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.contact-btn:hover {
+  background: #ffb733;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .home-title {
+    font-size: 2.5rem;
+  }
+
+  .card-container {
+    grid-template-columns: 1fr;
+  }
+
+  .specialties-container {
+    grid-template-columns: 1fr;
+  }
+}

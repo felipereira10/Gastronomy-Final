@@ -1,11 +1,12 @@
 import platesServices from "../../services/plates";
 import { useEffect, useState } from "react";
-import Loading from "../../components/Loading/Loading.jsx";
+import Loading from "../../components/loading/Loading.jsx";
 // import PlateCard from "../../components/plateCard/plateCard";
 import PlateGrid from "../../components/plateGrid/plateGrid.jsx";
 import styles from './page.module.css';
 import PlatePopup from "../../components/platePopup/platePopup.jsx";
 import { useCartContext } from "../../contexts/useCartContext.jsx";
+import PlateCard from "../../components/plateCard/plateCard.jsx";   
 
 export default function Plates() {
 
@@ -36,10 +37,6 @@ export default function Plates() {
         return <Loading />;
     }
 
-    if (platesLoading) {
-        return <Loading />;
-    }
-
     return (
         <>
         {/* Renderize o grid UMA vez, passando a lista e a função de seleção */}
@@ -52,6 +49,12 @@ export default function Plates() {
             onAddToCart={handleAddToCart}
             />
         )}
+
+        {/* <div>
+            {platesList.map((plate) => (
+                <PlateCard plateData={plate} key={plate.id} />
+            ))}
+        </div> */}
         </>
     );
     }

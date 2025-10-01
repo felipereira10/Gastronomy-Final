@@ -1,11 +1,12 @@
 import './home.css';
-import { FaUtensils, FaLeaf, FaSmile } from 'react-icons/fa';
+import { FaUtensils, FaLeaf, FaSmile, FaWineGlassAlt, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 export default function Home() {
   return (
     <div className="home-wrapper">
-      <motion.h1 
+      {/* Título */}
+      <motion.h1
         className="home-title"
         initial={{ opacity: 0, y: -40 }}
         animate={{ opacity: 1, y: 0 }}
@@ -14,8 +15,9 @@ export default function Home() {
         Welcome to My Gastronomy
       </motion.h1>
 
+      {/* Cards principais */}
       <div className="card-container">
-        <motion.div 
+        <motion.div
           className="card"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -28,7 +30,7 @@ export default function Home() {
           </p>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="card"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -41,7 +43,7 @@ export default function Home() {
           </p>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="card"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -54,6 +56,49 @@ export default function Home() {
           </p>
         </motion.div>
       </div>
+
+      {/* Nova seção: Destaques */}
+      <motion.section
+        className="specialties"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+      >
+        <h2>Our Specialties</h2>
+        <div className="specialties-container">
+          <div className="specialty">
+            <FaWineGlassAlt className="specialty-icon" />
+            <h3>Fine Wines</h3>
+            <p>Exclusive wine selection curated to pair with every dish.</p>
+          </div>
+          <div className="specialty">
+            <FaUtensils className="specialty-icon" />
+            <h3>Chef’s Specials</h3>
+            <p>Unique seasonal dishes prepared with passion and precision.</p>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Nova seção: Localização / Contato */}
+      <motion.section
+        className="contact-home"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+      >
+        <div className="contact-home">
+          <h2>Visit Us</h2>
+          <div className="contact-info">
+            <p><FaUtensils /> Av. Paulista, 1000 - São Paulo</p>
+            <p><FaLeaf /> Open: Mon-Sun, 10:00 - 23:00</p>
+            <p><FaSmile /> Phone: (11) 99999-9999</p>
+          </div>
+          <a href="mailto:reservas@mygastronomy.com" className="contact-btn">
+            Reserve a Table
+          </a>
+        </div>
+      </motion.section>
     </div>
+
   );
 }

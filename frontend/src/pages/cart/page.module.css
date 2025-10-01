@@ -7,8 +7,11 @@
 .itemContainer img {
     width: 200px;
     height: 100%;
-    border-radius: 1em;
     object-fit: cover;
+    border-width: 3px;
+    border-style: solid;
+    border-color: #004643;
+    border-radius: 1em;
 }
 
 .itemsListContainer {
@@ -63,4 +66,31 @@
     padding: 10px;
     margin-bottom: 20px;
     border-radius: 10px;
+}
+
+.platesBtn {
+    margin-top: 10em;
+    align-self: flex-center;
+    background-color: #004643 !important;
+    color: white !important;
+    font-weight: bold;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    align-items: center;
+}
+
+.platesBtn:hover, .rmvBtn:hover, .confirmBtn:hover {
+    background-color: #48c098 !important;
+    cursor: pointer;
+    color: #004643 !important;
+    border-radius: 18px;
+}
+
+.title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #004643;
+    text-align: center;
+    margin-top: 1em;
 }

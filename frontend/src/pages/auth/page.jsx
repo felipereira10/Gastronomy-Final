@@ -16,7 +16,7 @@ import styles from './page.module.css';
 import { useNavigate } from "react-router-dom";
 import useAuthServices from "../../services/auth";
 import { useAuth } from '../../contexts/AuthContext';
-import Loading from "../../components/Loading/Loading.jsx";
+import Loading from "../../components/loading/Loading.jsx";
 import { Link } from "react-router-dom";
 
 export default function Auth() {

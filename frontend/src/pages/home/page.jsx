@@ -1,6 +1,7 @@
 import './home.css';
 import { FaUtensils, FaLeaf, FaSmile, FaWineGlassAlt, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import ChatWidget from '../../components/Chat/ChatWidget.jsx';
 
 export default function Home() {
   return (
@@ -98,6 +99,9 @@ export default function Home() {
           </a>
         </div>
       </motion.section>
+
+      {/* Componente Chat Widget - Flutuante no canto */}
+      <ChatWidget />
     </div>
 
   );

@@ -859,10 +859,13 @@ export default function Profile() {
 
       {/* 🍽️ Pedidos */}
       <div className={styles.ordersContainer}>
+        <h1>Your Orders:</h1> 
         {orders.length > 0 ? (
           orders.map((order) => {
             const statusInfo = statusMap[order.pickupStatus] || {};
+            <h1>Your Orders:</h1>
             return (
+              <h1>Your Orders:</h1>,
               <div key={order._id} className={styles.orderContainer}>
                 <p className={`${styles.pickupStatus} ${statusInfo.className || ""}`}>
                   {statusInfo.icon} {order.pickupStatus || "Unknown"}
@@ -871,7 +874,7 @@ export default function Profile() {
                 {order.orderItems.map((item) => (
                   <div key={item._id}>
                     <h4>{item.itemDetails[0]?.name}</h4>
-                    <p>Quantidade: {item.quantity}</p>
+                    <p>Quantity: {item.quantity}</p>
                   </div>
                 ))}
               </div>

@@ -1,0 +1,19 @@
+# Framework web
+fastapi==0.104.1
+uvicorn==0.24.0
+
+# IA e processamento
+langchain==0.0.346
+faiss-cpu==1.7.4
+sentence-transformers==2.2.2
+transformers==4.35.2
+torch==2.1.1
+accelerate==0.24.1
+
+# Processamento de documentos
+pypdf2==3.0.1
+python-docx==1.1.0
+pydantic==2.5.0
+
+# Utilitários
+python-multipart==0.0.6
